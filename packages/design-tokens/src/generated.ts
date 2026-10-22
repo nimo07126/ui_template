@@ -1,0 +1,126 @@
+/* Generated from tokens.json. Do not edit directly. */
+export const tokens = {
+  "color": {
+    "canvas": "#F2F4F8",
+    "surface": "#FFFFFF",
+    "surfaceSubtle": "#F7F8FB",
+    "surfaceMuted": "#E9EDF3",
+    "ink": "#252A36",
+    "inkSoft": "#454D5E",
+    "muted": "#636D81",
+    "mutedSoft": "#667084",
+    "line": "#E2E6ED",
+    "lineStrong": "#CFD5E0",
+    "accent": "#7669C7",
+    "accentHover": "#6759B8",
+    "accentSoft": "#E9E5F6",
+    "accentInk": "#574A9C",
+    "success": "#316D5B",
+    "successSoft": "#E7F2ED",
+    "warning": "#805A25",
+    "warningSoft": "#F5EFDF",
+    "danger": "#A64D56",
+    "dangerSoft": "#F8EDEF",
+    "previewCanvas": "#F8F9FC",
+    "previewRail": "#F0F1F8",
+    "previewSelected": "#E9E5F6",
+    "focusRing": "#9C91DF"
+  },
+  "space": {
+    "0": "0rem",
+    "1": "0.25rem",
+    "2": "0.5rem",
+    "3": "0.75rem",
+    "4": "1rem",
+    "5": "1.25rem",
+    "6": "1.5rem",
+    "8": "2rem",
+    "10": "2.5rem",
+    "12": "3rem",
+    "16": "4rem",
+    "20": "5rem",
+    "24": "6rem",
+    "half": "0.125rem"
+  },
+  "radius": {
+    "sm": "0.5rem",
+    "md": "0.75rem",
+    "lg": "1rem",
+    "xl": "1.375rem",
+    "2xl": "1.75rem",
+    "pill": "999px"
+  },
+  "type": {
+    "family": {
+      "sans": "-apple-system, BlinkMacSystemFont, \"Segoe UI\", \"PingFang SC\", \"Hiragino Sans GB\", \"Microsoft YaHei\", sans-serif"
+    },
+    "size": {
+      "xs": "0.75rem",
+      "sm": "0.875rem",
+      "md": "1rem",
+      "lg": "1.125rem",
+      "xl": "1.375rem",
+      "2xl": "1.75rem",
+      "3xl": "2.25rem",
+      "display": "3.25rem",
+      "displayLarge": "6rem",
+      "displayMedium": "3.25rem",
+      "displaySmall": "2.25rem",
+      "headingXxl": "2.5rem",
+      "headingXl": "2.25rem",
+      "headingLarge": "2rem",
+      "headingMedium": "1.75rem",
+      "headingSmall": "1.5rem",
+      "headingXs": "1.25rem",
+      "bodyLarge": "1.125rem",
+      "bodyMedium": "1rem",
+      "bodySmall": "0.875rem",
+      "bodyXs": "0.75rem",
+      "labelLarge": "0.875rem",
+      "labelMedium": "0.8125rem",
+      "labelSmall": "0.75rem"
+    },
+    "weight": {
+      "regular": "400",
+      "medium": "500",
+      "semibold": "600",
+      "bold": "700"
+    },
+    "line": {
+      "tight": "1.15",
+      "heading": "1.35",
+      "body": "1.7",
+      "compact": "1.45",
+      "displayLarge": "7rem",
+      "displayMedium": "4rem",
+      "displaySmall": "2.75rem",
+      "headingXxl": "3.25rem",
+      "headingXl": "2.75rem",
+      "headingLarge": "2.5rem",
+      "headingMedium": "2.25rem",
+      "headingSmall": "2rem",
+      "headingXs": "1.75rem",
+      "bodyLarge": "1.75rem",
+      "bodyMedium": "1.5rem",
+      "bodySmall": "1.375rem",
+      "bodyXs": "1.125rem",
+      "labelLarge": "1.25rem",
+      "labelMedium": "1.125rem",
+      "labelSmall": "1rem"
+    },
+    "tracking": {
+      "tight": "-0.04em",
+      "normal": "0"
+    }
+  },
+  "shadow": {
+    "soft": "0 1px 2px rgb(37 42 54 / 4%), 0 12px 32px rgb(37 42 54 / 5%)",
+    "float": "0 10px 30px rgb(37 42 54 / 10%)"
+  },
+  "layout": {
+    "sidebarWidth": "15.5rem",
+    "contentMax": "82rem",
+    "controlHeight": "2.875rem",
+    "previewMinHeight": "29rem"
+  }
+} as const;
