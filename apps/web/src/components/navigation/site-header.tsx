@@ -21,7 +21,7 @@ const pageTitles: Record<string, string> = {
   "/colors": "颜色系统",
   "/typography": "字体层级",
   "/spacing": "间距与形状",
-  "/components": "常用控件",
+  "/components": "组件预览",
 };
 
 export function SiteHeader() {

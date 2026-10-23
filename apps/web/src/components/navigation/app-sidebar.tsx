@@ -29,7 +29,7 @@ const navigation = [
   { title: "颜色系统", url: "/colors", icon: Palette },
   { title: "字体层级", url: "/typography", icon: Type },
   { title: "间距与形状", url: "/spacing", icon: Ruler },
-  { title: "常用控件", url: "/components", icon: Component },
+  { title: "组件预览", url: "/components", icon: Component },
 ];
 
 export function AppSidebar() {

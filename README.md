@@ -37,7 +37,7 @@ packages/
 | `/colors` | 三套浅色、一套深色主题与可编辑的功能颜色矩阵 |
 | `/typography` | 字体分类与完整参数 |
 | `/spacing` | 间距、圆角与形状 |
-| `/components` | shadcn/ui 组件变体示例 |
+| `/components` | 33 个 shadcn/ui 组件示例，按 6 类区块预览 |
 
 侧栏使用 shadcn/ui Sidebar；通用控件直接引用 `src/components/ui/` 中的 shadcn 组件。
 
@@ -80,3 +80,14 @@ packages/
 切换和编辑仅做全站预览，页面导航保留草稿，刷新恢复已保存状态。点击「保存主题」将当前选择及四套主题的所有自定义值保存至**当前浏览器的 localStorage**，键为 `chengxu.theme.v1`，不会修改仓库文件或跨设备同步。浏览器存储不可用时显示错误并保留草稿；可通过「导出配置」下载包含自定义值及 CSS 变量的 JSON。根布局在首屏绘制前应用保存的主题，避免深浅主题闪烁。
 
 `pnpm test:themes` 检查角色完整性、派生依赖、覆盖与恢复、持久化校验及启动恢复。
+
+## 组件预览库
+
+`/components` 按基础操作、表单输入、导航切换、数据展示、反馈状态、浮层交互分为六个区块，提供 33 个组件示例，支持中英文名称/用途搜索、分类筛选、四套主题预览、复制引用与官方文档跳转。示例操作只在本地演示，不会请求业务接口。
+
+- 通用组件：`apps/web/src/components/ui/`，保持当前 `base-nova` / Base UI 配置。
+- 示例与分类：`apps/web/src/components/theme-showcase/component-demos.tsx`；添加示例时在 `componentExamples` 注册，分类计数会自动更新。
+- 预览容器与筛选：`component-samples.tsx`；布局样式：`component-samples.module.css`。
+- 源码于 2026-10-23 对照 [shadcn 官方 registry](https://ui.shadcn.com/r/styles/base-nova/button.json) 同步，当前 CLI 为 4.22.1。图标使用 Lucide，内部引用改为项目别名；按钮、输入框和 Sheet 保留已有主题定制。
+- 新增组件通过 `--theme-control-*`、`--theme-field-*`、`--theme-progress-*`、`--theme-segment-*`、`--theme-backdrop` 和既有 shadcn 变量读取主题，不引入默认品牌色。后续使用 `pnpm --dir apps/web exec shadcn add <组件名> --dry-run` 检查上游更新，合入时保留本项目的语义颜色映射。
+- Toast 使用当前 Base UI 版 `Toaster` 与 `toast.add(...)`；在使用通知的页面或布局挂载一次 `Toaster`。
