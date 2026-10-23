@@ -1,16 +1,16 @@
-import type { CSSProperties, ReactNode } from "react";
-import type { Metadata } from "next";
+import { AppSidebar } from "@/shared/layout/app-sidebar";
+import { SiteHeader } from "@/shared/layout/site-header";
+import { ThemeProvider } from "@/shared/providers/theme-provider";
+import { SidebarInset, SidebarProvider } from "@/shared/ui/sidebar";
+import { TooltipProvider } from "@/shared/ui/tooltip";
 import { tokens, tokenVariables } from "@template/design-tokens";
 import {
   DEFAULT_THEME,
   themeBootScript,
   themeStyle,
 } from "@template/design-tokens/themes";
-import { ThemeProvider } from "@/components/theme-editor/theme-provider";
-import { AppSidebar } from "@/components/navigation/app-sidebar";
-import { SiteHeader } from "@/components/navigation/site-header";
-import { SidebarInset, SidebarProvider } from "@/components/ui/sidebar";
-import { TooltipProvider } from "@/components/ui/tooltip";
+import type { Metadata } from "next";
+import type { CSSProperties, ReactNode } from "react";
 import "./tailwind.css";
 
 export const metadata: Metadata = {

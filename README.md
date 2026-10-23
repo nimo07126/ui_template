@@ -16,11 +16,19 @@ pnpm dev
 ```text
 apps/
   web/                         Next.js App Router 展示站
-    src/app/                   页面入口、metadata 与 Tailwind 入口
-    src/components/layout/     SectionShared 等公共布局组件
-    src/components/navigation/  shadcn Sidebar 与当前页面头部
-    src/components/ui/         shadcn/ui 可复用组件
-    src/components/theme-showcase/  页面专属主题样例区块
+    src/app/
+      page.tsx                 首页结构与组件组合
+      components/              首页私有组件
+      colors/components/       颜色工作台、矩阵与编辑器
+      typography/components/   字体数据、规范展示与样例行
+      spacing/components/      间距与圆角面板
+      showcase/components/     组件预览、筛选、分类示例
+    src/shared/
+      layout/                  公共侧栏、页头与 SectionShared
+      providers/               跨页面共享的主题状态
+      ui/                      shadcn/ui 基础组件库
+      hooks/                   公共 hooks
+      lib/                     公共工具
 packages/
   design-tokens/
     tokens.json                唯一设计 token 源
@@ -37,11 +45,13 @@ packages/
 | `/colors` | 三套浅色、一套深色主题与可编辑的功能颜色矩阵 |
 | `/typography` | 字体分类与完整参数 |
 | `/spacing` | 间距、圆角与形状 |
-| `/components` | 33 个 shadcn/ui 组件示例，按 6 类区块预览 |
+| `/showcase` | 33 个 shadcn/ui 组件示例，按 6 类区块预览 |
 
-侧栏使用 shadcn/ui Sidebar；通用控件直接引用 `src/components/ui/` 中的 shadcn 组件。
+侧栏使用 shadcn/ui Sidebar；通用控件直接引用 `src/shared/ui/` 中的 shadcn 组件。旧地址 `/components` 永久重定向到 `/showcase`。
 
-页面专属的展示内容和数据放在对应路由的 `page.tsx` 中：首页、字体页与间距页直接编写页面内容，不通过集中组件按参数切换。`components/layout/section-shared.tsx` 统一区块布局与响应式间距，字体页与间距页直接组合使用；页面自行提供 `id` 和 `aria-labelledby`。可复用的展示与交互组件（如 `TypeSpecimenRow`）保留在 `components/`。颜色工作台和组件预览库的状态与交互保留在独立客户端组件中，由对应的页面入口调用。
+页面采用“总分”结构：`page.tsx` 只组合布局、Provider 和内容组件；标题、说明、数据展示和业务交互由当前路由 `components/` 下的组件负责。页面私有的数据、类型、工具和状态放在同一目录，仅跨页面复用的代码进入 `shared/`。组件文件夹内不放 `page.tsx` 或 `route.ts`，普通组件不会成为公开路由。
+
+公共布局统一从 `shared/layout/` 引用；页面专属状态由路由内的 Provider 管理，全站主题状态保留在 `shared/providers/`。源码按职责拆分，当前 `apps/web/src` 下单个 TypeScript/TSX 文件均不超过 300 行；组件示例按六类拆分，侧栏基础实现按状态、框架、结构和菜单拆分。
 
 ## Token 约定
 
@@ -87,11 +97,11 @@ packages/
 
 ## 组件预览库
 
-`/components` 按基础操作、表单输入、导航切换、数据展示、反馈状态、浮层交互分为六个区块，提供 33 个组件示例，支持中英文名称/用途搜索、分类筛选、四套主题预览、复制引用与官方文档跳转。示例操作只在本地演示，不会请求业务接口。
+`/showcase` 按基础操作、表单输入、导航切换、数据展示、反馈状态、浮层交互分为六个区块，提供 33 个组件示例，支持中英文名称/用途搜索、分类筛选、四套主题预览、复制引用与官方文档跳转。示例操作只在本地演示，不会请求业务接口。
 
-- 通用组件：`apps/web/src/components/ui/`，保持当前 `base-nova` / Base UI 配置。
-- 示例与分类：`apps/web/src/components/theme-showcase/component-demos.tsx`；添加示例时在 `componentExamples` 注册，分类计数会自动更新。
-- 预览容器与筛选：`component-samples.tsx`；布局样式直接写在对应 JSX 节点的 Tailwind 类中。
+- 通用组件：`apps/web/src/shared/ui/`，保持当前 `base-nova` / Base UI 配置。
+- 示例与分类：`apps/web/src/app/showcase/components/demos/` 按六个分类分别维护示例及注册信息，`component-registry.ts` 统一汇总，分类计数自动更新。
+- 预览容器与筛选：`app/showcase/components/component-preview.tsx`、`showcase-toolbar.tsx` 和 `showcase-context.tsx`；布局样式直接写在对应 JSX 节点的 Tailwind 类中。
 - 源码于 2026-10-23 对照 [shadcn 官方 registry](https://ui.shadcn.com/r/styles/base-nova/button.json) 同步，当前 CLI 为 4.22.1。图标使用 Lucide，内部引用改为项目别名；按钮、输入框和 Sheet 保留已有主题定制。
 - 新增组件通过 `--theme-control-*`、`--theme-field-*`、`--theme-progress-*`、`--theme-segment-*`、`--theme-backdrop` 和既有 shadcn 变量读取主题，不引入默认品牌色。后续使用 `pnpm --dir apps/web exec shadcn add <组件名> --dry-run` 检查上游更新，合入时保留本项目的语义颜色映射。
 - Toast 使用当前 Base UI 版 `Toaster` 与 `toast.add(...)`；在使用通知的页面或布局挂载一次 `Toaster`。
