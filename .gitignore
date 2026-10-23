@@ -5,3 +5,7 @@ build/
 *.tsbuildinfo
 .DS_Store
 pnpm-debug.log*
+.expo/
+dist/
+apps/mobile/ios/
+apps/mobile/android/

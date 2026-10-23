@@ -1,5 +1,16 @@
 packages:
-  - "apps/*"
-  - "packages/*"
+  - 'apps/*'
+  - 'packages/*'
 allowBuilds:
   unrs-resolver: false
+# Keep Next's ambient React types bound to the Web app in this mixed RN workspace.
+packageExtensions:
+  next:
+    peerDependencies:
+      '@types/react': '*'
+      '@types/react-dom': '*'
+    peerDependenciesMeta:
+      '@types/react':
+        optional: true
+      '@types/react-dom':
+        optional: true

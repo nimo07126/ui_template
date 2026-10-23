@@ -1,6 +1,6 @@
 # 澄序 · 设计主题样板
 
-一套清晰、克制但不沉闷的界面主题示例。当前交付响应式 Web 多页面展示站；Expo 移动端将在主题方向确认后扩展，并复用同一份设计 token。
+一套清晰、克制但不沉闷的界面主题示例。Web 展示站与 Expo 移动端分别位于 `apps/web`、`apps/mobile`，共用一份设计 token，各自维护页面、组件和构建配置。
 
 ## 快速开始
 
@@ -9,12 +9,20 @@ pnpm install
 pnpm dev
 ```
 
-开发服务默认运行在 `http://localhost:3000`。`pnpm dev` 会先从 token 源文件生成 TypeScript token 和主题变量，再启动 Next.js。
+Web 开发服务默认运行在 `http://localhost:3399`。`pnpm dev` 会先从 token 源文件生成 TypeScript token 和主题变量，再启动 Next.js。
+
+移动端启动：`pnpm dev:mobile`；本地构建并启动 iOS / Android：`pnpm mobile:ios` / `pnpm mobile:android`。首次原生运行需要 Xcode 或 Android SDK；使用开发构建连接 Metro。浏览器辅助预览：`pnpm mobile:web`（`http://localhost:8081`）。兼容版本、目录与构建说明见 [移动端文档](apps/mobile/README.md)。
 
 ## 项目结构
 
 ```text
 apps/
+  mobile/                      Expo Router + NativeWind + HeroUI Native
+    src/app/                   路由入口，仅组合布局和功能页面
+      (drawer)/(tabs)/          首页、搜索、我的三个底部页面
+      design/                  颜色、字体、间距、组件；Stack push 与返回
+    src/features/              按页面职责组织内容和交互
+    src/shared/                公共导航、主题、本机状态与 UI
   web/                         Next.js App Router 展示站
     src/app/
       page.tsx                 首页结构与组件组合
@@ -33,19 +41,19 @@ packages/
   design-tokens/
     tokens.json                唯一设计 token 源
     scripts/build.mjs          生成 TypeScript token 与主题变量
-    src/generated.ts           自动生成，供应用与未来 Expo 端复用
+    src/generated.ts           自动生成，供 Web 与 Expo 端复用
     src/themes.ts              语义角色、派生规则与全站组件映射
 ```
 
 ## 页面路由
 
-| 路径 | 内容 |
-| --- | --- |
-| `/` | 主题概览与工作台样例 |
-| `/colors` | 三套浅色、一套深色主题与可编辑的功能颜色矩阵 |
-| `/typography` | 字体分类与完整参数 |
-| `/spacing` | 间距、圆角与形状 |
-| `/showcase` | 33 个 shadcn/ui 组件示例，按 6 类区块预览 |
+| 路径          | 内容                                         |
+| ------------- | -------------------------------------------- |
+| `/`           | 主题概览与工作台样例                         |
+| `/colors`     | 三套浅色、一套深色主题与可编辑的功能颜色矩阵 |
+| `/typography` | 字体分类与完整参数                           |
+| `/spacing`    | 间距、圆角与形状                             |
+| `/showcase`   | 33 个 shadcn/ui 组件示例，按 6 类区块预览    |
 
 侧栏使用 shadcn/ui Sidebar；通用控件直接引用 `src/shared/ui/` 中的 shadcn 组件。旧地址 `/components` 永久重定向到 `/showcase`。
 
@@ -64,13 +72,17 @@ packages/
 
 ## 常用命令
 
-| 命令 | 作用 |
-| --- | --- |
-| `pnpm dev` | 生成 token 并启动 Web 开发服务器 |
-| `pnpm build` | 生成 token 并构建 Web 生产版本 |
-| `pnpm lint` | 检查 Web 代码规范 |
-| `pnpm typecheck` | 执行 TypeScript 检查 |
-| `pnpm tokens:check` | 校验 token 生成结果 |
+| 命令                                      | 作用                                               |
+| ----------------------------------------- | -------------------------------------------------- |
+| `pnpm dev`                                | 生成 token 并启动 Web 开发服务器                   |
+| `pnpm build`                              | 生成 token 并构建 Web 生产版本                     |
+| `pnpm dev:mobile`                         | 启动 Expo 开发构建的 Metro 服务                    |
+| `pnpm mobile:ios` / `pnpm mobile:android` | 本地构建并运行原生应用                             |
+| `pnpm mobile:web`                         | 启动移动端浏览器辅助预览                           |
+| `pnpm build:mobile`                       | 导出 iOS、Android、Web 生产 bundle（不生成安装包） |
+| `pnpm lint`                               | 检查 Web 与 Mobile 代码规范                        |
+| `pnpm typecheck`                          | 检查 Web 与 Mobile TypeScript                      |
+| `pnpm tokens:check`                       | 校验 token 生成结果                                |
 
 ## 视觉规则
 
@@ -78,7 +90,6 @@ packages/
 - 使用系统中文无衬线字体，依靠字号、字重和行高形成阅读层级。
 - 间距以 4px 为基础递增，圆角按控件与容器层级区分。
 - 优先用对齐、留白和语义表达组织信息；装饰不承担内容本身的任务。
-
 
 ## 主题工作台
 

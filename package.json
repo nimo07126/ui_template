@@ -6,9 +6,14 @@
     "tokens:build": "node packages/design-tokens/scripts/build.mjs",
     "tokens:check": "node packages/design-tokens/scripts/build.mjs --check",
     "dev": "pnpm tokens:build && pnpm --filter @template/web dev",
+    "dev:mobile": "pnpm tokens:build && pnpm --filter @template/mobile dev",
+    "mobile:ios": "pnpm tokens:build && pnpm --filter @template/mobile ios",
+    "mobile:android": "pnpm tokens:build && pnpm --filter @template/mobile android",
+    "mobile:web": "pnpm tokens:build && pnpm --filter @template/mobile web",
+    "build:mobile": "pnpm tokens:build && pnpm --filter @template/mobile export",
     "build": "pnpm tokens:build && pnpm --filter @template/web build",
-    "lint": "pnpm --filter @template/web lint",
-    "typecheck": "pnpm --filter @template/web typecheck",
+    "lint": "pnpm --filter './apps/*' lint",
+    "typecheck": "pnpm --filter './apps/*' typecheck",
     "test:themes": "node --test packages/design-tokens/tests/themes.test.mjs"
   }
 }
