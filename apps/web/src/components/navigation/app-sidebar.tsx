@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { Badge } from "@/components/ui/badge";
+import { version } from "../../../package.json";
 import {
   Sidebar,
   SidebarContent,
@@ -21,7 +21,6 @@ import {
   LayoutDashboard,
   Palette,
   Ruler,
-  Sparkles,
   Type,
 } from "lucide-react";
 
@@ -38,9 +37,9 @@ export function AppSidebar() {
 
   return (
     <Sidebar collapsible="icon" variant="inset">
-      <SidebarHeader className="gap-3 px-3 py-4">
-        <Link className="flex items-center gap-3 px-1" href="/" aria-label="澄序设计主题首页">
-          <span className="grid size-9 shrink-0 place-items-center rounded-xl bg-foreground text-sm font-semibold text-background">
+      <SidebarHeader className="px-4 py-6 group-data-[collapsible=icon]:px-0">
+        <Link className="flex min-h-10 items-center gap-3 group-data-[collapsible=icon]:justify-center" href="/" aria-label="澄序设计主题首页">
+          <span className="grid size-8 shrink-0 place-items-center rounded-xl bg-foreground text-sm font-semibold text-background">
             澄
           </span>
           <span className="grid min-w-0 gap-0.5 group-data-[collapsible=icon]:hidden">
@@ -51,19 +50,20 @@ export function AppSidebar() {
       </SidebarHeader>
 
       <SidebarContent>
-        <SidebarGroup>
-          <SidebarGroupLabel>设计语言</SidebarGroupLabel>
+        <SidebarGroup className="px-3 py-2 group-data-[collapsible=icon]:px-0">
+          <SidebarGroupLabel className="mb-2 px-3 group-data-[collapsible=icon]:hidden">设计语言</SidebarGroupLabel>
           <SidebarGroupContent>
-            <SidebarMenu>
+            <SidebarMenu className="gap-2">
               {navigation.map((item) => (
                 <SidebarMenuItem key={item.url}>
                   <SidebarMenuButton
+                    className="h-11 gap-3 rounded-lg px-3 group-data-[collapsible=icon]:mx-auto group-data-[collapsible=icon]:justify-center"
                     isActive={pathname === item.url}
-                    render={<Link aria-current={pathname === item.url ? "page" : undefined} href={item.url} />}
+                    render={<Link aria-current={pathname === item.url ? "page" : undefined} aria-label={item.title} href={item.url} />}
                     tooltip={item.title}
                   >
                     <item.icon aria-hidden="true" />
-                    <span>{item.title}</span>
+                    <span className="group-data-[collapsible=icon]:hidden">{item.title}</span>
                   </SidebarMenuButton>
                 </SidebarMenuItem>
               ))}
@@ -72,18 +72,8 @@ export function AppSidebar() {
         </SidebarGroup>
       </SidebarContent>
 
-      <SidebarFooter className="p-3 group-data-[collapsible=icon]:items-center">
-        <div className="flex min-w-0 items-center gap-2 text-xs text-muted-foreground">
-          <span className="size-2 shrink-0 rounded-full bg-[var(--ds-color-success)]" />
-          <span className="truncate group-data-[collapsible=icon]:hidden">主题变量已同步</span>
-          <Badge className="ml-auto group-data-[collapsible=icon]:hidden" variant="secondary">v0.1</Badge>
-        </div>
-        <div className="mt-3 flex items-start gap-2 rounded-lg border border-sidebar-border bg-background/70 p-3 group-data-[collapsible=icon]:hidden">
-          <Sparkles aria-hidden="true" className="mt-0.5 size-4 shrink-0 text-primary" />
-          <p className="text-xs leading-relaxed text-muted-foreground">
-            把复杂留给系统，<br />把清晰留给使用者。
-          </p>
-        </div>
+      <SidebarFooter className="shrink-0 px-6 py-4 group-data-[collapsible=icon]:items-center group-data-[collapsible=icon]:px-0">
+        <span aria-label={`版本 ${version}`} className="text-xs tabular-nums text-muted-foreground">v{version}</span>
       </SidebarFooter>
       <SidebarRail />
     </Sidebar>

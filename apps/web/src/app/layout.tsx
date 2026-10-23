@@ -23,13 +23,20 @@ export default function RootLayout({ children }: Readonly<{ children: ReactNode 
     <html data-scroll-behavior="smooth" lang="zh-CN">
       <body>
         <TooltipProvider>
-          <SidebarProvider style={sidebarStyle}>
+          <SidebarProvider className="h-dvh min-h-0 overflow-hidden" style={sidebarStyle}>
             <AppSidebar />
-            <SidebarInset className="min-h-svh overflow-hidden">
+            <SidebarInset className="min-h-0 min-w-0 overflow-hidden">
               <SiteHeader />
-              <main className="mx-auto flex w-full max-w-[var(--layout-content-max)] flex-1 flex-col gap-8 px-5 py-8 md:px-8 md:py-10">
-                {children}
-              </main>
+              <div
+                aria-label="页面内容"
+                className="min-h-0 flex-1 overflow-y-auto overscroll-y-contain scroll-smooth scroll-pt-8 [scrollbar-gutter:stable]"
+                data-slot="page-scroll"
+                tabIndex={0}
+              >
+                <div className="mx-auto flex w-full min-w-0 max-w-[var(--layout-content-max)] flex-col gap-8 px-5 py-8 md:px-8 md:py-10">
+                  {children}
+                </div>
+              </div>
             </SidebarInset>
           </SidebarProvider>
         </TooltipProvider>
