@@ -1,7 +1,7 @@
 import assert from 'node:assert/strict';
 import { runInNewContext } from 'node:vm';
 import test from 'node:test';
-import { allTokens, isEditableColor, parseSavedTheme, resolveTheme, themes, themeBootScript, themeStyle } from '../src/themes.ts';
+import { allTokens, getThemeConcepts, isEditableColor, parseSavedTheme, resolveTheme, themes, themeBootScript, themeStyle } from '../src/themes.ts';
 
 test('every theme defines every semantic role with an acyclic dependency graph', () => {
   const keys = allTokens.map((token) => token.key);
@@ -62,4 +62,30 @@ test('boot restores saved mode and only valid known overrides before hydration',
 test('boot tolerates unavailable storage and corrupt saved data', () => {
   assert.doesNotThrow(() => runInNewContext(themeBootScript(), { localStorage: { getItem: () => { throw new Error('blocked'); } } }));
   assert.doesNotThrow(() => runInNewContext(themeBootScript(), { localStorage: { getItem: () => '{' } }));
+});
+
+
+test('concept palettes omit derived roles, linked roles, primitives and transparency', () => {
+  for (const theme of themes) {
+    const concepts = getThemeConcepts(theme.id, (value) => value.toLowerCase());
+    const roles = concepts.flatMap((concept) => concept.roles.map((role) => role.key));
+    assert.ok(roles.includes('background'));
+    assert.ok(roles.includes('accent'));
+    for (const key of ['white', 'black', 'snow', 'eclipse', 'accent-hover', 'accent-soft', 'button-primary', 'button-ghost']) assert.ok(!roles.includes(key), `${theme.id}/${key}`);
+    assert.ok(concepts.every((concept) => !concept.value.includes('var(') && !concept.value.includes('color-mix(') && concept.value !== 'transparent'));
+  }
+});
+test('concept palettes merge equivalent color formats and preserve their uses', () => {
+  const normalize = (value) => ['#fff', '#ffffff', 'rgb(255 255 255)'].includes(value.toLowerCase()) ? 'white' : value.toLowerCase();
+  const concepts = getThemeConcepts('studio', normalize, { background: '#FFF', foreground: '#FFFFFF', surface: 'rgb(255 255 255)' });
+  const white = concepts.filter((concept) => normalize(concept.value) === 'white');
+  assert.equal(white.length, 1);
+  for (const key of ['background', 'foreground', 'surface']) assert.ok(white[0].roles.some((role) => role.key === key));
+});
+test('concepts reflect independent custom colors and remove them after restoring a link', () => {
+  const normalize = (value) => value.toLowerCase();
+  const modified = getThemeConcepts('studio', normalize, { 'button-primary': '#123456' });
+  assert.ok(modified.some((concept) => concept.value === '#123456' && concept.roles.some((role) => role.key === 'button-primary')));
+  assert.ok(!getThemeConcepts('studio', normalize).some((concept) => concept.roles.some((role) => role.key === 'button-primary')));
+  assert.ok(!getThemeConcepts('reading', normalize).some((concept) => concept.value === '#123456'));
 });

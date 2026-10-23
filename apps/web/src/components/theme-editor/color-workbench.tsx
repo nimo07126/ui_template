@@ -2,7 +2,7 @@
 
 import { useState, type MouseEvent } from "react";
 import { ArrowDownToLine, ArrowUpRight, Check, CheckCheck, Circle, Moon, Palette, Pencil, RotateCcw, Search, Sun } from "lucide-react";
-import { allTokens, isEditableColor, resolveTheme, themes, themeStyle, tokenGroups, type ColorToken, type ThemeId } from "@template/design-tokens/themes";
+import { allTokens, getThemeConcepts, isEditableColor, resolveTheme, themes, themeStyle, tokenGroups, type ColorToken, type ThemeId } from "@template/design-tokens/themes";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Sheet, SheetContent, SheetDescription, SheetHeader, SheetTitle } from "@/components/ui/sheet";
@@ -20,7 +20,7 @@ function colorParts(value: string) {
   context.fillStyle = value;
   context.fillRect(0, 0, 1, 1);
   const [r, g, b, a] = context.getImageData(0, 0, 1, 1).data;
-  return { hex: `#${[r, g, b].map((n) => n.toString(16).padStart(2, "0")).join("")}`, opacity: Math.round(a / 255 * 100) };
+  return { hex: `#${[r, g, b].map((n) => n.toString(16).padStart(2, "0")).join("")}`, opacity: Math.round(a / 255 * 100), identity: a === 0 ? "transparent" : `${r},${g},${b},${a}` };
 }
 function colorWithOpacity(hex: string, opacity: number) {
   if (opacity === 100) return hex.toUpperCase();
@@ -46,6 +46,7 @@ export function ColorWorkbench() {
   const { activeId, overrides, savedAt, dirty, ready, message, selectTheme, editToken, saveTheme, discardPreview, resetTheme, exportTheme } = useThemeEditor();
   const [group, setGroup] = useState("all");
   const [query, setQuery] = useState("");
+  const [conceptView, setConceptView] = useState(false);
   const [lastLight, setLastLight] = useState<ThemeId>("studio");
   const [editing, setEditing] = useState<Editing | null>(null);
   const dark = activeId === "night";
@@ -123,7 +124,43 @@ export function ColorWorkbench() {
     </div>
     <p className={styles.feedback} role="status" aria-live="polite">{message}</p>
 
-    <div className={styles.matrixHeading}><div><h2>功能颜色矩阵</h2><p>同一功能，跨主题对照。色块均可点击编辑。</p></div><span>{foundCount} / {allTokens.length} 个角色</span></div>
+    <div className={styles.matrixHeading}>
+      <div><h2>功能颜色矩阵</h2><p>{conceptView ? "每套主题的独立基础色，合并相同颜色与用途，快速了解配色。" : "同一功能，跨主题对照。色块均可点击编辑。"}</p></div>
+      <div className={styles.matrixHeadingActions}>
+        {!conceptView && <span>{foundCount} / {allTokens.length} 个角色</span>}
+        <div className={styles.viewSwitch} role="group" aria-label="矩阵视图">
+          <button aria-pressed={!conceptView} onClick={() => setConceptView(false)}>功能角色</button>
+          <button aria-pressed={conceptView} onClick={() => setConceptView(true)}><Palette size={13} />颜色概念</button>
+        </div>
+      </div>
+    </div>
+    {conceptView ? <div className={styles.conceptGrid} data-view="concepts" data-dark={dark}>
+      {visibleThemes.map((theme) => {
+        const concepts = getThemeConcepts(theme.id, (value) => colorParts(value).identity, overrides[theme.id]);
+        return <section className={styles.conceptColumn} key={theme.id} data-concept-theme={theme.id} aria-label={`${theme.name}的颜色概念`}>
+          <div className={styles.conceptHeading}>
+            <button onClick={() => chooseTheme(theme.id)}>{theme.name}{theme.id === activeId && <Check size={12} />}</button>
+            <span>{concepts.length} 个独立颜色</span>
+            <p>{theme.subtitle}</p>
+          </div>
+          <div className={styles.conceptList}>
+            {concepts.map(({ value, roles }) => {
+              const primary = roles[0];
+              const usage = roles.map((role) => role.usage).join("；");
+              return <button className={styles.conceptColor} key={primary.key} data-theme-scope={theme.id} onClick={(event) => openEditor(event, theme.id, primary)} aria-label={`编辑${theme.name}的${primary.name}`} title={`${usage}\n${roles.map((role) => role.key).join("、")}`}>
+                <span className={styles.paintChecker}><span data-paint style={{ background: value }} /></span>
+                <span className={styles.conceptMeta}>
+                  <strong>{primary.name}{roles.length > 1 && <small>+{roles.length - 1} 用途</small>}</strong>
+                  <code>{value}</code>
+                  <span>{usage}</span>
+                </span>
+                <Pencil className={styles.editIcon} size={12} />
+              </button>;
+            })}
+          </div>
+        </section>;
+      })}
+    </div> : <>
     <div className={styles.filters}>
       <div className={styles.groupFilters} role="group" aria-label="颜色功能分类">
         <button aria-pressed={group === "all"} onClick={() => setGroup("all")}>全部</button>
@@ -155,7 +192,8 @@ export function ColorWorkbench() {
       </table>
       {!groups.length && <div className={styles.empty}><Search size={24} /><strong>没有匹配的颜色角色</strong><span>试试 background、按钮、输入或其他功能名称。</span><Button variant="outline" onClick={() => { setQuery(""); setGroup("all"); }}>清除筛选</Button></div>}
     </div>
-    <div className={styles.matrixFootnote}><span>自动派生的颜色跟随上游角色变化；单独修改后，可在编辑面板恢复关联。</span><span>{activeTheme.name} · {dark ? "深色" : "浅色"}</span></div>
+    </>}
+    <div className={styles.matrixFootnote}><span>{conceptView ? "各主题独立去重，仅展示有实际用途的独立色值；派生色、关联色和完全透明色不重复列出。" : "自动派生的颜色跟随上游角色变化；单独修改后，可在编辑面板恢复关联。"}</span><span>{activeTheme.name} · {dark ? "深色" : "浅色"}</span></div>
 
     <Sheet open={!!editing} onOpenChange={(open) => { if (!open) cancelEditor(); }}>
       <SheetContent className="w-full! overflow-y-auto sm:max-w-[420px]" showCloseButton>

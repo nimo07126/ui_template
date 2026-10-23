@@ -153,6 +153,25 @@ export function resolveTheme(id: ThemeId, overrides: Record<string, string> = {}
   return values;
 }
 
+export type ColorConcept = { value: string; roles: ColorToken[] };
+export function getThemeConcepts(id: ThemeId, colorIdentity: (value: string) => string, overrides: Record<string, string> = {}): ColorConcept[] {
+  const values = resolveTheme(id, overrides);
+  const concepts = new Map<string, ColorConcept>();
+  for (const group of tokenGroups) {
+    if (group.id === "primitive") continue;
+    for (const role of group.tokens) {
+      const value = values[role.key];
+      if (!isEditableColor(value)) continue;
+      const identity = colorIdentity(value);
+      if (identity === "transparent") continue;
+      const existing = concepts.get(identity);
+      if (existing) existing.roles.push(role);
+      else concepts.set(identity, { value, roles: [role] });
+    }
+  }
+  return [...concepts.values()];
+}
+
 // Bridge the semantic palette to both shadcn slots and the original showcase tokens.
 const aliases: Record<string, string> = {
   background: "background", foreground: "foreground", card: "surface", "card-foreground": "surface-foreground",
