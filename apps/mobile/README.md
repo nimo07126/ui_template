@@ -1,6 +1,6 @@
 # 澄序 · Mobile
 
-独立于 `apps/web` 的 Expo 应用，复用 `@template/design-tokens`。界面使用 NativeWind 工具类和真正的 HeroUI Native 组件，采用系统字体、iOS 分组列表、简洁导航和 4pt 间距。
+独立于 `apps/web` 的 Expo SDK 57 应用，复用 `@template/design-tokens`。界面使用 NativeWind 工具类和真正的 HeroUI Native 组件，采用系统字体、iOS 分组列表、简洁导航和 4pt 间距。
 
 ## 运行与构建
 
@@ -10,7 +10,8 @@
 pnpm install
 pnpm mobile:ios       # 首次本地构建并运行，需要完整 Xcode
 pnpm mobile:android   # 首次本地构建并运行，需要 Android SDK / 模拟器或设备
-pnpm dev:mobile       # 已安装开发构建后，启动 Metro（8081）
+pnpm dev:mobile       # Expo Go 扫码预览，需支持 SDK 57（8081）
+pnpm dev:mobile:client # 自定义开发客户端模式（8081）
 pnpm mobile:web       # 浏览器辅助预览（8081）
 pnpm build:mobile     # 导出三个平台的生产 bundle 到 apps/mobile/dist
 pnpm typecheck
@@ -18,6 +19,12 @@ pnpm lint
 ```
 
 原生工程由 Expo 按需生成，不提交 `ios/`、`android/`。iOS 本地构建需完整 Xcode，只有 Command Line Tools 无法启动模拟器。`expo export` 校验 bundle，不等于已生成或签名 IPA / APK。
+
+默认 `pnpm dev:mobile` 明确使用 Expo Go，二维码应为 `exp://<电脑 Wi-Fi IP>:8081`。`scripts/start.mjs` 优先选择 Wi-Fi 网卡的 IPv4 地址，避免同时连接有线网络时选中另一张网卡；已有 `REACT_NATIVE_PACKAGER_HOSTNAME` 设置会保留。电脑和手机需要处于能互相访问的同一局域网，iPhone 需允许 Expo Go 的本地网络访问。网络变化后重启 Metro，扫描新二维码。
+
+SDK 57 需要匹配版本的 Expo Go；应用商店最新版不一定支持 SDK 57，版本不匹配会显示单独的 SDK 提示。以 [Expo Go 官方版本页面](https://expo.dev/go) 和手机实际安装版本为准。iPhone 真机如出现账号提示，按提示让 Expo CLI 与 Expo Go 登录同一 Expo 账号。
+
+自定义开发客户端使用 `pnpm dev:mobile:client`，二维码是 `exp+chengxu-mobile://…`，需先安装澄序开发版。升级 SDK 后必须重新构建开发客户端，旧 SDK 54 的客户端不能加载 SDK 57。iPhone 真机首次安装可使用 `pnpm --filter @template/mobile exec expo run:ios --device`，安装成功后再连接开发客户端模式。
 
 已提供 `eas.json` 的 development、preview、production 配置。需要安装包时，在有 Expo 账号及相应平台签名凭据的环境中执行：
 
@@ -27,7 +34,7 @@ pnpm dlx eas-cli build --profile development --platform ios
 pnpm dlx eas-cli build --profile preview --platform android
 ```
 
-EAS 首次会关联项目并写入 `extra.eas.projectId`。开发配置生成包含 `expo-dev-client` 的客户端，再用 `pnpm dev:mobile` 连接。本仓库未关联或发起云构建。
+EAS 首次会关联项目并写入 `extra.eas.projectId`。开发配置生成包含 `expo-dev-client` 的客户端，再用 `pnpm dev:mobile:client` 连接。本仓库未关联或发起云构建。
 
 ## 兼容性选择
 
@@ -35,17 +42,25 @@ EAS 首次会关联项目并写入 `extra.eas.projectId`。开发配置生成包
 
 | 依赖                      | 版本                |
 | ------------------------- | ------------------- |
-| Expo                      | SDK 54 / `~54.0.38` |
-| React / React Native      | `19.1.0` / `0.81.5` |
-| NativeWind / Tailwind CSS | `4.2.1` / `3.4.x`   |
+| Expo                      | SDK 57 / `~57.0.31` |
+| React / React Native      | `19.2.3` / `0.86.3` |
+| NativeWind / Tailwind CSS | `4.2.7` / `3.4.x`   |
 | HeroUI Native             | `1.0.0-alpha.16`    |
-| Reanimated / Worklets     | `4.1.x` / `0.5.1`   |
+| Reanimated / Worklets     | `4.5.1` / `0.10.1`  |
+| TypeScript                | `6.0.3`             |
 
-HeroUI Native 正式版已采用 Uniwind；这里使用官方支持 NativeWind 的最后一个 alpha 版本，具体要求见 [alpha.16 安装说明](https://github.com/heroui-inc/heroui-native/blob/v1.0.0-alpha.16/README.md)。不直接升级 `heroui-native` 或替换 NativeWind；迁移时需要一起处理主题 API、组件 API 与样式引擎。
+HeroUI Native 正式版已采用 Uniwind；这里保留 NativeWind 时代的 alpha.16，原始依赖要求见 [alpha.16 安装说明](https://github.com/heroui-inc/heroui-native/blob/v1.0.0-alpha.16/README.md)。该版本上游声明的是旧 SDK 配套依赖，本仓库进行了以下适配，并不代表上游宣布支持 SDK 57：
 
-该 Expo 版本不保证能被应用商店最新 Expo Go 打开，默认使用开发构建。NativeWind 的 JSX 转换会引用 `react-native-css-interop`，因此在 pnpm 隔离依赖下将其显式声明。工作区 `packageExtensions` 让 Next.js 的 React 类型绑定到 Web 自己的版本，避免两个 React 类型版本串用。
+- 根目录 `.pnpmfile.cjs` 仅针对 `heroui-native@1.0.0-alpha.16` 调整 NativeWind、Reanimated、Worklets 和 Safe Area 的 peer 版本，使整个 Mobile 使用 SDK 57 的同一组原生依赖。
+- Metro 通过包的 `source` 条件读取 HeroUI TypeScript 源码，让 SDK 57 的 Worklets 插件重新编译动画函数，避免执行 alpha 包中由旧 Worklets 0.5.1 预编译的函数。保留此设置；只放宽 peer 版本不足以完成迁移。
+- NativeWind 升至 [4.2.7](https://www.nativewind.dev/docs/getting-started/installation)，显式使用对应的 `react-native-css-interop@0.2.7`，继续保留 Tailwind 3 和 Babel preset 配置。
+- 导航迁至 `expo-router/react-navigation`、`expo-router/js-tabs`、`expo-router/drawer`，删除旧的 `@react-navigation/*` 应用依赖。
 
-浏览器辅助预览通过 Metro 编译 Reanimated 源码，以保留 NativeWind 的 JSX 样式转换；原生解析不变。浮层使用 HeroUI 自带的 `Dialog.Trigger` / `Dialog.Close`，避免该 alpha 版本 `asChild` 与动画按钮组合时的事件问题。
+后续升级 HeroUI 或动画依赖时，需要同时复核这一适配、类型检查、三端 bundle 和原生客户端。
+
+NativeWind 的 JSX 转换会引用 `react-native-css-interop`，因此在 pnpm 隔离依赖下将其显式声明。工作区 `packageExtensions` 让 Next.js 的 React 类型绑定到 Web 自己的版本，避免两个 React 类型版本串用。
+
+浏览器辅助预览通过 Metro 编译 Reanimated 源码，以保留 NativeWind 的 JSX 样式转换。HeroUI 在三个平台均通过源码编译。浮层使用 HeroUI 自带的 `Dialog.Trigger` / `Dialog.Close`，避免该 alpha 版本 `asChild` 与动画按钮组合时的事件问题。
 
 ## 目录约定
 

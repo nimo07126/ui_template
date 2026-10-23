@@ -11,7 +11,7 @@ pnpm dev
 
 Web 开发服务默认运行在 `http://localhost:3399`。`pnpm dev` 会先从 token 源文件生成 TypeScript token 和主题变量，再启动 Next.js。
 
-移动端启动：`pnpm dev:mobile`；本地构建并启动 iOS / Android：`pnpm mobile:ios` / `pnpm mobile:android`。首次原生运行需要 Xcode 或 Android SDK；使用开发构建连接 Metro。浏览器辅助预览：`pnpm mobile:web`（`http://localhost:8081`）。兼容版本、目录与构建说明见 [移动端文档](apps/mobile/README.md)。
+移动端扫码预览：`pnpm dev:mobile`（Expo Go，需匹配 SDK 57，手机和电脑同一 Wi-Fi）。自定义开发客户端使用 `pnpm dev:mobile:client`；本地构建并启动 iOS / Android：`pnpm mobile:ios` / `pnpm mobile:android`，需要 Xcode 或 Android SDK。浏览器辅助预览：`pnpm mobile:web`（`http://localhost:8081`）。兼容版本、目录与构建说明见 [移动端文档](apps/mobile/README.md)。
 
 ## 项目结构
 
@@ -76,7 +76,8 @@ packages/
 | ----------------------------------------- | -------------------------------------------------- |
 | `pnpm dev`                                | 生成 token 并启动 Web 开发服务器                   |
 | `pnpm build`                              | 生成 token 并构建 Web 生产版本                     |
-| `pnpm dev:mobile`                         | 启动 Expo 开发构建的 Metro 服务                    |
+| `pnpm dev:mobile`                         | 启动 Expo Go 扫码预览，优先使用 Wi-Fi 地址         |
+| `pnpm dev:mobile:client`                  | 启动自定义开发客户端的 Metro 服务                  |
 | `pnpm mobile:ios` / `pnpm mobile:android` | 本地构建并运行原生应用                             |
 | `pnpm mobile:web`                         | 启动移动端浏览器辅助预览                           |
 | `pnpm build:mobile`                       | 导出 iOS、Android、Web 生产 bundle（不生成安装包） |

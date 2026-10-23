@@ -7,6 +7,7 @@
     "tokens:check": "node packages/design-tokens/scripts/build.mjs --check",
     "dev": "pnpm tokens:build && pnpm --filter @template/web dev",
     "dev:mobile": "pnpm tokens:build && pnpm --filter @template/mobile dev",
+    "dev:mobile:client": "pnpm tokens:build && pnpm --filter @template/mobile dev:client",
     "mobile:ios": "pnpm tokens:build && pnpm --filter @template/mobile ios",
     "mobile:android": "pnpm tokens:build && pnpm --filter @template/mobile android",
     "mobile:web": "pnpm tokens:build && pnpm --filter @template/mobile web",

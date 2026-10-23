@@ -1,7 +1,4 @@
-import {
-  DrawerContentScrollView,
-  type DrawerContentComponentProps,
-} from '@react-navigation/drawer';
+import { DrawerContentScrollView, type DrawerContentComponentProps } from 'expo-router/drawer';
 import { useRouter } from 'expo-router';
 import { Button, useTheme } from 'heroui-native';
 import { ArrowUpRight, House, Layers2, X } from 'lucide-react-native';

@@ -1,5 +1,6 @@
-import { Tabs, useNavigation } from 'expo-router';
-import { DrawerActions } from '@react-navigation/native';
+import { useNavigation } from 'expo-router';
+import { Tabs } from 'expo-router/js-tabs';
+import { DrawerActions } from 'expo-router/react-navigation';
 import { Button, useTheme } from 'heroui-native';
 import { House, Menu, Search, UserRound } from 'lucide-react-native';
 

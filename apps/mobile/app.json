@@ -6,11 +6,20 @@
     "version": "1.0.0",
     "orientation": "portrait",
     "userInterfaceStyle": "automatic",
-    "newArchEnabled": true,
-    "ios": { "supportsTablet": true, "bundleIdentifier": "com.chengxu.template" },
-    "android": { "package": "com.chengxu.template", "edgeToEdgeEnabled": true },
-    "web": { "bundler": "metro", "output": "single" },
+    "ios": {
+      "supportsTablet": true,
+      "bundleIdentifier": "com.chengxu.template"
+    },
+    "android": {
+      "package": "com.chengxu.template"
+    },
+    "web": {
+      "bundler": "metro",
+      "output": "single"
+    },
     "plugins": ["expo-router"],
-    "experiments": { "typedRoutes": true }
+    "experiments": {
+      "typedRoutes": true
+    }
   }
 }
