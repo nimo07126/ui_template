@@ -1,5 +1,6 @@
 import { tokens } from "@template/design-tokens";
 import { Icon } from "@/components/theme-showcase/icon";
+import { TypeSpecimenRow } from "@/components/theme-showcase/type-specimen-row";
 import styles from "./theme-tokens.module.css";
 
 type SizeKey = keyof typeof tokens.type.size;
@@ -139,24 +140,21 @@ export function ThemeTokens({ section }: { section: "typography" | "spacing" }) 
                 <span>{category.specimens.length} 个规格</span>
               </header>
               {category.specimens.map((specimen) => (
-                <div className={styles.typeRow} key={specimen.size}>
-                  <div className={styles.typeDetails}>
-                    <div className={styles.typeMeta}>
-                      <strong>{specimen.name}</strong>
-                      <code>{typeToken("size", specimen.size)}</code>
-                    </div>
-                    <dl className={styles.typeParams}>
-                      <div><dt>字族</dt><dd>系统无衬线</dd></div>
-                      <div><dt>字号</dt><dd>{toPixels(tokens.type.size[specimen.size])}</dd></div>
-                      <div><dt>行高</dt><dd>{toPixels(tokens.type.line[specimen.line])}</dd></div>
-                      <div><dt>字重</dt><dd>{tokens.type.weight[specimen.weight]} · {weightLabels[specimen.weight]}</dd></div>
-                      <div><dt>字距</dt><dd>{tokens.type.tracking[specimen.tracking] === "0" ? "0px" : tokens.type.tracking[specimen.tracking]}</dd></div>
-                    </dl>
-                  </div>
-                  <div className={styles.typeSampleWrap}>
-                    <p className={`${styles.typeSample} ${specimen.className}`}>{specimen.sample}</p>
-                  </div>
-                </div>
+                <TypeSpecimenRow
+                  key={specimen.size}
+                  size={specimen.size}
+                  name={specimen.name}
+                  token={typeToken("size", specimen.size)}
+                  params={[
+                    { label: "字族", value: "系统无衬线" },
+                    { label: "字号", value: toPixels(tokens.type.size[specimen.size]) },
+                    { label: "行高", value: toPixels(tokens.type.line[specimen.line]) },
+                    { label: "字重", value: `${tokens.type.weight[specimen.weight]} · ${weightLabels[specimen.weight]}` },
+                    { label: "字距", value: tokens.type.tracking[specimen.tracking] === "0" ? "0px" : tokens.type.tracking[specimen.tracking] },
+                  ]}
+                  sample={specimen.sample}
+                  sampleClassName={specimen.className}
+                />
               ))}
             </section>
           ))}

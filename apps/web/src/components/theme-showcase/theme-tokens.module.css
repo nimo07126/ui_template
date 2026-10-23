@@ -381,6 +381,54 @@
   font-weight: var(--type-weight-medium);
 }
 
+.typeColorOptions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-2);
+  min-width: 0;
+  margin: 0;
+  padding: 0;
+  border: 0;
+}
+
+.typeColorChoice {
+  position: relative;
+  display: grid;
+  width: 2rem;
+  height: 2rem;
+  place-items: center;
+  cursor: pointer;
+}
+
+.typeColorSwatch {
+  display: block;
+  width: 1.75rem;
+  height: 1.75rem;
+  border: 3px solid transparent;
+  border-radius: var(--ds-radius-sm);
+  box-shadow: 0 0 0 1px var(--ds-color-line);
+}
+
+.typeColorChoice input:checked + .typeColorSwatch {
+  border-color: #fff;
+  box-shadow: 0 0 0 1px var(--ds-color-line-strong);
+}
+
+.typeColorChoice input:focus-visible + .typeColorSwatch {
+  outline: 2px solid var(--ds-color-focus-ring);
+  outline-offset: 3px;
+}
+
+.typeColorName {
+  margin-top: var(--space-1);
+  color: var(--ds-color-muted);
+  overflow-wrap: anywhere;
+}
+
+.typeColorName code {
+  font: inherit;
+}
+
 .typeSample {
   margin: 0;
   color: var(--ds-color-ink);
