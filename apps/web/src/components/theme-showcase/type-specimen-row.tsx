@@ -148,9 +148,27 @@ export function TypeSpecimenRow({
               </dd>
             </div>
           ))}
+          
           <div className="grid grid-cols-[3rem_minmax(0,_1fr)] items-baseline min-w-0 gap-3">
             <dt className="text-[var(--ds-color-muted)] text-[length:var(--type-size-xs)]">
-              配色
+              用途
+            </dt>
+            <dd
+              className="text-[var(--ds-color-ink-soft)] text-[length:var(--type-size-xs)] tabular-nums font-[number:var(--type-weight-medium)] m-0"
+              aria-live="polite"
+            >
+              {selected.usage}
+              <div className="mt-1 text-[var(--ds-color-muted)] wrap-anywhere">
+                {selected.name} ·{" "}
+                <code className="[font-family:inherit] text-[length:inherit] [font-weight:inherit] leading-[inherit]">
+                  {selected.token}
+                </code>
+              </div>
+            </dd>
+          </div>
+          <div className="grid grid-cols-[3rem_minmax(0,_1fr)] items-baseline min-w-0 gap-3">
+            <dt className="text-[var(--ds-color-muted)] text-[length:var(--type-size-xs)]">
+            
             </dt>
             <dd className="text-[var(--ds-color-ink-soft)] text-[length:var(--type-size-xs)] tabular-nums font-[number:var(--type-weight-medium)] m-0">
               <fieldset className="flex flex-wrap min-w-0 border-0 m-0 p-0 gap-2">
@@ -181,23 +199,7 @@ export function TypeSpecimenRow({
                   </label>
                 ))}
               </fieldset>
-              <div className="mt-1 text-[var(--ds-color-muted)] wrap-anywhere">
-                {selected.name} ·{" "}
-                <code className="[font-family:inherit] text-[length:inherit] [font-weight:inherit] leading-[inherit]">
-                  {selected.token}
-                </code>
-              </div>
-            </dd>
-          </div>
-          <div className="grid grid-cols-[3rem_minmax(0,_1fr)] items-baseline min-w-0 gap-3">
-            <dt className="text-[var(--ds-color-muted)] text-[length:var(--type-size-xs)]">
-              用途
-            </dt>
-            <dd
-              className="text-[var(--ds-color-ink-soft)] text-[length:var(--type-size-xs)] tabular-nums font-[number:var(--type-weight-medium)] m-0"
-              aria-live="polite"
-            >
-              {selected.usage}
+              
             </dd>
           </div>
         </dl>

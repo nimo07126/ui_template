@@ -275,7 +275,7 @@ export function ThemeTokens({
             </p>
           </div>
 
-          <dl className="grid grid-cols-3 border-t border-t-[var(--ds-color-line)] border-b border-b-[var(--ds-color-line)] m-0 py-4 px-0 gap-4 max-[52rem]:gap-3 max-[36rem]:grid-cols-1">
+          <dl className="grid grid-cols-3  m-0 py-4 px-0 gap-4 max-[52rem]:gap-3 max-[36rem]:grid-cols-1">
             <div className="min-w-0">
               <dt className="text-[var(--ds-color-muted)] text-[length:var(--type-size-xs)]">
                 字体族 Family
