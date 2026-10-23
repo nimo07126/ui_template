@@ -170,11 +170,6 @@ export function ComponentSamples() {
       >
         <header className="flex items-center justify-between pt-3 pb-2 px-0 gap-8 max-[64rem]:items-start max-[40rem]:flex-col max-[40rem]:gap-5">
           <div>
-            <div className="flex items-center mb-5 text-[var(--ds-color-accent-ink)] text-[length:var(--type-size-xs)] font-[number:var(--type-weight-medium)] gap-2">
-              <Component className="w-4 h-4" aria-hidden="true" />
-              <span>澄序 · 组件预览库</span>
-              <span className="w-8 h-px bg-[var(--ds-color-line-strong)] ml-1" />
-            </div>
             <h1
               className="text-[length:clamp(1.65rem,_2.6vw,_2.4rem)] font-[number:var(--type-weight-semibold)] tracking-[var(--type-tracking-tight)] leading-[1.4] m-0"
               id="components-title"

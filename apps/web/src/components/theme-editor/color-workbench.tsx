@@ -214,15 +214,11 @@ export function ColorWorkbench() {
   );
   return (
     <section
-      className="[--matrix-line:color-mix(in_oklab,_var(--border)_36%,_transparent)] [--matrix-outline:color-mix(in_oklab,_var(--border)_52%,_transparent)] w-full min-w-0 pb-4"
+      className="[--matrix-line:color-mix(in_oklab,_var(--border)_36%,_transparent)] [--matrix-outline:color-mix(in_oklab,_var(--border)_52%,_transparent)] w-full min-w-0"
       aria-labelledby="colors-title"
     >
       <div className="flex justify-between items-end mb-8 gap-8 max-[767px]:mb-6">
         <div>
-          <div className="flex items-center text-[var(--ds-color-accent-ink)] text-[length:.75rem] tracking-[.025em] gap-2">
-            <Palette size={15} />
-            <span>设计语言 / 颜色与主题</span>
-          </div>
           <h1
             className="mt-3.5 mb-3 text-[length:clamp(1.875rem,_3vw,_2.625rem)] leading-[1.3] tracking-[-.055em] font-[650] mx-0"
             id="colors-title"

@@ -17,6 +17,7 @@ pnpm dev
 apps/
   web/                         Next.js App Router 展示站
     src/app/                   页面入口、metadata 与 Tailwind 入口
+    src/components/layout/     SectionShared 等公共布局组件
     src/components/navigation/  shadcn Sidebar 与当前页面头部
     src/components/ui/         shadcn/ui 可复用组件
     src/components/theme-showcase/  页面专属主题样例区块
@@ -39,6 +40,8 @@ packages/
 | `/components` | 33 个 shadcn/ui 组件示例，按 6 类区块预览 |
 
 侧栏使用 shadcn/ui Sidebar；通用控件直接引用 `src/components/ui/` 中的 shadcn 组件。
+
+页面专属的展示内容和数据放在对应路由的 `page.tsx` 中：首页、字体页与间距页直接编写页面内容，不通过集中组件按参数切换。`components/layout/section-shared.tsx` 统一区块布局与响应式间距，字体页与间距页直接组合使用；页面自行提供 `id` 和 `aria-labelledby`。可复用的展示与交互组件（如 `TypeSpecimenRow`）保留在 `components/`。颜色工作台和组件预览库的状态与交互保留在独立客户端组件中，由对应的页面入口调用。
 
 ## Token 约定
 
