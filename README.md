@@ -9,22 +9,21 @@ pnpm install
 pnpm dev
 ```
 
-开发服务默认运行在 `http://localhost:3000`。`pnpm dev` 会先从 token 源文件生成 Web CSS 变量和 TypeScript token，再启动 Next.js。
+开发服务默认运行在 `http://localhost:3000`。`pnpm dev` 会先从 token 源文件生成 TypeScript token 和主题变量，再启动 Next.js。
 
 ## 项目结构
 
 ```text
 apps/
   web/                         Next.js App Router 展示站
-    src/app/                   页面入口、metadata 与全局基础样式
+    src/app/                   页面入口、metadata 与 Tailwind 入口
     src/components/navigation/  shadcn Sidebar 与当前页面头部
     src/components/ui/         shadcn/ui 可复用组件
     src/components/theme-showcase/  页面专属主题样例区块
-    src/styles/tokens.css      自动生成的 CSS 自定义属性
 packages/
   design-tokens/
     tokens.json                唯一设计 token 源
-    scripts/build.mjs          生成 Web CSS 与 TypeScript token
+    scripts/build.mjs          生成 TypeScript token 与主题变量
     src/generated.ts           自动生成，供应用与未来 Expo 端复用
     src/themes.ts              语义角色、派生规则与全站组件映射
 ```
@@ -46,7 +45,9 @@ packages/
 - 修改 `packages/design-tokens/tokens.json`，不要直接编辑生成文件。
 - 自定义页面样式通过 `--ds-color-*`、`--space-*`、`--ds-radius-*`、`--type-*` 等变量读取设计 token。
 - `pnpm tokens:build` 重新生成目标文件；`pnpm tokens:check` 检查生成产物是否与源一致。
-- 新的产品颜色应先加入 token，再在组件样式中引用，不在 CSS Modules 中散落十六进制色值。
+- 样式直接平铺在 JSX 节点的 Tailwind className 中，不新增 CSS Modules 或页面 CSS。
+- `src/app/tailwind.css` 仅保留 Tailwind 入口、主题映射与基础层工具类；主题变量通过生成的 `tokenVariables` 注入根节点。
+- 新的产品颜色应先加入 token，再在节点工具类中引用。
 
 ## 常用命令
 
@@ -87,7 +88,7 @@ packages/
 
 - 通用组件：`apps/web/src/components/ui/`，保持当前 `base-nova` / Base UI 配置。
 - 示例与分类：`apps/web/src/components/theme-showcase/component-demos.tsx`；添加示例时在 `componentExamples` 注册，分类计数会自动更新。
-- 预览容器与筛选：`component-samples.tsx`；布局样式：`component-samples.module.css`。
+- 预览容器与筛选：`component-samples.tsx`；布局样式直接写在对应 JSX 节点的 Tailwind 类中。
 - 源码于 2026-10-23 对照 [shadcn 官方 registry](https://ui.shadcn.com/r/styles/base-nova/button.json) 同步，当前 CLI 为 4.22.1。图标使用 Lucide，内部引用改为项目别名；按钮、输入框和 Sheet 保留已有主题定制。
 - 新增组件通过 `--theme-control-*`、`--theme-field-*`、`--theme-progress-*`、`--theme-segment-*`、`--theme-backdrop` 和既有 shadcn 变量读取主题，不引入默认品牌色。后续使用 `pnpm --dir apps/web exec shadcn add <组件名> --dry-run` 检查上游更新，合入时保留本项目的语义颜色映射。
 - Toast 使用当前 Base UI 版 `Toaster` 与 `toast.add(...)`；在使用通知的页面或布局挂载一次 `Toaster`。

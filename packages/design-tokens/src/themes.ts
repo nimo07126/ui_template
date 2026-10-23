@@ -190,7 +190,11 @@ const aliases: Record<string, string> = {
 };
 export function themeStyle(id: ThemeId, overrides: Record<string, string> = {}): Record<string, string> {
   const values = resolveTheme(id, overrides);
-  const style: Record<string, string> = { colorScheme: id === "night" ? "dark" : "light" };
+  const style: Record<string, string> = {
+    colorScheme: id === "night" ? "dark" : "light",
+    "--shadow-soft": source.shadow.soft,
+    "--shadow-float": source.shadow.float,
+  };
   for (const [key, value] of Object.entries(values)) style[`--theme-${key}`] = value;
   for (const [key, value] of Object.entries(aliases)) style[`--${key}`] = ref(value);
   if (id === "night") {

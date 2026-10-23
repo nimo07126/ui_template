@@ -1,6 +1,7 @@
 import assert from 'node:assert/strict';
 import { runInNewContext } from 'node:vm';
 import test from 'node:test';
+import source from '../tokens.json' with { type: 'json' };
 import { allTokens, getThemeConcepts, isEditableColor, parseSavedTheme, resolveTheme, themes, themeBootScript, themeStyle } from '../src/themes.ts';
 
 test('every theme defines every semantic role with an acyclic dependency graph', () => {
@@ -33,6 +34,11 @@ test('dark mode has independent surfaces and both component and legacy mappings'
   assert.equal(dark['--primary-foreground'], 'var(--theme-button-primary-foreground)');
   assert.equal(dark['--ds-color-canvas'], 'var(--theme-background)');
   assert.equal(themeStyle('studio').colorScheme, 'light');
+});
+test('switching back to light mode restores shadows without a CSS variable file', () => {
+  const style = { ...themeStyle('night'), ...themeStyle('studio') };
+  assert.equal(style['--shadow-soft'], source.shadow.soft);
+  assert.equal(style['--shadow-float'], source.shadow.float);
 });
 test('saved state round trips all theme customizations', () => {
   const saved = { version: 1, activeId: 'night', overrides: { studio: { accent: '#123456' }, night: { background: 'oklch(12% 0 0)' } }, savedAt: '2026-10-23T12:00:00.000Z' };

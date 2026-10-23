@@ -1,7 +1,6 @@
 import { tokens } from "@template/design-tokens";
 import { Icon } from "@/components/theme-showcase/icon";
 import { TypeSpecimenRow } from "@/components/theme-showcase/type-specimen-row";
-import styles from "./theme-tokens.module.css";
 
 type SizeKey = keyof typeof tokens.type.size;
 type LineKey = keyof typeof tokens.type.line;
@@ -34,42 +33,187 @@ const weightLabels: Record<WeightKey, string> = {
 const typeCategories: TypeCategory[] = [
   {
     title: "展示 Display",
-    description: "用于品牌时刻与极少量的关键数字。展示字级保持克制，避免与产品内容争夺注意力。",
+    description:
+      "用于品牌时刻与极少量的关键数字。展示字级保持克制，避免与产品内容争夺注意力。",
     specimens: [
-      { name: "大号 Large", size: "displayLarge", line: "displayLarge", weight: "bold", tracking: "tight", sample: "澄序设计", className: styles.typeDisplayLarge },
-      { name: "中号 Medium", size: "displayMedium", line: "displayMedium", weight: "bold", tracking: "tight", sample: "为内容留白", className: styles.typeDisplayMedium },
-      { name: "小号 Small", size: "displaySmall", line: "displaySmall", weight: "bold", tracking: "tight", sample: "让重点浮现", className: styles.typeDisplaySmall },
+      {
+        name: "大号 Large",
+        size: "displayLarge",
+        line: "displayLarge",
+        weight: "bold",
+        tracking: "tight",
+        sample: "澄序设计",
+        className:
+          "font-[number:var(--type-weight-bold)] tracking-[var(--type-tracking-tight)] text-[length:var(--type-size-display-large)] leading-[var(--type-line-display-large)] max-[36rem]:text-[length:var(--type-size-display-medium)] max-[36rem]:leading-[var(--type-line-display-medium)]",
+      },
+      {
+        name: "中号 Medium",
+        size: "displayMedium",
+        line: "displayMedium",
+        weight: "bold",
+        tracking: "tight",
+        sample: "为内容留白",
+        className:
+          "font-[number:var(--type-weight-bold)] tracking-[var(--type-tracking-tight)] text-[length:var(--type-size-display-medium)] leading-[var(--type-line-display-medium)] max-[36rem]:text-[length:var(--type-size-display-small)] max-[36rem]:leading-[var(--type-line-display-small)]",
+      },
+      {
+        name: "小号 Small",
+        size: "displaySmall",
+        line: "displaySmall",
+        weight: "bold",
+        tracking: "tight",
+        sample: "让重点浮现",
+        className:
+          "font-[number:var(--type-weight-bold)] tracking-[var(--type-tracking-tight)] text-[length:var(--type-size-display-small)] leading-[var(--type-line-display-small)] max-[36rem]:text-[length:var(--type-size-heading-large)] max-[36rem]:leading-[var(--type-line-heading-large)]",
+      },
     ],
   },
   {
     title: "标题 Heading",
     description: "用于页面、区块与卡片标题。按信息层级选用，不跨级跳跃。",
     specimens: [
-      { name: "特大 XX Large", size: "headingXxl", line: "headingXxl", weight: "semibold", tracking: "tight", sample: "让信息有清晰层次", className: styles.typeHeadingXxl },
-      { name: "超大 X Large", size: "headingXl", line: "headingXl", weight: "semibold", tracking: "tight", sample: "让信息易于理解", className: styles.typeHeadingXl },
-      { name: "大号 Large", size: "headingLarge", line: "headingLarge", weight: "semibold", tracking: "tight", sample: "秩序让界面更从容", className: styles.typeHeadingLarge },
-      { name: "中号 Medium", size: "headingMedium", line: "headingMedium", weight: "semibold", tracking: "tight", sample: "先看懂，再行动", className: styles.typeHeadingMedium },
-      { name: "小号 Small", size: "headingSmall", line: "headingSmall", weight: "semibold", tracking: "tight", sample: "一致，但不单调", className: styles.typeHeadingSmall },
-      { name: "特小 X Small", size: "headingXs", line: "headingXs", weight: "semibold", tracking: "normal", sample: "中文标题示例", className: styles.typeHeadingXs },
+      {
+        name: "特大 XX Large",
+        size: "headingXxl",
+        line: "headingXxl",
+        weight: "semibold",
+        tracking: "tight",
+        sample: "让信息有清晰层次",
+        className:
+          "font-[number:var(--type-weight-semibold)] tracking-[var(--type-tracking-tight)] text-[length:var(--type-size-heading-xxl)] leading-[var(--type-line-heading-xxl)]",
+      },
+      {
+        name: "超大 X Large",
+        size: "headingXl",
+        line: "headingXl",
+        weight: "semibold",
+        tracking: "tight",
+        sample: "让信息易于理解",
+        className:
+          "font-[number:var(--type-weight-semibold)] tracking-[var(--type-tracking-tight)] text-[length:var(--type-size-heading-xl)] leading-[var(--type-line-heading-xl)]",
+      },
+      {
+        name: "大号 Large",
+        size: "headingLarge",
+        line: "headingLarge",
+        weight: "semibold",
+        tracking: "tight",
+        sample: "秩序让界面更从容",
+        className:
+          "font-[number:var(--type-weight-semibold)] tracking-[var(--type-tracking-tight)] text-[length:var(--type-size-heading-large)] leading-[var(--type-line-heading-large)]",
+      },
+      {
+        name: "中号 Medium",
+        size: "headingMedium",
+        line: "headingMedium",
+        weight: "semibold",
+        tracking: "tight",
+        sample: "先看懂，再行动",
+        className:
+          "font-[number:var(--type-weight-semibold)] tracking-[var(--type-tracking-tight)] text-[length:var(--type-size-heading-medium)] leading-[var(--type-line-heading-medium)]",
+      },
+      {
+        name: "小号 Small",
+        size: "headingSmall",
+        line: "headingSmall",
+        weight: "semibold",
+        tracking: "tight",
+        sample: "一致，但不单调",
+        className:
+          "font-[number:var(--type-weight-semibold)] tracking-[var(--type-tracking-tight)] text-[length:var(--type-size-heading-small)] leading-[var(--type-line-heading-small)]",
+      },
+      {
+        name: "特小 X Small",
+        size: "headingXs",
+        line: "headingXs",
+        weight: "semibold",
+        tracking: "normal",
+        sample: "中文标题示例",
+        className:
+          "font-[number:var(--type-weight-semibold)] tracking-[var(--type-tracking-normal)] text-[length:var(--type-size-heading-xs)] leading-[var(--type-line-heading-xs)]",
+      },
     ],
   },
   {
     title: "正文 Body",
     description: "用于段落、说明和长内容。正文行高略宽，帮助中文连续阅读。",
     specimens: [
-      { name: "大号 Large", size: "bodyLarge", line: "bodyLarge", weight: "regular", tracking: "normal", sample: "清晰的层级，让每一段内容都更容易阅读。", className: styles.typeBodyLarge },
-      { name: "中号 Medium", size: "bodyMedium", line: "bodyMedium", weight: "regular", tracking: "normal", sample: "界面保持安静，重要的信息自然浮现。", className: styles.typeBodyMedium },
-      { name: "小号 Small", size: "bodySmall", line: "bodySmall", weight: "regular", tracking: "normal", sample: "为日常说明和辅助阅读提供稳定节奏。", className: styles.typeBodySmall },
-      { name: "特小 X Small", size: "bodyXs", line: "bodyXs", weight: "regular", tracking: "normal", sample: "适用于简短、次级的补充信息。", className: styles.typeBodyXs },
+      {
+        name: "大号 Large",
+        size: "bodyLarge",
+        line: "bodyLarge",
+        weight: "regular",
+        tracking: "normal",
+        sample: "清晰的层级，让每一段内容都更容易阅读。",
+        className:
+          "font-[number:var(--type-weight-regular)] tracking-[var(--type-tracking-normal)] text-[length:var(--type-size-body-large)] leading-[var(--type-line-body-large)]",
+      },
+      {
+        name: "中号 Medium",
+        size: "bodyMedium",
+        line: "bodyMedium",
+        weight: "regular",
+        tracking: "normal",
+        sample: "界面保持安静，重要的信息自然浮现。",
+        className:
+          "font-[number:var(--type-weight-regular)] tracking-[var(--type-tracking-normal)] text-[length:var(--type-size-body-medium)] leading-[var(--type-line-body-medium)]",
+      },
+      {
+        name: "小号 Small",
+        size: "bodySmall",
+        line: "bodySmall",
+        weight: "regular",
+        tracking: "normal",
+        sample: "为日常说明和辅助阅读提供稳定节奏。",
+        className:
+          "font-[number:var(--type-weight-regular)] tracking-[var(--type-tracking-normal)] text-[length:var(--type-size-body-small)] leading-[var(--type-line-body-small)]",
+      },
+      {
+        name: "特小 X Small",
+        size: "bodyXs",
+        line: "bodyXs",
+        weight: "regular",
+        tracking: "normal",
+        sample: "适用于简短、次级的补充信息。",
+        className:
+          "font-[number:var(--type-weight-regular)] tracking-[var(--type-tracking-normal)] text-[length:var(--type-size-body-xs)] leading-[var(--type-line-body-xs)]",
+      },
     ],
   },
   {
     title: "标签 Label",
     description: "用于按钮、表单标签、状态和导航。字级较小，保持清晰、短促。",
     specimens: [
-      { name: "大号 Large", size: "labelLarge", line: "labelLarge", weight: "medium", tracking: "normal", sample: "主要操作", className: styles.typeLabelLarge },
-      { name: "中号 Medium", size: "labelMedium", line: "labelMedium", weight: "medium", tracking: "normal", sample: "进行中", className: styles.typeLabelMedium },
-      { name: "小号 Small", size: "labelSmall", line: "labelSmall", weight: "medium", tracking: "normal", sample: "辅助说明", className: styles.typeLabelSmall },
+      {
+        name: "大号 Large",
+        size: "labelLarge",
+        line: "labelLarge",
+        weight: "medium",
+        tracking: "normal",
+        sample: "主要操作",
+        className:
+          "font-[number:var(--type-weight-medium)] tracking-[var(--type-tracking-normal)] text-[length:var(--type-size-label-large)] leading-[var(--type-line-label-large)]",
+      },
+      {
+        name: "中号 Medium",
+        size: "labelMedium",
+        line: "labelMedium",
+        weight: "medium",
+        tracking: "normal",
+        sample: "进行中",
+        className:
+          "font-[number:var(--type-weight-medium)] tracking-[var(--type-tracking-normal)] text-[length:var(--type-size-label-medium)] leading-[var(--type-line-label-medium)]",
+      },
+      {
+        name: "小号 Small",
+        size: "labelSmall",
+        line: "labelSmall",
+        weight: "medium",
+        tracking: "normal",
+        sample: "辅助说明",
+        className:
+          "font-[number:var(--type-weight-medium)] tracking-[var(--type-tracking-normal)] text-[length:var(--type-size-label-small)] leading-[var(--type-line-label-small)]",
+      },
     ],
   },
 ];
@@ -83,120 +227,271 @@ function toPixels(value: string) {
 }
 
 function typeToken(category: "size" | "line", key: string) {
-  const kebabKey = key.replace(/[A-Z]/g, (letter) => `-${letter.toLowerCase()}`);
+  const kebabKey = key.replace(
+    /[A-Z]/g,
+    (letter) => `-${letter.toLowerCase()}`,
+  );
   return `--type-${category}-${kebabKey}`;
 }
 
-
 const spacingSamples = [
-  { name: "紧凑", token: "space-2", className: styles.space2 },
-  { name: "常规", token: "space-4", className: styles.space4 },
-  { name: "宽松", token: "space-6", className: styles.space6 },
-  { name: "区块", token: "space-10", className: styles.space10 },
+  { name: "紧凑", token: "space-2", className: "w-2" },
+  { name: "常规", token: "space-4", className: "w-4" },
+  { name: "宽松", token: "space-6", className: "w-6" },
+  { name: "区块", token: "space-10", className: "w-10" },
 ];
 
-export function ThemeTokens({ section }: { section: "typography" | "spacing" }) {
+export function ThemeTokens({
+  section,
+}: {
+  section: "typography" | "spacing";
+}) {
   return (
     <>
       {section === "typography" && (
-        <section aria-labelledby="type-title" className={`${styles.tokenSection} ${styles.typeSection}`} id="type">
-        <div className={styles.sectionIntro}>
-          <div className={styles.sectionIndex}><Icon name="type" /><span>字体层级</span></div>
-          <h1 id="type-title">从展示到阅读，<br />每一级都有依据。</h1>
-          <p>字体规范不只是几种字号示例。这里定义字体族、字号分类、行高、字重与字距，让不同页面能够使用同一套排版尺度。</p>
-        </div>
+        <section
+          aria-labelledby="type-title"
+          className="grid grid-cols-1 border-t border-t-[var(--ds-color-line)] py-16 px-0 gap-6 max-[68rem]:grid-cols-1 max-[68rem]:gap-8 max-[52rem]:grid-cols-1 max-[52rem]:py-12 max-[52rem]:px-0 max-[52rem]:gap-6 max-[36rem]:py-8 max-[36rem]:px-0"
+          id="type"
+        >
+          <div className="max-w-172 max-[52rem]:max-w-144">
+            <div className="flex items-center mb-5 text-[var(--ds-color-accent-ink)] text-[length:var(--type-size-xs)] font-[number:var(--type-weight-semibold)] gap-2">
+              <Icon
+                className="w-4 h-4 text-[var(--ds-color-accent)]"
+                name="type"
+              />
+              <span>字体层级</span>
+            </div>
+            <h1
+              className="text-[length:var(--type-size-2xl)] font-[number:var(--type-weight-semibold)] tracking-[var(--type-tracking-tight)] leading-[var(--type-line-heading)] m-0 max-[52rem]:text-[length:var(--type-size-2xl)] max-[36rem]:text-[length:var(--type-size-xl)]"
+              id="type-title"
+            >
+              从展示到阅读，
+              <br />
+              每一级都有依据。
+            </h1>
+            <p className="mt-4 mb-0 text-[var(--ds-color-muted)] text-[length:var(--type-size-sm)] leading-[var(--type-line-body)] mx-0">
+              字体规范不只是几种字号示例。这里定义字体族、字号分类、行高、字重与字距，让不同页面能够使用同一套排版尺度。
+            </p>
+          </div>
 
-        <dl className={styles.typeFoundation}>
-          <div>
-            <dt>字体族 Family</dt>
-            <dd>系统中文无衬线</dd>
-            <code>--type-family-sans</code>
-          </div>
-          <div>
-            <dt>字重 Weight</dt>
-            <dd className={styles.foundationValues}>
-              {Object.entries(tokens.type.weight).map(([key, value]) => (
-                <span key={key}>{value} · {weightLabels[key as WeightKey]}</span>
-              ))}
-            </dd>
-            <code>--type-weight-*</code>
-          </div>
-          <div>
-            <dt>字距 Tracking</dt>
-            <dd className={styles.foundationValues}>
-              {Object.entries(tokens.type.tracking).map(([key, value]) => (
-                <span key={key}>{key === "tight" ? "紧凑" : "常规"} · {value === "0" ? "0px" : value}</span>
-              ))}
-            </dd>
-            <code>--type-tracking-*</code>
-          </div>
-        </dl>
+          <dl className="grid grid-cols-3 border-t border-t-[var(--ds-color-line)] border-b border-b-[var(--ds-color-line)] m-0 py-4 px-0 gap-4 max-[52rem]:gap-3 max-[36rem]:grid-cols-1">
+            <div className="min-w-0">
+              <dt className="text-[var(--ds-color-muted)] text-[length:var(--type-size-xs)]">
+                字体族 Family
+              </dt>
+              <dd className="mt-1 mb-0 text-[var(--ds-color-ink-soft)] text-[length:var(--type-size-sm)] font-[number:var(--type-weight-medium)] mx-0">
+                系统中文无衬线
+              </dd>
+              <code className="block wrap-anywhere mt-1 text-[var(--ds-color-muted)] font-[family-name:var(--type-family-sans)] text-[length:var(--type-size-xs)]">
+                --type-family-sans
+              </code>
+            </div>
+            <div className="min-w-0">
+              <dt className="text-[var(--ds-color-muted)] text-[length:var(--type-size-xs)]">
+                字重 Weight
+              </dt>
+              <dd className="mt-1 mb-0 text-[var(--ds-color-ink-soft)] text-[length:var(--type-size-sm)] font-[number:var(--type-weight-medium)] flex flex-wrap gap-y-1 gap-x-3 mx-0">
+                {Object.entries(tokens.type.weight).map(([key, value]) => (
+                  <span className="whitespace-nowrap" key={key}>
+                    {value} · {weightLabels[key as WeightKey]}
+                  </span>
+                ))}
+              </dd>
+              <code className="block wrap-anywhere mt-1 text-[var(--ds-color-muted)] font-[family-name:var(--type-family-sans)] text-[length:var(--type-size-xs)]">
+                --type-weight-*
+              </code>
+            </div>
+            <div className="min-w-0">
+              <dt className="text-[var(--ds-color-muted)] text-[length:var(--type-size-xs)]">
+                字距 Tracking
+              </dt>
+              <dd className="mt-1 mb-0 text-[var(--ds-color-ink-soft)] text-[length:var(--type-size-sm)] font-[number:var(--type-weight-medium)] flex flex-wrap gap-y-1 gap-x-3 mx-0">
+                {Object.entries(tokens.type.tracking).map(([key, value]) => (
+                  <span className="whitespace-nowrap" key={key}>
+                    {key === "tight" ? "紧凑" : "常规"} ·{" "}
+                    {value === "0" ? "0px" : value}
+                  </span>
+                ))}
+              </dd>
+              <code className="block wrap-anywhere mt-1 text-[var(--ds-color-muted)] font-[family-name:var(--type-family-sans)] text-[length:var(--type-size-xs)]">
+                --type-tracking-*
+              </code>
+            </div>
+          </dl>
 
-        <div className={styles.typeSpecimen}>
-          {typeCategories.map((category) => (
-            <section aria-label={category.title} className={styles.typeCategory} key={category.title}>
-              <header className={styles.typeCategoryHeading}>
-                <div><h3>{category.title}</h3><p>{category.description}</p></div>
-                <span>{category.specimens.length} 个规格</span>
-              </header>
-              {category.specimens.map((specimen) => (
-                <TypeSpecimenRow
-                  key={specimen.size}
-                  size={specimen.size}
-                  name={specimen.name}
-                  token={typeToken("size", specimen.size)}
-                  params={[
-                    { label: "字族", value: "系统无衬线" },
-                    { label: "字号", value: toPixels(tokens.type.size[specimen.size]) },
-                    { label: "行高", value: toPixels(tokens.type.line[specimen.line]) },
-                    { label: "字重", value: `${tokens.type.weight[specimen.weight]} · ${weightLabels[specimen.weight]}` },
-                    { label: "字距", value: tokens.type.tracking[specimen.tracking] === "0" ? "0px" : tokens.type.tracking[specimen.tracking] },
-                  ]}
-                  sample={specimen.sample}
-                  sampleClassName={specimen.className}
-                />
-              ))}
-            </section>
-          ))}
-        </div>
-        <div className={styles.typeFooter}><span>阅读建议</span><strong>正文行宽约 32–40 个汉字；窄屏下展示字号会适度缩小，参数仍展示基础 token。</strong></div>
-      </section>
+          <div className="min-w-0">
+            {typeCategories.map((category) => (
+              <section
+                aria-label={category.title}
+                className="not-first:mt-8 max-[36rem]:not-first:mt-6"
+                key={category.title}
+              >
+                <header className="flex items-end justify-between pb-3 border-b border-b-[var(--ds-color-line-strong)] gap-4 max-[36rem]:grid max-[36rem]:gap-1">
+                  <div>
+                    <h3 className="text-[var(--ds-color-ink)] text-[length:var(--type-size-lg)] font-[number:var(--type-weight-semibold)] tracking-[var(--type-tracking-tight)] m-0">
+                      {category.title}
+                    </h3>
+                    <p className="max-w-168 mt-1 mb-0 text-[var(--ds-color-muted)] text-[length:var(--type-size-xs)] leading-[var(--type-line-compact)] mx-0">
+                      {category.description}
+                    </p>
+                  </div>
+                  <span className="flex-none text-[var(--ds-color-muted)] text-[length:var(--type-size-xs)]">
+                    {category.specimens.length} 个规格
+                  </span>
+                </header>
+                {category.specimens.map((specimen) => (
+                  <TypeSpecimenRow
+                    key={specimen.size}
+                    size={specimen.size}
+                    name={specimen.name}
+                    token={typeToken("size", specimen.size)}
+                    params={[
+                      { label: "字族", value: "系统无衬线" },
+                      {
+                        label: "字号",
+                        value: toPixels(tokens.type.size[specimen.size]),
+                      },
+                      {
+                        label: "行高",
+                        value: toPixels(tokens.type.line[specimen.line]),
+                      },
+                      {
+                        label: "字重",
+                        value: `${tokens.type.weight[specimen.weight]} · ${weightLabels[specimen.weight]}`,
+                      },
+                      {
+                        label: "字距",
+                        value:
+                          tokens.type.tracking[specimen.tracking] === "0"
+                            ? "0px"
+                            : tokens.type.tracking[specimen.tracking],
+                      },
+                    ]}
+                    sample={specimen.sample}
+                    sampleClassName={specimen.className}
+                  />
+                ))}
+              </section>
+            ))}
+          </div>
+          <div className="flex items-baseline rounded-[var(--ds-radius-md)] bg-[var(--ds-color-surface-subtle)] text-[var(--ds-color-muted)] text-[length:var(--type-size-xs)] p-4 gap-3 max-[36rem]:grid max-[36rem]:gap-1">
+            <span>阅读建议</span>
+            <strong className="text-[var(--ds-color-ink-soft)] font-[number:var(--type-weight-medium)]">
+              正文行宽约 32–40 个汉字；窄屏下展示字号会适度缩小，参数仍展示基础
+              token。
+            </strong>
+          </div>
+        </section>
       )}
 
       {section === "spacing" && (
-        <section aria-labelledby="shape-title" className={`${styles.tokenSection} ${styles.shapeSection}`} id="shape">
-        <div className={styles.sectionIntro}>
-          <div className={styles.sectionIndex}><Icon name="shape" /><span>间距与形状</span></div>
-          <h1 id="shape-title">节奏来自距离，<br />而不是更多装饰。</h1>
-          <p>间距以 4px 为基础递增；圆角随元素层级变化。尺寸有规律，界面就会显得从容。</p>
-        </div>
+        <section
+          aria-labelledby="shape-title"
+          className="grid grid-cols-[minmax(14rem,_0.72fr)_minmax(0,_1.55fr)] border-t border-t-[var(--ds-color-line)] items-start py-16 px-0 gap-[clamp(var(--space-8),_6vw,_var(--space-16))] max-[68rem]:grid-cols-[minmax(13rem,_0.7fr)_minmax(0,_1.4fr)] max-[68rem]:gap-8 max-[52rem]:grid-cols-1 max-[52rem]:py-12 max-[52rem]:px-0 max-[52rem]:gap-6 max-[36rem]:py-8 max-[36rem]:px-0"
+          id="shape"
+        >
+          <div className="max-w-92 max-[52rem]:max-w-144">
+            <div className="flex items-center mb-5 text-[var(--ds-color-accent-ink)] text-[length:var(--type-size-xs)] font-[number:var(--type-weight-semibold)] gap-2">
+              <Icon
+                className="w-4 h-4 text-[var(--ds-color-accent)]"
+                name="shape"
+              />
+              <span>间距与形状</span>
+            </div>
+            <h1
+              className="text-[length:var(--type-size-2xl)] font-[number:var(--type-weight-semibold)] tracking-[var(--type-tracking-tight)] leading-[var(--type-line-heading)] m-0 max-[52rem]:text-[length:var(--type-size-2xl)] max-[36rem]:text-[length:var(--type-size-xl)]"
+              id="shape-title"
+            >
+              节奏来自距离，
+              <br />
+              而不是更多装饰。
+            </h1>
+            <p className="mt-4 mb-0 text-[var(--ds-color-muted)] text-[length:var(--type-size-sm)] leading-[var(--type-line-body)] mx-0">
+              间距以 4px
+              为基础递增；圆角随元素层级变化。尺寸有规律，界面就会显得从容。
+            </p>
+          </div>
 
-        <div className={styles.shapeContent}>
-          <div className={styles.spacingBoard}>
-            <div className={styles.subsectionHeading}><strong>间距阶梯</strong><span>4px 基础单位</span></div>
-            <div className={styles.spacingList}>
-              {spacingSamples.map((sample) => (
-                <div className={styles.spacingRow} key={sample.token}>
-                  <span>{sample.name}</span>
-                  <div className={styles.spacingTrack}><span className={sample.className} /></div>
-                  <code>{sample.token}</code>
+          <div className="grid gap-5">
+            <div className="border border-[var(--ds-color-line)] rounded-[var(--ds-radius-xl)] bg-[var(--ds-color-surface)] p-5 max-[36rem]:p-4">
+              <div className="flex items-baseline justify-between mb-4 gap-3 max-[36rem]:items-start">
+                <strong className="text-[var(--ds-color-ink-soft)] text-[length:var(--type-size-sm)] font-[number:var(--type-weight-semibold)]">
+                  间距阶梯
+                </strong>
+                <span className="text-[var(--ds-color-muted)] text-[length:var(--type-size-xs)] max-[36rem]:max-w-36 max-[36rem]:text-right">
+                  4px 基础单位
+                </span>
+              </div>
+              <div className="grid gap-3">
+                {spacingSamples.map((sample) => (
+                  <div
+                    className="grid grid-cols-[3rem_minmax(0,_1fr)_3.75rem] items-center gap-3"
+                    key={sample.token}
+                  >
+                    <span className="text-[var(--ds-color-muted)] text-[length:var(--type-size-xs)]">
+                      {sample.name}
+                    </span>
+                    <div className="h-5 flex items-center border-l border-l-[var(--ds-color-line-strong)] border-dashed">
+                      <span
+                        className={`block h-2.5 rounded-[var(--ds-radius-pill)] bg-[var(--ds-color-accent-soft)] ${sample.className}`}
+                      />
+                    </div>
+                    <code className="text-right">{sample.token}</code>
+                  </div>
+                ))}
+              </div>
+              <div className="flex items-center mt-4 pt-3 border-t border-t-[var(--ds-color-line)] text-[var(--ds-color-muted)] text-[length:var(--type-size-xs)] gap-2">
+                <span className="w-2 h-2 rounded-[var(--ds-radius-pill)] bg-[var(--ds-color-accent)]" />
+                相关内容靠近，不相关内容拉开。
+              </div>
+            </div>
+
+            <div className="border border-[var(--ds-color-line)] rounded-[var(--ds-radius-xl)] bg-[var(--ds-color-surface)] p-5 max-[36rem]:p-4">
+              <div className="flex items-baseline justify-between mb-4 gap-3 max-[36rem]:items-start">
+                <strong className="text-[var(--ds-color-ink-soft)] text-[length:var(--type-size-sm)] font-[number:var(--type-weight-semibold)]">
+                  圆角层级
+                </strong>
+                <span className="text-[var(--ds-color-muted)] text-[length:var(--type-size-xs)] max-[36rem]:max-w-36 max-[36rem]:text-right">
+                  结构清晰，不做过度柔化
+                </span>
+              </div>
+              <div className="grid grid-cols-3 gap-3 max-[36rem]:gap-1">
+                <div className="grid justify-items-center text-[var(--ds-color-muted)] text-[length:var(--type-size-xs)] gap-2">
+                  <span className="last:grid last:text-center last:gap-0.5 block w-16 h-12 border border-[var(--ds-color-line-strong)] bg-[var(--ds-color-surface-subtle)] rounded-[var(--ds-radius-sm)] max-[36rem]:w-13 max-[36rem]:h-10" />
+                  <span className="last:grid last:text-center last:gap-0.5">
+                    小型控件{" "}
+                    <code className="text-[var(--ds-color-muted-soft)]">8</code>
+                  </span>
                 </div>
-              ))}
+                <div className="grid justify-items-center text-[var(--ds-color-muted)] text-[length:var(--type-size-xs)] gap-2">
+                  <span className="last:grid last:text-center last:gap-0.5 block w-16 h-12 border border-[var(--ds-color-line-strong)] bg-[var(--ds-color-surface-subtle)] rounded-[var(--ds-radius-md)] max-[36rem]:w-13 max-[36rem]:h-10" />
+                  <span className="last:grid last:text-center last:gap-0.5">
+                    常用容器{" "}
+                    <code className="text-[var(--ds-color-muted-soft)]">
+                      12
+                    </code>
+                  </span>
+                </div>
+                <div className="grid justify-items-center text-[var(--ds-color-muted)] text-[length:var(--type-size-xs)] gap-2">
+                  <span className="last:grid last:text-center last:gap-0.5 block w-16 h-12 border border-[var(--ds-color-line-strong)] bg-[var(--ds-color-surface-subtle)] rounded-[var(--ds-radius-xl)] max-[36rem]:w-13 max-[36rem]:h-10" />
+                  <span className="last:grid last:text-center last:gap-0.5">
+                    展示面板{" "}
+                    <code className="text-[var(--ds-color-muted-soft)]">
+                      22
+                    </code>
+                  </span>
+                </div>
+              </div>
+              <div className="flex items-center mt-5 pt-4 border-t border-t-[var(--ds-color-line)] text-[var(--ds-color-muted)] text-[length:var(--type-size-xs)] gap-3">
+                <span className="grid w-10 h-10 flex-none place-items-center border border-[var(--ds-color-line)] rounded-[var(--ds-radius-md)] bg-[var(--ds-color-surface)] shadow-[var(--shadow-soft)] text-[var(--ds-color-accent)]">
+                  <Icon className="w-4" name="spark" />
+                </span>
+                <span>轻柔阴影只用于浮层和预览边界</span>
+              </div>
             </div>
-            <div className={styles.spacingRule}><span />相关内容靠近，不相关内容拉开。</div>
           </div>
-
-          <div className={styles.radiusBoard}>
-            <div className={styles.subsectionHeading}><strong>圆角层级</strong><span>结构清晰，不做过度柔化</span></div>
-            <div className={styles.radiusSamples}>
-              <div className={styles.radiusSample}><span className={styles.radiusSmall} /><span>小型控件 <code>8</code></span></div>
-              <div className={styles.radiusSample}><span className={styles.radiusMedium} /><span>常用容器 <code>12</code></span></div>
-              <div className={styles.radiusSample}><span className={styles.radiusLarge} /><span>展示面板 <code>22</code></span></div>
-            </div>
-            <div className={styles.shadowSample}><span className={styles.shadowSurface}><Icon name="spark" /></span><span>轻柔阴影只用于浮层和预览边界</span></div>
-          </div>
-        </div>
-      </section>
+        </section>
       )}
     </>
   );
