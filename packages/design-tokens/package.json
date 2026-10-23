@@ -4,7 +4,8 @@
   "private": true,
   "type": "module",
   "exports": {
-    ".": "./src/generated.ts"
+    ".": "./src/generated.ts",
+    "./themes": "./src/themes.ts"
   },
   "scripts": {
     "build": "node scripts/build.mjs",

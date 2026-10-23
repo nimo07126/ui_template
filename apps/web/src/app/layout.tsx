@@ -1,6 +1,8 @@
 import type { CSSProperties, ReactNode } from "react";
 import type { Metadata } from "next";
 import { tokens } from "@template/design-tokens";
+import { DEFAULT_THEME, themeBootScript, themeStyle } from "@template/design-tokens/themes";
+import { ThemeProvider } from "@/components/theme-editor/theme-provider";
 import { AppSidebar } from "@/components/navigation/app-sidebar";
 import { SiteHeader } from "@/components/navigation/site-header";
 import { SidebarInset, SidebarProvider } from "@/components/ui/sidebar";
@@ -20,26 +22,31 @@ const sidebarStyle = {
 
 export default function RootLayout({ children }: Readonly<{ children: ReactNode }>) {
   return (
-    <html data-scroll-behavior="smooth" lang="zh-CN">
+    <html data-scroll-behavior="smooth" lang="zh-CN" style={themeStyle(DEFAULT_THEME) as CSSProperties} suppressHydrationWarning>
+      <head>
+        <script dangerouslySetInnerHTML={{ __html: themeBootScript() }} />
+      </head>
       <body>
-        <TooltipProvider>
-          <SidebarProvider className="h-dvh min-h-0 overflow-hidden" style={sidebarStyle}>
-            <AppSidebar />
-            <SidebarInset className="min-h-0 min-w-0 overflow-hidden">
-              <SiteHeader />
-              <div
-                aria-label="页面内容"
-                className="min-h-0 flex-1 overflow-y-auto overscroll-y-contain scroll-smooth scroll-pt-8 [scrollbar-gutter:stable]"
-                data-slot="page-scroll"
-                tabIndex={0}
-              >
-                <div className="mx-auto flex w-full min-w-0 max-w-[var(--layout-content-max)] flex-col gap-8 px-5 py-8 md:px-8 md:py-10">
-                  {children}
+        <ThemeProvider>
+          <TooltipProvider>
+            <SidebarProvider className="h-dvh min-h-0 overflow-clip" style={sidebarStyle}>
+              <AppSidebar />
+              <SidebarInset className="min-h-0 min-w-0 overflow-clip">
+                <SiteHeader />
+                <div
+                  aria-label="页面内容"
+                  className="min-h-0 flex-1 overflow-y-auto overscroll-y-contain scroll-smooth scroll-pt-8 [scrollbar-gutter:stable]"
+                  data-slot="page-scroll"
+                  tabIndex={0}
+                >
+                  <div className="mx-auto flex w-full min-w-0 max-w-[var(--layout-content-max)] flex-col gap-8 px-5 py-8 md:px-8 md:py-10">
+                    {children}
+                  </div>
                 </div>
-              </div>
-            </SidebarInset>
-          </SidebarProvider>
-        </TooltipProvider>
+              </SidebarInset>
+            </SidebarProvider>
+          </TooltipProvider>
+        </ThemeProvider>
       </body>
     </html>
   );

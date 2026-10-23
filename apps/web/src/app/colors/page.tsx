@@ -1,5 +1,5 @@
-import { ThemeTokens } from "@/components/theme-showcase/theme-tokens";
+import { ColorWorkbench } from "@/components/theme-editor/color-workbench";
 
 export default function ColorsPage() {
-  return <ThemeTokens section="colors" />;
+  return <ColorWorkbench />;
 }

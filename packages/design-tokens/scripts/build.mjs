@@ -27,7 +27,7 @@ function flatten(value, prefix = []) {
 const css = [
   "/* Generated from packages/design-tokens/tokens.json. Do not edit directly. */",
   ":root {",
-  ...flatten(tokens).map(([name, value]) => {
+  ...flatten(Object.fromEntries(Object.entries(tokens).filter(([key]) => key !== "themes"))).map(([name, value]) => {
     const namespace = name.startsWith("color-") || name.startsWith("radius-") ? "--ds-" : "--";
     return `  ${namespace}${name}: ${value};`;
   }),

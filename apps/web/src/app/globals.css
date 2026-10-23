@@ -79,8 +79,8 @@ a {
 }
 
 ::selection {
-  background: var(--ds-color-accent-soft);
-  color: var(--ds-color-accent-ink);
+  background: var(--theme-selection);
+  color: var(--theme-selection-foreground);
 }
 
 :focus-visible:not([data-slot]) {

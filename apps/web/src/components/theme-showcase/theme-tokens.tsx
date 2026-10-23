@@ -1,16 +1,6 @@
-import Link from "next/link";
 import { tokens } from "@template/design-tokens";
 import { Icon } from "@/components/theme-showcase/icon";
 import styles from "./theme-tokens.module.css";
-
-const colors = [
-  { name: "雾面底色", token: "canvas", hex: tokens.color.canvas, className: styles.colorCanvas },
-  { name: "清透表面", token: "surface", hex: tokens.color.surface, className: styles.colorSurface },
-  { name: "石墨文字", token: "ink", hex: tokens.color.ink, className: styles.colorInk },
-  { name: "灰蓝辅助", token: "muted", hex: tokens.color.muted, className: styles.colorMuted },
-  { name: "紫靛强调", token: "accent", hex: tokens.color.accent, className: styles.colorAccent },
-  { name: "淡紫承托", token: "accent-soft", hex: tokens.color.accentSoft, className: styles.colorAccentSoft },
-];
 
 type SizeKey = keyof typeof tokens.type.size;
 type LineKey = keyof typeof tokens.type.line;
@@ -104,43 +94,9 @@ const spacingSamples = [
   { name: "区块", token: "space-10", className: styles.space10 },
 ];
 
-export function ThemeTokens({ section }: { section: "colors" | "typography" | "spacing" }) {
+export function ThemeTokens({ section }: { section: "typography" | "spacing" }) {
   return (
     <>
-      {section === "colors" && (
-        <section aria-labelledby="colors-title" className={styles.tokenSection} id="colors">
-        <div className={styles.sectionIntro}>
-          <div className={styles.sectionIndex}><Icon name="palette" /><span>颜色系统</span></div>
-          <h1 id="colors-title">颜色先建立语气，<br />再承担状态。</h1>
-          <p>基础层保持中性，强调色只指向可操作或被选中的内容。功能色有自己的职责，不与品牌色混用。</p>
-          <Link className={styles.textLink} href="/components">查看颜色应用 <Icon name="chevron" /></Link>
-        </div>
-
-        <div className={styles.colorArea}>
-          <div className={styles.paletteHeader}><span>澄序 · 核心色板</span><span>6 个基础角色</span></div>
-          <div className={styles.colorGrid}>
-            {colors.map((color) => (
-              <div className={styles.colorItem} key={color.token}>
-                <div aria-label={`${color.name} ${color.hex}`} className={`${styles.swatch} ${color.className}`} role="img">
-                  {color.token === "accent" && <Icon name="spark" />}
-                </div>
-                <div className={styles.colorMeta}>
-                  <strong>{color.name}</strong>
-                  <span>--ds-color-{color.token}</span>
-                  <code>{color.hex}</code>
-                </div>
-              </div>
-            ))}
-          </div>
-          <div className={styles.colorPrinciple}>
-            <span className={styles.principleMark}><Icon name="check" /></span>
-            <p><strong>颜色的比例</strong> 大面积使用中性色；紫靛只占少量，让每次强调都有意义。</p>
-            <div className={styles.ratio}><span /><span /><span /></div>
-          </div>
-        </div>
-      </section>
-      )}
-
       {section === "typography" && (
         <section aria-labelledby="type-title" className={`${styles.tokenSection} ${styles.typeSection}`} id="type">
         <div className={styles.sectionIntro}>

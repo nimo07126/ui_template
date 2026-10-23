@@ -13,6 +13,8 @@ import {
 import { Badge } from "@/components/ui/badge";
 import { Separator } from "@/components/ui/separator";
 import { SidebarTrigger } from "@/components/ui/sidebar";
+import { useThemeEditor } from "@/components/theme-editor/theme-provider";
+import { themes } from "@template/design-tokens/themes";
 
 const pageTitles: Record<string, string> = {
   "/": "主题概览",
@@ -25,6 +27,8 @@ const pageTitles: Record<string, string> = {
 export function SiteHeader() {
   const pathname = usePathname();
   const title = pageTitles[pathname] ?? "设计主题";
+  const { activeId, dirty } = useThemeEditor();
+  const theme = themes.find((entry) => entry.id === activeId)!;
 
   return (
     <header className="z-20 flex h-14 shrink-0 items-center gap-3 border-b border-border/80 bg-background px-4 md:px-6">
@@ -43,7 +47,7 @@ export function SiteHeader() {
       </Breadcrumb>
       <Badge className="ml-auto gap-2 font-normal" variant="outline">
         <span className="size-1.5 rounded-full bg-primary" />
-        浅色主题
+        {theme.name}{dirty ? " · 预览" : ""}
       </Badge>
     </header>
   );

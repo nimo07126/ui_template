@@ -66,7 +66,7 @@
   padding: 0 var(--space-4);
   border-radius: var(--ds-radius-md);
   background: var(--ds-color-accent);
-  color: var(--ds-color-surface);
+  color: var(--theme-accent-foreground);
   font-size: var(--type-size-sm);
   font-weight: var(--type-weight-semibold);
   transition: background-color 160ms ease, transform 160ms ease;
@@ -251,7 +251,7 @@
   place-items: center;
   border-radius: var(--ds-radius-sm);
   background: var(--ds-color-ink);
-  color: var(--ds-color-surface);
+  color: var(--theme-accent-foreground);
   font-weight: var(--type-weight-medium);
 }
 
