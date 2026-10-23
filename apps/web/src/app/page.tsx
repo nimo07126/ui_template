@@ -1,5 +1,5 @@
-import { ThemeShowcase } from "@/components/theme-showcase/theme-showcase";
+import { ThemeOverview } from "@/components/theme-showcase/theme-overview";
 
 export default function HomePage() {
-  return <ThemeShowcase />;
+  return <ThemeOverview />;
 }

@@ -119,6 +119,7 @@ export const tokens = {
   },
   "layout": {
     "sidebarWidth": "15.5rem",
+    "sidebarCollapsedWidth": "3rem",
     "contentMax": "82rem",
     "controlHeight": "2.875rem",
     "previewMinHeight": "29rem"

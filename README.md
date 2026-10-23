@@ -1,6 +1,6 @@
 # 澄序 · 设计主题样板
 
-一套清晰、克制但不沉闷的界面主题示例。当前先交付响应式 Web 展示页；Expo 移动端将在主题方向确认后扩展，并复用同一份设计 token。
+一套清晰、克制但不沉闷的界面主题示例。当前交付响应式 Web 多页面展示站；Expo 移动端将在主题方向确认后扩展，并复用同一份设计 token。
 
 ## 快速开始
 
@@ -17,7 +17,9 @@ pnpm dev
 apps/
   web/                         Next.js App Router 展示站
     src/app/                   页面入口、metadata 与全局基础样式
-    src/components/theme-showcase/ 主题导航、样板界面、token 与控件展示
+    src/components/navigation/  shadcn Sidebar 与当前页面头部
+    src/components/ui/         shadcn/ui 可复用组件
+    src/components/theme-showcase/  页面专属主题样例区块
     src/styles/tokens.css      自动生成的 CSS 自定义属性
 packages/
   design-tokens/
@@ -26,10 +28,22 @@ packages/
     src/generated.ts           自动生成，供应用与未来 Expo 端复用
 ```
 
+## 页面路由
+
+| 路径 | 内容 |
+| --- | --- |
+| `/` | 主题概览与工作台样例 |
+| `/colors` | 语义色板与颜色规则 |
+| `/typography` | 字体分类与完整参数 |
+| `/spacing` | 间距、圆角与形状 |
+| `/components` | shadcn/ui 组件变体示例 |
+
+侧栏使用 shadcn/ui Sidebar；通用控件直接引用 `src/components/ui/` 中的 shadcn 组件。
+
 ## Token 约定
 
 - 修改 `packages/design-tokens/tokens.json`，不要直接编辑生成文件。
-- 页面样式通过语义变量（例如 `--color-accent`、`--space-4`、`--radius-md`）读取主题值。
+- 自定义页面样式通过 `--ds-color-*`、`--space-*`、`--ds-radius-*`、`--type-*` 等变量读取设计 token。
 - `pnpm tokens:build` 重新生成目标文件；`pnpm tokens:check` 检查生成产物是否与源一致。
 - 新的产品颜色应先加入 token，再在组件样式中引用，不在 CSS Modules 中散落十六进制色值。
 

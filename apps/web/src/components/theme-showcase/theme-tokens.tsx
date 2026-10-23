@@ -1,3 +1,4 @@
+import Link from "next/link";
 import { tokens } from "@template/design-tokens";
 import { Icon } from "@/components/theme-showcase/icon";
 import styles from "./theme-tokens.module.css";
@@ -103,15 +104,16 @@ const spacingSamples = [
   { name: "区块", token: "space-10", className: styles.space10 },
 ];
 
-export function ThemeTokens() {
+export function ThemeTokens({ section }: { section: "colors" | "typography" | "spacing" }) {
   return (
     <>
-      <section aria-labelledby="colors-title" className={styles.tokenSection} id="colors">
+      {section === "colors" && (
+        <section aria-labelledby="colors-title" className={styles.tokenSection} id="colors">
         <div className={styles.sectionIntro}>
           <div className={styles.sectionIndex}><Icon name="palette" /><span>颜色系统</span></div>
-          <h2 id="colors-title">颜色先建立语气，<br />再承担状态。</h2>
+          <h1 id="colors-title">颜色先建立语气，<br />再承担状态。</h1>
           <p>基础层保持中性，强调色只指向可操作或被选中的内容。功能色有自己的职责，不与品牌色混用。</p>
-          <a className={styles.textLink} href="#components">查看颜色应用 <Icon name="chevron" /></a>
+          <Link className={styles.textLink} href="/components">查看颜色应用 <Icon name="chevron" /></Link>
         </div>
 
         <div className={styles.colorArea}>
@@ -124,7 +126,7 @@ export function ThemeTokens() {
                 </div>
                 <div className={styles.colorMeta}>
                   <strong>{color.name}</strong>
-                  <span>--color-{color.token}</span>
+                  <span>--ds-color-{color.token}</span>
                   <code>{color.hex}</code>
                 </div>
               </div>
@@ -137,11 +139,13 @@ export function ThemeTokens() {
           </div>
         </div>
       </section>
+      )}
 
-      <section aria-labelledby="type-title" className={`${styles.tokenSection} ${styles.typeSection}`} id="type">
+      {section === "typography" && (
+        <section aria-labelledby="type-title" className={`${styles.tokenSection} ${styles.typeSection}`} id="type">
         <div className={styles.sectionIntro}>
           <div className={styles.sectionIndex}><Icon name="type" /><span>字体层级</span></div>
-          <h2 id="type-title">从展示到阅读，<br />每一级都有依据。</h2>
+          <h1 id="type-title">从展示到阅读，<br />每一级都有依据。</h1>
           <p>字体规范不只是几种字号示例。这里定义字体族、字号分类、行高、字重与字距，让不同页面能够使用同一套排版尺度。</p>
         </div>
 
@@ -207,11 +211,13 @@ export function ThemeTokens() {
         </div>
         <div className={styles.typeFooter}><span>阅读建议</span><strong>正文行宽约 32–40 个汉字；窄屏下展示字号会适度缩小，参数仍展示基础 token。</strong></div>
       </section>
+      )}
 
-      <section aria-labelledby="shape-title" className={`${styles.tokenSection} ${styles.shapeSection}`} id="shape">
+      {section === "spacing" && (
+        <section aria-labelledby="shape-title" className={`${styles.tokenSection} ${styles.shapeSection}`} id="shape">
         <div className={styles.sectionIntro}>
           <div className={styles.sectionIndex}><Icon name="shape" /><span>间距与形状</span></div>
-          <h2 id="shape-title">节奏来自距离，<br />而不是更多装饰。</h2>
+          <h1 id="shape-title">节奏来自距离，<br />而不是更多装饰。</h1>
           <p>间距以 4px 为基础递增；圆角随元素层级变化。尺寸有规律，界面就会显得从容。</p>
         </div>
 
@@ -241,6 +247,7 @@ export function ThemeTokens() {
           </div>
         </div>
       </section>
+      )}
     </>
   );
 }

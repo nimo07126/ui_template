@@ -20,7 +20,7 @@
   align-items: center;
   gap: var(--space-2);
   margin-bottom: var(--space-5);
-  color: var(--color-muted);
+  color: var(--ds-color-muted);
   font-size: var(--type-size-sm);
   font-weight: var(--type-weight-medium);
 }
@@ -28,14 +28,14 @@
 .eyebrowDot {
   width: 0.5rem;
   height: 0.5rem;
-  border-radius: var(--radius-pill);
-  background: var(--color-accent);
-  box-shadow: 0 0 0 0.25rem var(--color-accent-soft);
+  border-radius: var(--ds-radius-pill);
+  background: var(--ds-color-accent);
+  box-shadow: 0 0 0 0.25rem var(--ds-color-accent-soft);
 }
 
 .intro h1 {
   margin: 0;
-  color: var(--color-ink);
+  color: var(--ds-color-ink);
   font-size: clamp(var(--type-size-3xl), 5vw, var(--type-size-display));
   font-weight: var(--type-weight-semibold);
   letter-spacing: var(--type-tracking-tight);
@@ -45,7 +45,7 @@
 .introText {
   max-width: 35rem;
   margin: var(--space-5) 0 0;
-  color: var(--color-ink-soft);
+  color: var(--ds-color-ink-soft);
   font-size: var(--type-size-md);
   line-height: var(--type-line-body);
 }
@@ -64,9 +64,9 @@
   align-items: center;
   gap: var(--space-2);
   padding: 0 var(--space-4);
-  border-radius: var(--radius-md);
-  background: var(--color-accent);
-  color: var(--color-surface);
+  border-radius: var(--ds-radius-md);
+  background: var(--ds-color-accent);
+  color: var(--ds-color-surface);
   font-size: var(--type-size-sm);
   font-weight: var(--type-weight-semibold);
   transition: background-color 160ms ease, transform 160ms ease;
@@ -74,7 +74,7 @@
 
 .primaryLink:hover {
   transform: translateY(-1px);
-  background: var(--color-accent-hover);
+  background: var(--ds-color-accent-hover);
 }
 
 .primaryLink svg {
@@ -82,23 +82,23 @@
 }
 
 .themeCode {
-  color: var(--color-muted);
+  color: var(--ds-color-muted);
   font-size: var(--type-size-xs);
 }
 
 .themeCode strong {
   margin-left: var(--space-2);
-  color: var(--color-ink-soft);
+  color: var(--ds-color-ink-soft);
   font-weight: var(--type-weight-medium);
 }
 
 .introAside {
   padding: var(--space-2) 0 var(--space-2) var(--space-6);
-  border-left: 1px solid var(--color-line-strong);
+  border-left: 1px solid var(--ds-color-line-strong);
 }
 
 .asideLabel {
-  color: var(--color-muted);
+  color: var(--ds-color-muted);
   font-size: var(--type-size-xs);
 }
 
@@ -106,7 +106,7 @@
   display: grid;
   gap: var(--space-3);
   margin-top: var(--space-4);
-  color: var(--color-ink-soft);
+  color: var(--ds-color-ink-soft);
   font-size: var(--type-size-sm);
   font-weight: var(--type-weight-medium);
 }
@@ -116,8 +116,8 @@
   width: 0.3125rem;
   height: 0.3125rem;
   margin: 0 var(--space-2) var(--space-half) 0;
-  border-radius: var(--radius-pill);
-  background: var(--color-accent);
+  border-radius: var(--ds-radius-pill);
+  background: var(--ds-color-accent);
   content: "";
 }
 
@@ -129,33 +129,33 @@
 }
 
 .paletteSignature span {
-  border-radius: var(--radius-pill);
+  border-radius: var(--ds-radius-pill);
 }
 
 .signatureCanvas {
   flex: 2;
-  background: var(--color-canvas);
-  box-shadow: inset 0 0 0 1px var(--color-line);
+  background: var(--ds-color-canvas);
+  box-shadow: inset 0 0 0 1px var(--ds-color-line);
 }
 
 .signatureInk {
   flex: 1;
-  background: var(--color-ink);
+  background: var(--ds-color-ink);
 }
 
 .signatureAccent {
   flex: 1;
-  background: var(--color-accent);
+  background: var(--ds-color-accent);
 }
 
 .signatureSoft {
   flex: 1;
-  background: var(--color-accent-soft);
+  background: var(--ds-color-accent-soft);
 }
 
 .previewSection {
   padding-top: var(--space-8);
-  border-top: 1px solid var(--color-line);
+  border-top: 1px solid var(--ds-color-line);
 }
 
 .previewHeading {
@@ -167,7 +167,7 @@
 }
 
 .previewKicker {
-  color: var(--color-muted);
+  color: var(--ds-color-muted);
   font-size: var(--type-size-xs);
 }
 
@@ -185,24 +185,24 @@
   align-items: center;
   gap: var(--space-2);
   padding: var(--space-2) var(--space-3);
-  border: 1px solid var(--color-line);
-  border-radius: var(--radius-pill);
-  background: var(--color-surface);
-  color: var(--color-muted);
+  border: 1px solid var(--ds-color-line);
+  border-radius: var(--ds-radius-pill);
+  background: var(--ds-color-surface);
+  color: var(--ds-color-muted);
   font-size: var(--type-size-xs);
 }
 
 .previewTag > span {
   width: 0.375rem;
   height: 0.375rem;
-  background: var(--color-success);
+  background: var(--ds-color-success);
 }
 
 .previewFrame {
   overflow: hidden;
-  border: 1px solid var(--color-line-strong);
-  border-radius: var(--radius-2xl);
-  background: var(--color-surface);
+  border: 1px solid var(--ds-color-line-strong);
+  border-radius: var(--ds-radius-2xl);
+  background: var(--ds-color-surface);
   box-shadow: var(--shadow-soft);
 }
 
@@ -212,8 +212,8 @@
   align-items: center;
   justify-content: space-between;
   padding-inline: var(--space-5);
-  border-bottom: 1px solid var(--color-line);
-  background: var(--color-surface);
+  border-bottom: 1px solid var(--ds-color-line);
+  background: var(--ds-color-surface);
 }
 
 .appIdentity,
@@ -224,23 +224,23 @@
 
 .appIdentity {
   gap: var(--space-2);
-  color: var(--color-muted);
+  color: var(--ds-color-muted);
   font-size: var(--type-size-xs);
 }
 
 .appIdentity > span:nth-child(2) {
-  color: var(--color-ink-soft);
+  color: var(--ds-color-ink-soft);
   font-weight: var(--type-weight-medium);
 }
 
 .appIdentity > strong {
-  color: var(--color-ink);
+  color: var(--ds-color-ink);
   font-weight: var(--type-weight-semibold);
 }
 
 .appIdentity > svg {
   width: 0.8125rem;
-  color: var(--color-muted-soft);
+  color: var(--ds-color-muted-soft);
 }
 
 .appMark,
@@ -249,9 +249,9 @@
   display: grid;
   flex: 0 0 auto;
   place-items: center;
-  border-radius: var(--radius-sm);
-  background: var(--color-ink);
-  color: var(--color-surface);
+  border-radius: var(--ds-radius-sm);
+  background: var(--ds-color-ink);
+  color: var(--ds-color-surface);
   font-weight: var(--type-weight-medium);
 }
 
@@ -270,31 +270,21 @@
   display: grid;
   padding: 0;
   place-items: center;
-  border: 0;
-  background: transparent;
-  color: var(--color-muted);
-  cursor: pointer;
 }
 
 .searchButton {
   width: 2rem;
   height: 2rem;
-  border-radius: var(--radius-sm);
 }
 
-.searchButton:hover,
-.rowMore:hover {
-  background: var(--color-surface-muted);
-  color: var(--color-ink);
-}
 
 .avatar {
   width: 2rem;
   height: 2rem;
-  border: 2px solid var(--color-surface);
-  border-radius: var(--radius-pill);
-  background: var(--color-accent-soft);
-  color: var(--color-accent-ink);
+  border: 2px solid var(--ds-color-surface);
+  border-radius: var(--ds-radius-pill);
+  background: var(--ds-color-accent-soft);
+  color: var(--ds-color-accent-ink);
   font-size: var(--type-size-xs);
 }
 
@@ -308,13 +298,13 @@
   display: flex;
   flex-direction: column;
   padding: var(--space-5) var(--space-3) var(--space-3);
-  border-right: 1px solid var(--color-line);
-  background: var(--color-preview-rail);
+  border-right: 1px solid var(--ds-color-line);
+  background: var(--ds-color-preview-rail);
 }
 
 .railCaption {
   padding: 0 var(--space-2) var(--space-2);
-  color: var(--color-muted-soft);
+  color: var(--ds-color-muted-soft);
   font-size: var(--type-size-xs);
   font-weight: var(--type-weight-medium);
 }
@@ -326,19 +316,19 @@
   align-items: center;
   gap: var(--space-2);
   padding: 0 var(--space-2);
-  border-radius: var(--radius-sm);
-  color: var(--color-muted);
+  border-radius: var(--ds-radius-sm);
+  color: var(--ds-color-muted);
   font-size: var(--type-size-xs);
   font-weight: var(--type-weight-medium);
 }
 
 .railLinkActive {
-  background: var(--color-preview-selected);
-  color: var(--color-accent-ink);
+  background: var(--ds-color-preview-selected);
+  color: var(--ds-color-accent-ink);
 }
 
 .railLinkActive svg {
-  color: var(--color-accent);
+  color: var(--ds-color-accent);
 }
 
 .railLink svg,
@@ -352,16 +342,16 @@
   width: 0.9375rem;
   height: 0.9375rem;
   place-items: center;
-  border-radius: var(--radius-sm);
-  background: var(--color-surface-muted);
-  color: var(--color-muted);
+  border-radius: var(--ds-radius-sm);
+  background: var(--ds-color-surface-muted);
+  color: var(--ds-color-muted);
   font-size: var(--type-size-xs);
 }
 
 .railDivider {
   height: 1px;
   margin: var(--space-4) var(--space-2);
-  background: var(--color-line);
+  background: var(--ds-color-line);
 }
 
 .railBottom {
@@ -370,8 +360,8 @@
   gap: var(--space-2);
   margin-top: auto;
   padding: var(--space-3) var(--space-1) 0;
-  border-top: 1px solid var(--color-line);
-  color: var(--color-ink-soft);
+  border-top: 1px solid var(--ds-color-line);
+  color: var(--ds-color-ink-soft);
   font-size: var(--type-size-xs);
   font-weight: var(--type-weight-medium);
 }
@@ -379,16 +369,16 @@
 .railAvatar {
   width: 1.75rem;
   height: 1.75rem;
-  border-radius: var(--radius-pill);
-  background: var(--color-accent-soft);
-  color: var(--color-accent-ink);
+  border-radius: var(--ds-radius-pill);
+  background: var(--ds-color-accent-soft);
+  color: var(--ds-color-accent-ink);
   font-size: var(--type-size-xs);
 }
 
 .railBottom small {
   display: block;
   margin-top: var(--space-half);
-  color: var(--color-muted);
+  color: var(--ds-color-muted);
   font-size: var(--type-size-xs);
   font-weight: var(--type-weight-regular);
 }
@@ -396,13 +386,13 @@
 .railBottom > svg {
   width: 1rem;
   margin-left: auto;
-  color: var(--color-muted);
+  color: var(--ds-color-muted);
 }
 
 .appContent {
   min-width: 0;
   padding: var(--space-6) clamp(var(--space-4), 3vw, var(--space-8));
-  background: var(--color-preview-canvas);
+  background: var(--ds-color-preview-canvas);
 }
 
 .workspaceHeading {
@@ -413,7 +403,7 @@
 }
 
 .dateLabel {
-  color: var(--color-muted);
+  color: var(--ds-color-muted);
   font-size: var(--type-size-xs);
 }
 
@@ -427,29 +417,12 @@
 
 .workspaceHeading p {
   margin: var(--space-1) 0 0;
-  color: var(--color-muted);
+  color: var(--ds-color-muted);
   font-size: var(--type-size-xs);
 }
 
 .createButton {
-  display: inline-flex;
-  min-height: 2.375rem;
   flex: 0 0 auto;
-  align-items: center;
-  gap: var(--space-2);
-  padding: 0 var(--space-3);
-  border: 0;
-  border-radius: var(--radius-sm);
-  background: var(--color-accent);
-  color: var(--color-surface);
-  font-size: var(--type-size-xs);
-  font-weight: var(--type-weight-semibold);
-  cursor: pointer;
-  transition: background-color 160ms ease;
-}
-
-.createButton:hover {
-  background: var(--color-accent-hover);
 }
 
 .createButton svg {
@@ -463,9 +436,9 @@
   gap: var(--space-3);
   margin-top: var(--space-5);
   padding: var(--space-3) var(--space-4);
-  border: 1px solid var(--color-accent-soft);
-  border-radius: var(--radius-md);
-  background: var(--color-accent-soft);
+  border: 1px solid var(--ds-color-accent-soft);
+  border-radius: var(--ds-radius-md);
+  background: var(--ds-color-accent-soft);
 }
 
 .focusIcon {
@@ -474,9 +447,9 @@
   height: 2rem;
   flex: 0 0 auto;
   place-items: center;
-  border-radius: var(--radius-sm);
-  background: var(--color-surface);
-  color: var(--color-accent);
+  border-radius: var(--ds-radius-sm);
+  background: var(--ds-color-surface);
+  color: var(--ds-color-accent);
 }
 
 .focusIcon svg {
@@ -491,14 +464,14 @@
 }
 
 .focusCopy strong {
-  color: var(--color-ink-soft);
+  color: var(--ds-color-ink-soft);
   font-size: var(--type-size-xs);
   font-weight: var(--type-weight-semibold);
 }
 
 .focusCopy span {
   overflow: hidden;
-  color: var(--color-accent-ink);
+  color: var(--ds-color-accent-ink);
   font-size: var(--type-size-xs);
   text-overflow: ellipsis;
   white-space: nowrap;
@@ -511,17 +484,17 @@
   flex: 0 0 auto;
   overflow: hidden;
   margin-left: auto;
-  border-radius: var(--radius-pill);
-  background: var(--color-surface);
+  border-radius: var(--ds-radius-pill);
+  background: var(--ds-color-surface);
 }
 
 .focusProgress span:first-child {
   width: 80%;
-  background: var(--color-accent);
+  background: var(--ds-color-accent);
 }
 
 .focusCount {
-  color: var(--color-accent-ink);
+  color: var(--ds-color-accent-ink);
   font-size: var(--type-size-xs);
   font-variant-numeric: tabular-nums;
   font-weight: var(--type-weight-semibold);
@@ -549,21 +522,12 @@
 }
 
 .projectHeader > div > span {
-  color: var(--color-muted);
+  color: var(--ds-color-muted);
   font-size: var(--type-size-xs);
 }
 
 .textAction {
-  display: inline-flex;
-  align-items: center;
-  gap: var(--space-1);
-  padding: var(--space-1);
-  border: 0;
-  background: transparent;
-  color: var(--color-accent-ink);
-  font-size: var(--type-size-xs);
-  font-weight: var(--type-weight-medium);
-  cursor: pointer;
+  padding-inline: var(--space-1);
 }
 
 .textAction svg {
@@ -571,7 +535,7 @@
 }
 
 .projectList {
-  border-top: 1px solid var(--color-line);
+  border-top: 1px solid var(--ds-color-line);
 }
 
 .projectRow {
@@ -580,26 +544,26 @@
   grid-template-columns: 0.5rem minmax(8rem, 1fr) minmax(6rem, 0.7fr) auto 1.25rem;
   align-items: center;
   gap: var(--space-3);
-  border-bottom: 1px solid var(--color-line);
+  border-bottom: 1px solid var(--ds-color-line);
 }
 
 .projectMark {
   width: 0.5rem;
   height: 1.75rem;
-  border-radius: var(--radius-pill);
-  background: var(--color-accent);
+  border-radius: var(--ds-radius-pill);
+  background: var(--ds-color-accent);
 }
 
 .violet {
-  background: var(--color-accent);
+  background: var(--ds-color-accent);
 }
 
 .blue {
-  background: var(--color-muted);
+  background: var(--ds-color-muted);
 }
 
 .green {
-  background: var(--color-success);
+  background: var(--ds-color-success);
 }
 
 .projectName {
@@ -610,7 +574,7 @@
 
 .projectName strong {
   overflow: hidden;
-  color: var(--color-ink-soft);
+  color: var(--ds-color-ink-soft);
   font-size: var(--type-size-xs);
   font-weight: var(--type-weight-medium);
   text-overflow: ellipsis;
@@ -618,7 +582,7 @@
 }
 
 .projectName span {
-  color: var(--color-muted);
+  color: var(--ds-color-muted);
   font-size: var(--type-size-xs);
 }
 
@@ -626,7 +590,7 @@
   display: flex;
   align-items: center;
   gap: var(--space-2);
-  color: var(--color-muted);
+  color: var(--ds-color-muted);
   font-size: var(--type-size-xs);
   font-variant-numeric: tabular-nums;
 }
@@ -635,19 +599,19 @@
   height: 0.3125rem;
   flex: 1;
   overflow: hidden;
-  border-radius: var(--radius-pill);
-  background: var(--color-surface-muted);
+  border-radius: var(--ds-radius-pill);
+  background: var(--ds-color-surface-muted);
 }
 
 .progressTrack span {
   display: block;
   height: 100%;
   border-radius: inherit;
-  background: var(--color-accent);
+  background: var(--ds-color-accent);
 }
 
 .projectDue {
-  color: var(--color-muted);
+  color: var(--ds-color-muted);
   font-size: var(--type-size-xs);
   white-space: nowrap;
 }
@@ -655,7 +619,7 @@
 .rowMore {
   width: 1.5rem;
   height: 1.5rem;
-  border-radius: var(--radius-sm);
+  border-radius: var(--ds-radius-sm);
 }
 
 .rowMore svg {
@@ -667,7 +631,7 @@
   align-items: center;
   gap: var(--space-2);
   padding-top: var(--space-3);
-  color: var(--color-success);
+  color: var(--ds-color-success);
   font-size: var(--type-size-xs);
 }
 
@@ -675,8 +639,8 @@
   width: 0.5rem;
   height: 0.5rem;
   flex: 0 0 auto;
-  border-radius: var(--radius-pill);
-  background: var(--color-success);
+  border-radius: var(--ds-radius-pill);
+  background: var(--ds-color-success);
 }
 
 .appBottomNote .statusDot {
@@ -686,7 +650,7 @@
 
 .appBottomNote > span:last-child {
   margin-left: auto;
-  color: var(--color-muted);
+  color: var(--ds-color-muted);
 }
 
 .previewCaption {
@@ -694,7 +658,7 @@
   justify-content: space-between;
   gap: var(--space-3);
   margin-top: var(--space-3);
-  color: var(--color-muted);
+  color: var(--ds-color-muted);
   font-size: var(--type-size-xs);
 }
 
@@ -750,7 +714,7 @@
     gap: var(--space-2) var(--space-4);
     margin-top: var(--space-6);
     padding: var(--space-3) 0 0;
-    border-top: 1px solid var(--color-line);
+    border-top: 1px solid var(--ds-color-line);
     border-left: 0;
   }
 

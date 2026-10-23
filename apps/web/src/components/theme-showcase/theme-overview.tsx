@@ -1,3 +1,5 @@
+import Link from "next/link";
+import { Button } from "@/components/ui/button";
 import { Icon } from "@/components/theme-showcase/icon";
 import styles from "./theme-overview.module.css";
 
@@ -18,7 +20,7 @@ export function ThemeOverview() {
             「澄序」以柔和的灰蓝为底，用低饱和紫靛标记关键时刻。它不抢内容的声音，只让重要的事更容易被看见。
           </p>
           <div className={styles.introActions}>
-            <a className={styles.primaryLink} href="#colors">查看设计规则 <Icon name="chevron" /></a>
+            <Link className={styles.primaryLink} href="/colors">查看设计规则 <Icon name="chevron" /></Link>
             <span className={styles.themeCode}>主题编号 <strong>CX / 01</strong></span>
           </div>
         </div>
@@ -56,7 +58,7 @@ export function ThemeOverview() {
               <strong>项目空间</strong>
             </div>
             <div className={styles.appTopActions}>
-              <button aria-label="搜索" className={styles.searchButton} type="button"><Icon name="search" /></button>
+              <Button aria-label="搜索" className={styles.searchButton} size="icon" variant="ghost"><Icon name="search" /></Button>
               <span className={styles.avatar}>林</span>
             </div>
           </div>
@@ -64,12 +66,12 @@ export function ThemeOverview() {
           <div className={styles.appLayout}>
             <aside className={styles.appRail} aria-label="工作台示例导航">
               <div className={styles.railCaption}>工作空间</div>
-              <a aria-current="page" className={styles.railLinkActive} href="#overview"><Icon name="overview" />总览</a>
-              <a className={styles.railLink} href="#components"><Icon name="components" />项目</a>
-              <a className={styles.railLink} href="#shape"><Icon name="shape" />日程</a>
+              <span aria-current="page" className={styles.railLinkActive}><Icon name="overview" />总览</span>
+              <span className={styles.railLink}><Icon name="components" />项目</span>
+              <span className={styles.railLink}><Icon name="shape" />日程</span>
               <div className={styles.railDivider} />
               <div className={styles.railCaption}>协作</div>
-              <a className={styles.railLink} href="#type"><span className={styles.teamGlyph}>人</span>团队成员</a>
+              <span className={styles.railLink}><span className={styles.teamGlyph}>人</span>团队成员</span>
               <div className={styles.railBottom}><span className={styles.railAvatar}>林</span><span>林知遥<small>设计负责人</small></span><Icon name="more" /></div>
             </aside>
 
@@ -80,7 +82,7 @@ export function ThemeOverview() {
                   <h3>下午好，知遥</h3>
                   <p>今天有 3 个项目正在稳步推进。</p>
                 </div>
-                <button className={styles.createButton} type="button"><Icon name="plus" />新建项目</button>
+                <Button className={styles.createButton} size="lg"><Icon name="plus" />新建项目</Button>
               </div>
 
               <div className={styles.focusStrip}>
@@ -92,7 +94,7 @@ export function ThemeOverview() {
 
               <div className={styles.projectHeader}>
                 <div><h4>正在推进</h4><span>按最近更新排序</span></div>
-                <button className={styles.textAction} type="button">查看全部 <Icon name="chevron" /></button>
+                <Button className={styles.textAction} size="sm" variant="link">查看全部 <Icon name="chevron" /></Button>
               </div>
               <div className={styles.projectList}>
                 {projects.map((project) => (
@@ -101,7 +103,7 @@ export function ThemeOverview() {
                     <div className={styles.projectName}><strong>{project.name}</strong><span>{project.category}</span></div>
                     <div className={styles.progressGroup}><div className={styles.progressTrack}><span style={{ width: project.progress }} /></div><span>{project.progress}</span></div>
                     <span className={styles.projectDue}>截止 {project.due}</span>
-                    <button aria-label={`更多：${project.name}`} className={styles.rowMore} type="button"><Icon name="more" /></button>
+                    <Button aria-label={`更多：${project.name}`} className={styles.rowMore} size="icon-sm" variant="ghost"><Icon name="more" /></Button>
                   </div>
                 ))}
               </div>

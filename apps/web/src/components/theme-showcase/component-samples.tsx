@@ -1,63 +1,130 @@
-import { Icon } from "@/components/theme-showcase/icon";
+import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
+import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
+import { Input } from "@/components/ui/input";
+import { Separator } from "@/components/ui/separator";
 import styles from "./component-samples.module.css";
+import {
+  AlertCircle,
+  Check,
+  MoreHorizontal,
+  Plus,
+  Search,
+  Sparkles,
+} from "lucide-react";
 
 export function ComponentSamples() {
   return (
-    <section aria-labelledby="components-title" className={styles.componentsSection} id="components">
+    <section aria-labelledby="components-title" className={styles.componentsSection}>
       <div className={styles.componentIntro}>
-        <div className={styles.sectionIndex}><Icon name="components" /><span>常用控件</span></div>
-        <h2 id="components-title">少量控件，<br />看清同一套规则。</h2>
-        <p>组件共用颜色、间距、圆角和状态定义。具体形态服务于操作，不为变化而变化。</p>
+        <div className={styles.sectionIndex}><Sparkles aria-hidden="true" /><span>常用控件</span></div>
+        <h1 id="components-title">真实组件，<br />遵循同一套主题。</h1>
+        <p>以下示例直接引用 shadcn/ui 组件。主题颜色、圆角与焦点状态由共享 token 提供，而不是在页面里另写一套控件样式。</p>
       </div>
 
-      <div className={styles.componentCanvas}>
-        <div className={styles.canvasHeader}>
-          <div><strong>基础交互</strong><span>按钮 · 输入 · 状态反馈</span></div>
-          <span className={styles.canvasVersion}>组件示例</span>
-        </div>
-
-        <div className={styles.componentRow}>
-          <div className={styles.rowLabel}><strong>按钮</strong><span>操作有主次</span></div>
-          <div className={styles.buttonSamples}>
-            <button className={styles.primaryButton} type="button"><Icon name="plus" />新建项目</button>
-            <button className={styles.secondaryButton} type="button">保存草稿</button>
-            <button className={styles.tertiaryButton} type="button">取消</button>
-            <button aria-label="更多操作" className={styles.iconButton} type="button"><Icon name="more" /></button>
+      <Card className={styles.componentCanvas}>
+        <CardHeader className={styles.canvasHeader}>
+          <div>
+            <CardTitle>基础交互组件</CardTitle>
+            <CardDescription>shadcn/ui · 澄序主题映射</CardDescription>
           </div>
-        </div>
+          <Badge variant="outline">交互规范</Badge>
+        </CardHeader>
+        <CardContent className={styles.canvasContent}>
+          <section aria-labelledby="button-samples-title" className={styles.componentRow}>
+            <div className={styles.rowLabel}>
+              <h2 id="button-samples-title">按钮 Button</h2>
+              <p>用层级区分操作优先级。</p>
+            </div>
+            <div className={styles.buttonSamples}>
+              <Button><Plus data-icon="inline-start" />新建项目</Button>
+              <Button variant="secondary">次要操作</Button>
+              <Button variant="outline">保存草稿</Button>
+              <Button variant="ghost">取消</Button>
+              <Button aria-label="更多操作" size="icon" variant="outline"><MoreHorizontal /></Button>
+            </div>
+          </section>
 
-        <div className={styles.componentRow}>
-          <div className={styles.rowLabel}><strong>输入框</strong><span>有标签，也有说明</span></div>
-          <div className={styles.inputSamples}>
-            <label className={styles.field}>
-              <span>项目名称</span>
-              <div className={styles.inputWrap}><input aria-label="项目名称" placeholder="例如：春季品牌更新" /><Icon name="search" /></div>
-              <small>名称之后仍然可以修改。</small>
-            </label>
-            <label className={`${styles.field} ${styles.errorField}`}>
-              <span>工作邮箱</span>
-              <input aria-label="工作邮箱" aria-invalid="true" defaultValue="lin@example" />
-              <small>请输入完整的邮箱地址。</small>
-            </label>
+          <Separator />
+
+          <section aria-labelledby="input-samples-title" className={styles.componentRow}>
+            <div className={styles.rowLabel}>
+              <h2 id="input-samples-title">输入框 Input</h2>
+              <p>标签和错误信息始终明确。</p>
+            </div>
+            <div className={styles.inputSamples}>
+              <label className={styles.field} htmlFor="project-name">
+                <span>项目名称</span>
+                <div className={styles.inputWrap}>
+                  <Input className="h-10 pr-10" id="project-name" placeholder="例如：春季品牌更新" />
+                  <Search aria-hidden="true" />
+                </div>
+                <small>名称之后仍然可以修改。</small>
+              </label>
+              <label className={styles.field} htmlFor="work-email">
+                <span>工作邮箱</span>
+                <Input aria-invalid="true" defaultValue="lin@example" id="work-email" type="email" />
+                <small className={styles.errorMessage}>请输入完整的邮箱地址。</small>
+              </label>
+            </div>
+          </section>
+
+          <Separator />
+
+          <section aria-labelledby="badge-samples-title" className={styles.componentRow}>
+            <div className={styles.rowLabel}>
+              <h2 id="badge-samples-title">状态 Badge</h2>
+              <p>语义颜色表达状态。</p>
+            </div>
+            <div className={styles.statusSamples}>
+              <Badge><span className={styles.statusDot} />进行中</Badge>
+              <Badge variant="secondary"><Check data-icon="inline-start" />已完成</Badge>
+              <Badge variant="outline">待确认</Badge>
+              <Badge variant="destructive">需处理</Badge>
+            </div>
+          </section>
+
+          <Separator />
+
+          <section aria-labelledby="card-samples-title" className={styles.componentRow}>
+            <div className={styles.rowLabel}>
+              <h2 id="card-samples-title">信息卡片 Card</h2>
+              <p>承载关联内容，不额外堆叠装饰。</p>
+            </div>
+            <Card className={styles.sampleCard} size="sm">
+              <CardHeader>
+                <CardTitle>澄光品牌焕新</CardTitle>
+                <CardDescription>品牌设计 · 更新于 10 分钟前</CardDescription>
+              </CardHeader>
+              <CardContent className={styles.sampleCardContent}>
+                <span>项目进度</span><strong>78%</strong>
+              </CardContent>
+            </Card>
+          </section>
+
+          <Separator />
+
+          <div className={styles.alertSamples}>
+            <Alert>
+              <Sparkles aria-hidden="true" />
+              <AlertTitle>柔和，不等于模糊</AlertTitle>
+              <AlertDescription>辅助文字降低音量，但仍保持清晰可读。</AlertDescription>
+            </Alert>
+            <Alert variant="destructive">
+              <AlertCircle aria-hidden="true" />
+              <AlertTitle>邮箱地址不完整</AlertTitle>
+              <AlertDescription>请补全邮箱地址后再继续。</AlertDescription>
+            </Alert>
           </div>
-        </div>
-
-        <div className={styles.componentRow}>
-          <div className={styles.rowLabel}><strong>状态提示</strong><span>状态色只表达状态</span></div>
-          <div className={styles.statusSamples}>
-            <span className={styles.statusPill}><span />进行中</span>
-            <span className={styles.successPill}><Icon name="check" />已完成</span>
-            <span className={styles.warningPill}>待确认</span>
-            <span className={styles.neutralPill}>草稿</span>
-          </div>
-        </div>
-
-        <div className={styles.notice}>
-          <span className={styles.noticeIcon}><Icon name="spark" /></span>
-          <div><strong>柔和，不等于模糊</strong><span>辅助文字降低音量，但仍保持清晰可读；错误状态则直接告诉使用者如何继续。</span></div>
-          <a href="#colors" aria-label="回看颜色规则"><Icon name="chevron" /></a>
-        </div>
-      </div>
+        </CardContent>
+      </Card>
     </section>
   );
 }
