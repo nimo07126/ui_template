@@ -155,10 +155,6 @@ export function ThemeTokens({ section }: { section: "typography" | "spacing" }) 
                   </div>
                   <div className={styles.typeSampleWrap}>
                     <p className={`${styles.typeSample} ${specimen.className}`}>{specimen.sample}</p>
-                    <div className={styles.typeTokenPair}>
-                      <code>{typeToken("size", specimen.size)}</code>
-                      <code>{typeToken("line", specimen.line)}</code>
-                    </div>
                   </div>
                 </div>
               ))}
