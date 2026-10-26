@@ -16,9 +16,6 @@ export function MotionGallery() {
     <section aria-labelledby="motion-title" className="grid gap-8 pb-20">
       <header className="grid gap-5 pt-3">
         <div className="max-w-180">
-          <p className="mb-3 text-[length:var(--type-size-xs)] font-medium uppercase tracking-[0.16em] text-[var(--ds-color-accent-ink)]">
-            Motion for React · 可描述的动效词典
-          </p>
           <h1 className="m-0 text-[length:clamp(2rem,4vw,3.5rem)] font-[number:var(--type-weight-semibold)] leading-[1.1] tracking-[var(--type-tracking-tight)]" id="motion-title">
             让每一种动效，<span className="text-[var(--ds-color-muted)]">都有名字。</span>
           </h1>
