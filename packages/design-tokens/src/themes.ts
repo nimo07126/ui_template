@@ -18,7 +18,7 @@ const token = (key: string, name: string, usage: string, value?: string): ColorT
 
 export const tokenGroups: TokenGroup[] = [
   { id: "foundation", name: "背景与内容", description: "从页面画布到正文，先建立阅读层次。", tokens: [
-    token("background", "页面背景", "应用画布与内容区底色"),
+    token("background", "页面背景", "应用底层画布、侧栏与主内容背后的背景"),
     token("foreground", "主要内容", "正文、标题与主要图标"),
     token("background-secondary", "二级背景", "弱区分的背景区域", mix("background", 96, "foreground")),
     token("background-tertiary", "三级背景", "更深一层的背景区域", mix("background", 92, "foreground")),
@@ -30,7 +30,7 @@ export const tokenGroups: TokenGroup[] = [
     token("selection-foreground", "文本选择前景", "选中文本的文字", ref("accent-soft-foreground")),
   ] },
   { id: "surface", name: "容器与浮层", description: "表面通过亮度表达层级，浮层有独立的颜色角色。", tokens: [
-    token("surface", "基础表面", "卡片与独立面板"),
+    token("surface", "基础表面", "主内容区域、卡片与独立面板"),
     token("surface-foreground", "表面内容", "基础表面上的文字与图标", ref("foreground")),
     token("surface-secondary", "二级表面", "嵌套面板与中性分组"),
     token("surface-secondary-foreground", "二级表面内容", "嵌套面板上的内容", ref("foreground")),
@@ -107,7 +107,7 @@ export const tokenGroups: TokenGroup[] = [
     token("progress-indicator", "进度指示", "进度条的已完成部分", ref("accent")),
   ] },
   { id: "navigation", name: "导航与数据", description: "侧栏、菜单和图表也遵循同一套主题。", tokens: [
-    token("sidebar", "侧栏背景", "应用的固定侧栏", ref("surface")),
+    token("sidebar", "侧栏背景", "应用的固定侧栏，与底层画布一致", ref("background")),
     token("sidebar-foreground", "侧栏内容", "普通导航条目的文字", ref("foreground")),
     token("sidebar-selected", "导航选中背景", "当前页面的导航底色", ref("accent-soft")),
     token("sidebar-selected-foreground", "导航选中内容", "当前页面的导航文字", ref("accent-soft-foreground")),

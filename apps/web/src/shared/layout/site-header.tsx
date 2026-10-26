@@ -22,6 +22,7 @@ const pageTitles: Record<string, string> = {
   "/typography": "字体层级",
   "/spacing": "间距与形状",
   "/showcase": "组件预览",
+  "/motion": "动效预览",
 };
 
 export function SiteHeader() {
@@ -31,7 +32,7 @@ export function SiteHeader() {
   const theme = themes.find((entry) => entry.id === activeId)!;
 
   return (
-    <header className="z-20 flex h-14 shrink-0 items-center gap-3 border-b border-border/80 bg-background px-4 md:px-6">
+    <header className="z-20 flex h-14 shrink-0 items-center gap-3 border-b border-border/80 bg-surface px-4 md:px-6">
       <SidebarTrigger aria-label="切换导航栏" className="-ml-1" />
       <Separator className="h-4" orientation="vertical" />
       <Breadcrumb>

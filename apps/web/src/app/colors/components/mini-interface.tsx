@@ -14,7 +14,7 @@ export function MiniInterface() {
         <i className="block w-2 h-2 bg-[var(--theme-muted)] opacity-30 rounded-[2px] first:opacity-100 first:bg-[var(--theme-accent)] first:shadow-[0_0_0_5px_var(--theme-accent-soft)] first:mb-[0.2rem]" />
         <i className="block w-2 h-2 bg-[var(--theme-muted)] opacity-30 rounded-[2px] first:opacity-100 first:bg-[var(--theme-accent)] first:shadow-[0_0_0_5px_var(--theme-accent-soft)] first:mb-[0.2rem]" />
       </div>
-      <div className="min-w-0 p-2.5 min-[1600px]:p-3.5 max-[767px]:p-3">
+      <div className="min-w-0 bg-[var(--theme-surface)] p-2.5 min-[1600px]:p-3.5 max-[767px]:p-3">
         <div className="flex justify-between items-center text-[length:.5rem] mb-2 text-[var(--theme-muted)]">
           <span>项目空间</span>
           <i className="h-2.5 w-2.5 rounded-full bg-[var(--theme-accent-soft)]" />
