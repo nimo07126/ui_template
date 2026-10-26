@@ -18,6 +18,7 @@ import {
   LayoutDashboard,
   Palette,
   PanelsTopLeft,
+  Rows3,
   Ruler,
   Sparkles,
   Type,
@@ -34,6 +35,7 @@ const navigation = [
   { title: "组件预览", url: "/showcase", icon: Component },
   { title: "动效预览", url: "/motion", icon: Sparkles },
   { title: "风格预览", url: "/styles", icon: PanelsTopLeft },
+  { title: "UI 模式", url: "/patterns", icon: Rows3 },
 ];
 
 export function AppSidebar() {

@@ -24,6 +24,7 @@ const pageTitles: Record<string, string> = {
   "/showcase": "组件预览",
   "/motion": "动效预览",
   "/styles": "风格预览",
+  "/patterns": "UI 模式",
 };
 
 export function SiteHeader() {

@@ -23,7 +23,13 @@ type StyleKind =
   | "brutalist"
   | "soft"
   | "terminal"
-  | "swiss";
+  | "swiss"
+  | "aurora"
+  | "liquid"
+  | "retro"
+  | "pixel"
+  | "minimal"
+  | "paper";
 
 type StyleCard = {
   id: string;
@@ -194,6 +200,84 @@ const styles: StyleCard[] = [
       "瑞士国际主义网格，白底黑字，严格对齐和清晰编号，无衬线字体，红色作为唯一强调色，留白充足，信息理性、精确、克制。",
     traits: ["严格对齐", "清晰编号", "唯一强调色", "理性留白"],
   },
+  {
+    id: "aurora",
+    kind: "aurora",
+    index: "13",
+    title: "极光渐变",
+    english: "Aurora Gradient",
+    eyebrow: "颜色制造方向",
+    description:
+      "用大面积柔和渐变和发光色带建立氛围，再用清晰的文字和按钮把用户带向下一步。适合 AI 产品、科技发布页和未来感品牌。",
+    prompt:
+      "极光渐变风格，深色背景叠加蓝紫青绿的柔和发光渐变，标题简洁，内容居中聚焦，使用细边框和微弱光晕，未来感但保持易读。",
+    traits: ["发光渐变", "深色底", "居中聚焦", "未来感"],
+  },
+  {
+    id: "liquid",
+    kind: "liquid",
+    index: "14",
+    title: "流体动态",
+    english: "Liquid Motion",
+    eyebrow: "形状保持流动",
+    description:
+      "用不规则曲线、液体形状和动态色块取代整齐的矩形，让页面有更强的生命力。适合音乐、文化活动和强调情绪表达的品牌。",
+    prompt:
+      "流体动态网页，不规则液态色块和圆润曲线，局部元素像正在流动，排版轻盈，配合柔和渐变和大留白，具有艺术展览的气质。",
+    traits: ["液态形状", "不规则曲线", "柔和渐变", "动态感"],
+  },
+  {
+    id: "retro",
+    kind: "retro",
+    index: "15",
+    title: "Y2K 数字复古",
+    english: "Y2K Digital",
+    eyebrow: "未来曾经这样想象",
+    description:
+      "把早期互联网的金属质感、像素字、闪光按钮和夸张装饰重新组合，保留怀旧感，同时让导航和层级仍然清楚。",
+    prompt:
+      "Y2K 数字复古网页，银色金属渐变，蓝紫高光，像素字体和胶囊按钮，加入星星、窗口和小图标装饰，怀旧但信息结构清晰。",
+    traits: ["金属渐变", "像素字体", "胶囊按钮", "互联网怀旧"],
+  },
+  {
+    id: "pixel",
+    kind: "pixel",
+    index: "16",
+    title: "像素界面",
+    english: "Pixel UI",
+    eyebrow: "每一个格子都有意义",
+    description:
+      "把图标、边框、阴影都还原成像素单位，用有限的颜色和清晰的网格建立游戏感。适合游戏、创意工具和有角色设定的产品。",
+    prompt:
+      "像素风界面，8-bit 网格、硬边框、有限色板、阶梯式阴影和像素图标，模块化布局，带一点游戏菜单和任务面板的感觉。",
+    traits: ["8-bit 网格", "有限色板", "硬边框", "游戏菜单"],
+  },
+  {
+    id: "minimal",
+    kind: "minimal",
+    index: "17",
+    title: "极简留白",
+    english: "Ultra Minimal",
+    eyebrow: "让内容自己说话",
+    description:
+      "只留下必要的文字、边界和一个动作。页面有大块留白、极少装饰和非常明确的阅读顺序，适合高端服务、作品集和决策型产品。",
+    prompt:
+      "极简留白界面，白色画布，超大留白，少量黑色文字和一个强调按钮，细线分隔，内容单列排列，安静、高级、聚焦。",
+    traits: ["超大留白", "单列内容", "细线分隔", "单一动作"],
+  },
+  {
+    id: "paper",
+    kind: "paper",
+    index: "18",
+    title: "纸张手作",
+    english: "Tactile Paper",
+    eyebrow: "屏幕也可以有温度",
+    description:
+      "用纸张颜色、颗粒、胶带、印章和手写字制造触感，让数字内容像被放在桌面上整理过。适合生活方式、教育和个人日志。",
+    prompt:
+      "纸张手作风格，米白纸张背景，轻微颗粒纹理，卡片像便签和索引卡，加入胶带、印章和手写注释，温暖、随性、有收藏感。",
+    traits: ["米白纸张", "颗粒纹理", "便签卡片", "手写注释"],
+  },
 ];
 
 function PreviewArt({ kind, view }: { kind: StyleKind; view: ViewMode }) {
@@ -330,6 +414,64 @@ function PreviewArt({ kind, view }: { kind: StyleKind; view: ViewMode }) {
     );
   }
 
+  if (kind === "aurora") {
+    return (
+      <div className={`${frameClass} art-aurora`}>
+        <div className="aurora-ribbon aurora-ribbon-one" /><div className="aurora-ribbon aurora-ribbon-two" /><div className="aurora-ribbon aurora-ribbon-three" />
+        <div className="aurora-copy"><small>INTELLIGENCE, REIMAGINED</small><strong>Think<br /><i>further.</i></strong><span>Enter the next layer ↗</span></div>
+      </div>
+    );
+  }
+
+  if (kind === "liquid") {
+    return (
+      <div className={`${frameClass} art-liquid`}>
+        <div className="liquid-blob liquid-blob-one" /><div className="liquid-blob liquid-blob-two" /><div className="liquid-blob liquid-blob-three" />
+        <div className="liquid-copy"><span>SONIC MEMORY / 04</span><strong>Move<br /><i>with it.</i></strong><small>Listen now　↗</small></div>
+      </div>
+    );
+  }
+
+  if (kind === "retro") {
+    return (
+      <div className={`${frameClass} art-retro`}>
+        <div className="retro-window"><div className="retro-window-bar"><span>✦ future.exe</span><b>×</b></div><div className="retro-window-body"><small>WELCOME TO</small><strong>THE<br />FUTURE</strong><button>ENTER ↗</button></div></div>
+        <span className="retro-star star-one">✦</span><span className="retro-star star-two">✧</span><span className="retro-label">EST. 2001 / 2026</span>
+      </div>
+    );
+  }
+
+  if (kind === "pixel") {
+    return (
+      <div className={`${frameClass} art-pixel`}>
+        <div className="pixel-top"><span>◈ QUEST LOG</span><b>LV. 08</b></div>
+        <div className="pixel-hero"><div className="pixel-sprite">◢<br />◣</div><strong>THE<br />NEXT<br />LEVEL</strong></div>
+        <div className="pixel-actions"><span>▣ PLAY</span><span>▤ MAP</span><span>⚙ SETUP</span></div>
+      </div>
+    );
+  }
+
+  if (kind === "minimal") {
+    return (
+      <div className={`${frameClass} art-minimal`}>
+        <div className="minimal-top"><span>STUDIO / 24</span><span>MENU</span></div>
+        <div className="minimal-copy"><small>A quieter way to work</small><strong>Make<br /><i>space.</i></strong><button>Start a ritual　↗</button></div>
+        <span className="minimal-index">01 — 04</span>
+      </div>
+    );
+  }
+
+  if (kind === "paper") {
+    return (
+      <div className={`${frameClass} art-paper`}>
+        <span className="paper-tape paper-tape-one" /><span className="paper-tape paper-tape-two" />
+        <div className="paper-card paper-card-main"><small>WEEKLY NOTE</small><strong>Keep<br /><i>looking.</i></strong><span>Monday, Oct 26</span></div>
+        <div className="paper-card paper-card-small"><span>✦</span><p>Three things<br />worth keeping.</p></div>
+        <span className="paper-stamp">FILED / 18</span>
+      </div>
+    );
+  }
+
   return (
     <div className={`${frameClass} art-collage`}>
       <div className="collage-back"><span>ARCHIVE<br />OF<br />MOTION</span></div>
@@ -370,12 +512,12 @@ export function StyleAtlas() {
     <main className="style-atlas" aria-labelledby="styles-title">
       <div className="style-atlas-hero">
         <div>
-          <div className="style-kicker"><Layers3 size={14} /> STYLE ATLAS <span>／</span> 12 PATTERNS</div>
+          <div className="style-kicker"><Layers3 size={14} /> STYLE ATLAS <span>／</span> 18 PATTERNS</div>
           <h1 id="styles-title">把“感觉”说清楚，<br /><em>再开始做界面。</em></h1>
           <p>先选一种视觉叙事，再把它翻译成布局、比例和语气。这里收集常见的界面风格，也给出可以直接交给 AI 的准确描述。</p>
         </div>
         <div className="style-atlas-stats" aria-label="风格预览统计">
-          <strong>12</strong><span>主流<br />风格</span>
+          <strong>18</strong><span>主流<br />风格</span>
           <i />
           <strong>02</strong><span>终端<br />视图</span>
         </div>
@@ -410,6 +552,22 @@ export function StyleAtlas() {
           <div><span>02</span><strong>布局结构</strong><p>内容怎么走：网格、瀑布流、单列聚焦，还是不对称的编辑部版式。</p></div>
           <div><span>03</span><strong>材质语气</strong><p>圆角大小、阴影、边框、噪点、纸张感，以及整体是克制还是热闹。</p></div>
           <div><span>04</span><strong>终端变化</strong><p>说明移动端是保留叠图、改成单列，还是把桌面端的留白压缩成滚动节奏。</p></div>
+        </div>
+      </section>
+
+      <section className="project-style" aria-labelledby="project-style-title">
+        <div className="project-style-visual" aria-hidden="true">
+          <div className="project-mini-shell">
+            <div className="project-mini-sidebar"><span className="project-mini-mark">澄</span><i /><i /><i /><i /><i /></div>
+            <div className="project-mini-main"><div className="project-mini-header"><span>设计系统　›　风格预览</span><b>专注工作</b></div><div className="project-mini-kicker">STYLE ATLAS　/　18 PATTERNS</div><strong>把感觉<br /><em>说清楚。</em></strong><div className="project-mini-cards"><i /><i /><i /></div></div>
+          </div>
+        </div>
+        <div className="project-style-copy">
+          <span>PROJECT SIGNATURE / 00</span>
+          <h2 id="project-style-title">本项目的风格：<br /><em>安静的编辑式设计系统。</em></h2>
+          <p>它不是单一的视觉流派，而是一套把设计规则讲清楚的工作台：浅色画布、克制的紫色强调、宽松留白、细边界、统一圆角，以及像杂志目录一样的层级和阅读节奏。</p>
+          <div className="project-style-tags"><span>Editorial</span><span>Calm UI</span><span>Token-driven</span><span>Workstation</span></div>
+          <CopyPrompt text="安静的编辑式设计系统，浅色中性画布，克制的紫色强调，宽松留白，细边框和中等圆角，信息层级清晰，像一本可以操作的设计规范，专业、温和、有秩序。" />
         </div>
       </section>
     </main>
