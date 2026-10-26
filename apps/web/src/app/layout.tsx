@@ -55,7 +55,7 @@ export default function RootLayout({
                 <SiteHeader />
                 <div
                   aria-label="页面内容"
-                  className="min-h-0 flex-1 overflow-y-auto overscroll-y-contain scroll-smooth scroll-pt-8 [scrollbar-gutter:stable]"
+                  className="min-h-0 flex-1 overflow-y-auto overscroll-y-contain scroll-auto scroll-pt-8 [scrollbar-gutter:stable]"
                   data-slot="page-scroll"
                   tabIndex={0}
                 >
