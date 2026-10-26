@@ -13,7 +13,15 @@ import {
   SidebarMenuItem,
   SidebarRail,
 } from "@/shared/ui/sidebar";
-import { Component, LayoutDashboard, Palette, Ruler, Sparkles, Type } from "lucide-react";
+import {
+  Component,
+  LayoutDashboard,
+  Palette,
+  PanelsTopLeft,
+  Ruler,
+  Sparkles,
+  Type,
+} from "lucide-react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { version } from "../../../package.json";
@@ -25,6 +33,7 @@ const navigation = [
   { title: "间距与形状", url: "/spacing", icon: Ruler },
   { title: "组件预览", url: "/showcase", icon: Component },
   { title: "动效预览", url: "/motion", icon: Sparkles },
+  { title: "风格预览", url: "/styles", icon: PanelsTopLeft },
 ];
 
 export function AppSidebar() {

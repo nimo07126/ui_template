@@ -23,6 +23,7 @@ const pageTitles: Record<string, string> = {
   "/spacing": "间距与形状",
   "/showcase": "组件预览",
   "/motion": "动效预览",
+  "/styles": "风格预览",
 };
 
 export function SiteHeader() {

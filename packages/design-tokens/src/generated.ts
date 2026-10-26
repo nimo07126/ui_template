@@ -134,7 +134,7 @@ export const tokens = {
       "muted": "oklch(0.5517 0.0138 285.94)",
       "default": "oklch(94% 0.001 286.375)",
       "accent": "oklch(0.6204 0.195 253.83)",
-      "accent-foreground": "#18181B",
+      "accent-foreground": "#FFFFFF",
       "success": "oklch(0.7329 0.1935 150.81)",
       "success-foreground": "#18181B",
       "warning": "oklch(0.7819 0.1585 72.33)",
