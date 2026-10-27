@@ -1,4 +1,6 @@
 import { WorkspacePreview } from "./workspace-preview";
+import Link from "next/link";
+import { ArrowUpRight } from "lucide-react";
 
 export function HomePreview() {
   return (
@@ -12,10 +14,11 @@ export function HomePreview() {
             一眼看见规则如何协作
           </h2>
         </div>
-        <span className="inline-flex flex-none items-center border border-[var(--ds-color-line)] rounded-[var(--ds-radius-pill)] bg-[var(--ds-color-surface)] text-[var(--ds-color-muted)] text-[length:var(--type-size-xs)] py-2 px-3 gap-2 max-[42rem]:text-[length:0] max-[42rem]:p-2">
+        <Link href="/orchestratelq" className="inline-flex flex-none items-center border border-[var(--ds-color-line)] rounded-[var(--ds-radius-pill)] bg-[var(--ds-color-surface)] text-[var(--ds-color-muted)] text-[length:var(--type-size-xs)] py-2 px-3 gap-2 transition-colors hover:border-[var(--ds-color-accent)] hover:text-[var(--ds-color-accent-ink)] max-[42rem]:text-[length:0] max-[42rem]:p-2">
           <span className="w-1.5 h-1.5 bg-[var(--ds-color-success)] max-[42rem]:w-2 max-[42rem]:h-2" />
-          主题实时预览
-        </span>
+          打开系统工作台
+          <ArrowUpRight className="size-3.5" />
+        </Link>
       </div>
       <WorkspacePreview />
       <div className="flex justify-between mt-3 text-[var(--ds-color-muted)] text-[length:var(--type-size-xs)] gap-3 max-[30rem]:text-[length:var(--type-size-xs)]">

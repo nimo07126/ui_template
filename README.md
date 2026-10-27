@@ -11,6 +11,8 @@ pnpm dev
 
 Web 开发服务默认运行在 `http://localhost:3399`。`pnpm dev` 会先从 token 源文件生成 TypeScript token 和主题变量，再启动 Next.js。
 
+推送到 `main` 分支后，GitHub Actions 会自动构建 `apps/web` 的静态导出并部署到 GitHub Pages。仓库设置中的 Pages 来源请选择 **GitHub Actions**；项目站点路径由 `actions/configure-pages` 自动传给 Next.js。
+
 移动端扫码预览：`pnpm dev:mobile`（Expo Go，需匹配 SDK 57，手机和电脑同一 Wi-Fi）。自定义开发客户端使用 `pnpm dev:mobile:client`；本地构建并启动 iOS / Android：`pnpm mobile:ios` / `pnpm mobile:android`，需要 Xcode 或 Android SDK。浏览器辅助预览：`pnpm mobile:web`（`http://localhost:8081`）。兼容版本、目录与构建说明见 [移动端文档](apps/mobile/README.md)。
 
 ## 项目结构

@@ -36,6 +36,7 @@ const navigation = [
   { title: "动效预览", url: "/motion", icon: Sparkles },
   { title: "风格预览", url: "/styles", icon: PanelsTopLeft },
   { title: "UI 模式", url: "/patterns", icon: Rows3 },
+  { title: "工作台风格", url: "/orchestratelq", icon: LayoutDashboard },
 ];
 
 export function AppSidebar() {

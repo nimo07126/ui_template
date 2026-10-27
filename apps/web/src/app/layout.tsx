@@ -1,7 +1,5 @@
-import { AppSidebar } from "@/shared/layout/app-sidebar";
-import { SiteHeader } from "@/shared/layout/site-header";
+import { AppFrame } from "@/shared/layout/app-frame";
 import { ThemeProvider } from "@/shared/providers/theme-provider";
-import { SidebarInset, SidebarProvider } from "@/shared/ui/sidebar";
 import { TooltipProvider } from "@/shared/ui/tooltip";
 import { tokens, tokenVariables } from "@template/design-tokens";
 import {
@@ -17,11 +15,6 @@ export const metadata: Metadata = {
   title: "澄序 · 设计主题样板",
   description: "一套清晰、克制而有温度的界面主题规则。",
 };
-
-const sidebarStyle = {
-  "--sidebar-width": tokens.layout.sidebarWidth,
-  "--sidebar-width-icon": tokens.layout.sidebarCollapsedWidth,
-} as CSSProperties;
 
 export default function RootLayout({
   children,
@@ -46,25 +39,7 @@ export default function RootLayout({
       <body className="m-0 h-dvh overflow-hidden bg-background text-[length:var(--type-size-md)] leading-[var(--type-line-body)] text-foreground">
         <ThemeProvider>
           <TooltipProvider>
-            <SidebarProvider
-              className="h-dvh min-h-0 overflow-clip"
-              style={sidebarStyle}
-            >
-              <AppSidebar />
-              <SidebarInset className="min-h-0 min-w-0 overflow-clip">
-                <SiteHeader />
-                <div
-                  aria-label="页面内容"
-                  className="min-h-0 flex-1 overflow-y-auto overscroll-y-contain scroll-auto scroll-pt-8 [scrollbar-gutter:stable]"
-                  data-slot="page-scroll"
-                  tabIndex={0}
-                >
-                  <div className="mx-auto flex w-full min-w-0 max-w-[var(--layout-content-max)] flex-col gap-8 px-5 py-8 md:px-8 md:py-10">
-                    {children}
-                  </div>
-                </div>
-              </SidebarInset>
-            </SidebarProvider>
+            <AppFrame>{children}</AppFrame>
           </TooltipProvider>
         </ThemeProvider>
       </body>
