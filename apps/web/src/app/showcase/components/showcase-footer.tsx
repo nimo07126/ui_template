@@ -8,11 +8,11 @@ export function ShowcaseFooter() {
       <span>同一套语义颜色，贯穿每个交互细节。</span>
       <a
         className="inline-flex items-center gap-1"
-        href="https://ui.shadcn.com/docs/components"
+        href="https://uiarc.dev/components/button"
         target="_blank"
         rel="noreferrer"
       >
-        探索 shadcn/ui
+        探索 Arc UI
         <ArrowUpRight className="w-3.5 h-3.5" aria-hidden="true" />
       </a>
     </footer>

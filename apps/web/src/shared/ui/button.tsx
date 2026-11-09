@@ -1,3 +1,6 @@
+"use client";
+
+import { Button as ArcButton, type ButtonProps as ArcButtonProps } from "@/shared/arc/button/button";
 import { Button as ButtonPrimitive } from "@base-ui/react/button";
 import { cva, type VariantProps } from "class-variance-authority";
 import { cn } from "cn";
@@ -40,19 +43,56 @@ const buttonVariants = cva(
   },
 );
 
+const arcVariants = {
+  default: "primary",
+  outline: "secondary",
+  secondary: "secondary",
+  ghost: "ghost",
+  destructive: "danger",
+  link: "ghost",
+} satisfies Record<NonNullable<VariantProps<typeof buttonVariants>["variant"]>, ArcButtonProps["variant"]>;
+
 function Button({
   className,
   variant = "default",
   size = "default",
+  render,
+  nativeButton,
+  style,
+  ref,
+  type = "button",
+  focusableWhenDisabled,
   ...props
 }: ButtonPrimitive.Props & VariantProps<typeof buttonVariants>) {
-  return (
-    <ButtonPrimitive
-      data-slot="button"
-      className={cn(buttonVariants({ variant, size, className }))}
-      {...props}
-    />
-  );
+  if (render || nativeButton === false || focusableWhenDisabled || typeof className === "function" || typeof style === "function") {
+    return (
+      <ButtonPrimitive
+        data-slot="button"
+        render={render}
+        nativeButton={nativeButton}
+        ref={ref}
+        type={type}
+        focusableWhenDisabled={focusableWhenDisabled}
+        style={style}
+        className={typeof className === "function"
+          ? (state) => buttonVariants({ variant, size, className: className(state) })
+          : cn(buttonVariants({ variant, size, className }))}
+        {...props}
+      />
+    );
+  }
+
+  return <ArcButton
+    data-slot="button"
+    data-chengxu-button={variant ?? "default"}
+    data-chengxu-size={size ?? "default"}
+    ref={ref as React.Ref<HTMLButtonElement>}
+    variant={arcVariants[variant ?? "default"]}
+    type={type}
+    className={className}
+    style={style}
+    {...props}
+  />;
 }
 
 export { Button, buttonVariants };

@@ -12,6 +12,7 @@ import {
   SidebarMenuButton,
   SidebarMenuItem,
   SidebarRail,
+  useSidebar,
 } from "@/shared/ui/sidebar";
 import {
   Component,
@@ -40,7 +41,11 @@ const navigation = [
 ];
 
 export function AppSidebar() {
-  const pathname = usePathname();
+  const pathname = usePathname().replace(/\/$/, "") || "/";
+  const { isMobile, setOpenMobile } = useSidebar();
+  const closeMobileNavigation = () => {
+    if (isMobile) setOpenMobile(false);
+  };
 
   return (
     <Sidebar collapsible="icon" variant="inset">
@@ -49,6 +54,7 @@ export function AppSidebar() {
           className="flex min-h-10 items-center gap-3 group-data-[collapsible=icon]:justify-center"
           href="/"
           aria-label="澄序设计主题首页"
+          onNavigate={closeMobileNavigation}
         >
           <span className="grid size-8 shrink-0 place-items-center rounded-xl bg-foreground text-sm font-semibold text-background">
             澄
@@ -81,6 +87,7 @@ export function AppSidebar() {
                         }
                         aria-label={item.title}
                         href={item.url}
+                        onNavigate={closeMobileNavigation}
                       />
                     }
                     tooltip={item.title}

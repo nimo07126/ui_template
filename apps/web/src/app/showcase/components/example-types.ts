@@ -8,12 +8,17 @@ export type ComponentGroupId =
   | "feedback"
   | "overlays";
 
+export type DemoLoader = () => Promise<{ default: ComponentType }>;
+
 export type ComponentExample = {
   id: string;
+  slug?: string;
   name: string;
   title: string;
   description: string;
   group: ComponentGroupId;
-  imports: string;
-  demo: ComponentType;
+  source: "arc" | "shadcn";
+  docs: string;
+  importStatement: string;
+  loadDemo: DemoLoader;
 };

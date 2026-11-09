@@ -12,6 +12,7 @@ import {
 import {
   createContext,
   useContext,
+  useRef,
   useState,
   type MouseEvent,
   type ReactNode,
@@ -38,6 +39,7 @@ function useWorkbenchState() {
   const [conceptView, setConceptView] = useState(false);
   const [lastLight, setLastLight] = useState<ThemeId>("studio");
   const [editing, setEditing] = useState<Editing | null>(null);
+  const editorTrigger = useRef<HTMLButtonElement | null>(null);
   const dark = activeId === "night";
   const activeTheme = themes.find((theme) => theme.id === activeId)!;
   const visibleThemes = themes.filter(
@@ -74,6 +76,7 @@ function useWorkbenchState() {
     themeId: ThemeId,
     entry: ColorToken,
   ) {
+    editorTrigger.current = event.currentTarget;
     const computed = getComputedStyle(
       event.currentTarget.querySelector("[data-paint]")!,
     ).backgroundColor;
@@ -139,6 +142,7 @@ function useWorkbenchState() {
     lastLight,
     setLastLight,
     editing,
+    editorTrigger,
     setEditing,
     dark,
     activeTheme,

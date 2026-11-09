@@ -1,14 +1,8 @@
 "use client";
 
 import { Button } from "@/shared/ui/button";
-import { Input } from "@/shared/ui/input";
-import {
-  Sheet,
-  SheetContent,
-  SheetDescription,
-  SheetHeader,
-  SheetTitle,
-} from "@/shared/ui/sheet";
+import { Drawer, DrawerContent } from "@/shared/arc/drawer/drawer";
+import { Input } from "@/shared/arc/input/input";
 import { themes } from "@template/design-tokens/themes";
 import { Check, Pencil, RotateCcw } from "lucide-react";
 import { type CSSProperties } from "react";
@@ -21,30 +15,34 @@ export function ColorEditor() {
     editToken,
     saveTheme,
     editing,
+    editorTrigger,
     setEditing,
     validInput,
     changeInput,
     cancelEditor,
   } = useColorWorkbench();
   return (
-    <Sheet
+    <Drawer
       open={!!editing}
       onOpenChange={(open) => {
         if (!open) cancelEditor();
       }}
     >
-      <SheetContent
-        className="w-full! overflow-y-auto sm:max-w-[420px]"
-        showCloseButton
+      <DrawerContent
+        className="[--drawer-size:min(100vw,420px)]!"
+        closeLabel="关闭颜色编辑"
+        title="编辑功能颜色"
+        description={editing
+          ? `${themes.find((theme) => theme.id === editing.themeId)!.name} · ${editing.token.name}`
+          : "修改颜色并实时预览"}
+        onCloseAutoFocus={(event) => {
+          const trigger = editorTrigger.current;
+          if (trigger?.isConnected) {
+            event.preventDefault();
+            trigger.focus();
+          }
+        }}
       >
-        <SheetHeader className="px-6 pt-6 pb-2">
-          <SheetTitle>编辑功能颜色</SheetTitle>
-          <SheetDescription>
-            {editing
-              ? `${themes.find((theme) => theme.id === editing.themeId)!.name} · ${editing.token.name}`
-              : "修改颜色并实时预览"}
-          </SheetDescription>
-        </SheetHeader>
         {editing && (
           <div className="flex flex-col pt-2 pb-6 px-6 gap-4">
             <div>
@@ -88,18 +86,15 @@ export function ColorEditor() {
                 实时作用于整套界面
               </span>
             </div>
-            <label className="flex flex-col text-[length:.75rem] font-medium gap-2">
-              颜色值
-              <Input
-                className="text-[length:.75rem] font-[family-name:ui-monospace,monospace] leading-[normal] font-normal not-italic h-10"
-                aria-label="颜色值"
-                aria-invalid={!validInput}
-                aria-describedby="color-input-hint"
-                value={editing.input}
-                onChange={(event) => changeInput(event.target.value)}
-                spellCheck={false}
-              />
-            </label>
+            <Input
+              label="颜色值"
+              className="text-[length:.75rem]! font-[family-name:ui-monospace,monospace]!"
+              aria-invalid={!validInput}
+              aria-describedby="color-input-hint"
+              value={editing.input}
+              onChange={(event) => changeInput(event.target.value)}
+              spellCheck={false}
+            />
             <p
               id="color-input-hint"
               className="-mt-2 mb-0 text-[length:.625rem] text-[var(--muted-foreground)] mx-0 data-[invalid=true]:text-[var(--theme-danger-soft-foreground)]"
@@ -141,6 +136,7 @@ export function ColorEditor() {
                 <Button variant="destructive">删除</Button>
               </div>
               <Input
+                label="输入预览"
                 placeholder="输入内容，查看字段效果"
                 aria-label="颜色编辑输入预览"
               />
@@ -196,7 +192,7 @@ export function ColorEditor() {
             </div>
           </div>
         )}
-      </SheetContent>
-    </Sheet>
+      </DrawerContent>
+    </Drawer>
   );
 }

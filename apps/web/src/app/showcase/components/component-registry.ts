@@ -1,10 +1,7 @@
-import { actionsExamples } from "./demos/actions";
-import { dataExamples } from "./demos/data";
-import { feedbackExamples } from "./demos/feedback";
-import { formsExamples } from "./demos/forms";
-import { navigationExamples } from "./demos/navigation";
-import { overlaysExamples } from "./demos/overlays";
+import { arcCatalog } from "./arc-catalog";
+import { arcDemoLoaders } from "./arc-demos/loaders";
 import type { ComponentExample } from "./example-types";
+import { migratedExamples, retainedExamples } from "./legacy-catalog";
 
 export const componentGroups = [
   {
@@ -46,10 +43,20 @@ export const componentGroups = [
 ] as const;
 
 export const componentExamples: ComponentExample[] = [
-  ...actionsExamples,
-  ...formsExamples,
-  ...navigationExamples,
-  ...dataExamples,
-  ...feedbackExamples,
-  ...overlaysExamples,
+  ...arcCatalog.map(([slug, group, title, name, description, importStatement]): ComponentExample => {
+    const migrated = migratedExamples[slug];
+    return {
+      id: migrated?.id ?? (slug === "toast" ? "arc-toast" : slug),
+      slug,
+      group,
+      title,
+      name,
+      description,
+      source: "arc",
+      docs: `https://uiarc.dev/components/${slug}`,
+      importStatement,
+      loadDemo: migrated?.loadDemo ?? arcDemoLoaders[slug],
+    };
+  }),
+  ...retainedExamples,
 ];

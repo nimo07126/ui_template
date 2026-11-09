@@ -4,6 +4,45 @@
 
 @custom-variant dark (&:is(.dark *));
 
+/* Keep dense and icon-only sizes at the existing shared Button boundary. */
+button[data-chengxu-button][data-chengxu-size] {
+  min-height: var(--chengxu-button-size, 2rem);
+  padding-inline: .625rem;
+}
+button[data-chengxu-size="xs"], button[data-chengxu-size="icon-xs"] {
+  --chengxu-button-size: 1.5rem;
+}
+button[data-chengxu-size="sm"], button[data-chengxu-size="icon-sm"] {
+  --chengxu-button-size: 1.75rem;
+}
+button[data-chengxu-size="lg"], button[data-chengxu-size="icon-lg"] {
+  --chengxu-button-size: 2.25rem;
+}
+button[data-chengxu-button][data-chengxu-size^="icon"] {
+  width: var(--chengxu-button-size, 2rem);
+  padding-inline: 0;
+}
+button[data-chengxu-button] svg:not([class*="size-"]) {
+  width: 1rem;
+  height: 1rem;
+}
+button[data-chengxu-button="outline"]:not(:disabled) {
+  color: var(--foreground);
+  background: var(--background);
+  border-color: var(--border);
+}
+button[data-chengxu-button="outline"]:hover:not(:disabled) {
+  background: var(--muted);
+}
+button[data-chengxu-button="link"]:not(:disabled) {
+  color: var(--theme-link);
+  background: transparent;
+}
+button[data-chengxu-button="link"]:hover:not(:disabled) {
+  text-decoration: underline;
+  text-underline-offset: .25rem;
+}
+
 @theme inline {
   --font-heading: var(--type-family-sans);
   --font-sans: var(--type-family-sans);

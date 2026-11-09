@@ -1,7 +1,7 @@
 "use client";
 
 import { useThemeEditor } from "@/shared/providers/theme-provider";
-import { Toaster } from "@/shared/ui/toast";
+import { ToastStack, ToastStackProvider } from "@/shared/arc/toast-stack/toast-stack";
 import { createContext, useContext, useState, type ReactNode } from "react";
 import { componentExamples, componentGroups } from "./component-registry";
 import type { ComponentExample as Example } from "./example-types";
@@ -9,10 +9,11 @@ import type { ComponentExample as Example } from "./example-types";
 function useShowcaseState() {
   const [query, setQuery] = useState("");
   const [category, setCategory] = useState("all");
+  const [openExample, setOpenExample] = useState<string | null>(null);
   const { activeId, selectTheme } = useThemeEditor();
   const normalizedQuery = query.trim().toLocaleLowerCase();
   const matchesQuery = (example: Example) =>
-    `${example.title} ${example.name} ${example.id} ${example.description} ${componentGroups.find((group) => group.id === example.group)?.name}`
+    `${example.title} ${example.name} ${example.id} ${example.slug ?? ""} ${example.description} ${example.source} ${componentGroups.find((group) => group.id === example.group)?.name}`
       .toLocaleLowerCase()
       .includes(normalizedQuery);
   const visible = componentExamples.filter(
@@ -29,6 +30,7 @@ function useShowcaseState() {
   const reset = () => {
     setQuery("");
     setCategory("all");
+    setOpenExample(null);
   };
   return {
     query,
@@ -42,6 +44,8 @@ function useShowcaseState() {
     visible,
     groups,
     reset,
+    openExample,
+    toggleExample: (id: string) => setOpenExample((current) => current === id ? null : id),
   };
 }
 
@@ -51,7 +55,10 @@ export function ShowcaseProvider({ children }: { children: ReactNode }) {
   const value = useShowcaseState();
   return (
     <Context.Provider value={value}>
-      <Toaster>{children}</Toaster>
+      <ToastStackProvider>
+        {children}
+        <ToastStack label="组件演示通知" hotkey={false} />
+      </ToastStackProvider>
     </Context.Provider>
   );
 }

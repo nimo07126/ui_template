@@ -1,9 +1,9 @@
 "use client";
 
 import { Button } from "@/shared/ui/button";
-import { ButtonGroup } from "@/shared/ui/button-group";
+import { ButtonGroup } from "@/shared/arc/button-group/button-group";
 import { Toggle } from "@/shared/ui/toggle";
-import { ToggleGroup, ToggleGroupItem } from "@/shared/ui/toggle-group";
+import { ToggleGroup, ToggleGroupItem } from "@/shared/arc/toggle-group/toggle-group";
 import {
   AlignCenter,
   AlignLeft,
@@ -16,10 +16,11 @@ import {
   Star,
   Underline,
 } from "lucide-react";
-import type { ComponentExample } from "../example-types";
-import { notify, row } from "./demo-utils";
+import { useState } from "react";
+import { row, useNotify } from "./demo-utils";
 
-function ButtonsDemo() {
+export function ButtonsDemo() {
+  const notify = useNotify();
   return (
     <div className="grid gap-5">
       <div className={row}>
@@ -62,25 +63,26 @@ function ButtonsDemo() {
   );
 }
 
-function ButtonGroupDemo() {
+export function ButtonGroupDemo() {
+  const notify = useNotify();
   return (
-    <ButtonGroup>
-      <Button variant="outline" onClick={() => notify("草稿已保存")}>
-        保存草稿
-      </Button>
-      <Button
-        variant="outline"
-        onClick={() => notify("已展开保存选项")}
-        aria-label="更多保存选项"
-        size="icon"
-      >
-        <ChevronDown />
-      </Button>
-    </ButtonGroup>
+    <ButtonGroup
+      label="草稿操作"
+      items={[
+        { id: "save", label: "保存草稿", onSelect: () => notify("草稿已保存") },
+        {
+          id: "more",
+          label: "更多保存选项",
+          icon: <ChevronDown />,
+          iconOnly: true,
+          onSelect: () => notify("已展开保存选项"),
+        },
+      ]}
+    />
   );
 }
 
-function ToggleDemo() {
+export function ToggleDemo() {
   return (
     <div className={row}>
       <Toggle aria-label="收藏项目" variant="outline">
@@ -97,75 +99,37 @@ function ToggleDemo() {
   );
 }
 
-function ToggleGroupDemo() {
+export function ToggleGroupDemo() {
+  const [alignment, setAlignment] = useState(["left"]);
   return (
     <div className="grid gap-4">
       <ToggleGroup
-        defaultValue={["left"]}
-        variant="outline"
-        spacing={0}
-        aria-label="文本对齐"
+        type="multiple"
+        value={alignment}
+        onValueChange={(next) => setAlignment(next.slice(-1))}
+        label="文本对齐"
       >
-        <ToggleGroupItem value="left" aria-label="左对齐">
+        <ToggleGroupItem value="left" label="左对齐">
           <AlignLeft />
         </ToggleGroupItem>
-        <ToggleGroupItem value="center" aria-label="居中对齐">
+        <ToggleGroupItem value="center" label="居中对齐">
           <AlignCenter />
         </ToggleGroupItem>
-        <ToggleGroupItem value="right" aria-label="右对齐">
+        <ToggleGroupItem value="right" label="右对齐">
           <AlignRight />
         </ToggleGroupItem>
       </ToggleGroup>
-      <ToggleGroup multiple defaultValue={["bold"]} aria-label="文字样式">
-        <ToggleGroupItem value="bold" aria-label="加粗">
+      <ToggleGroup type="multiple" defaultValue={["bold"]} label="文字样式">
+        <ToggleGroupItem value="bold" label="加粗">
           <Bold />
         </ToggleGroupItem>
-        <ToggleGroupItem value="italic" aria-label="斜体">
+        <ToggleGroupItem value="italic" label="斜体">
           <Italic />
         </ToggleGroupItem>
-        <ToggleGroupItem value="underline" aria-label="下划线">
+        <ToggleGroupItem value="underline" label="下划线">
           <Underline />
         </ToggleGroupItem>
       </ToggleGroup>
     </div>
   );
 }
-
-export const actionsExamples: ComponentExample[] = [
-  {
-    id: "button",
-    name: "Button",
-    title: "按钮",
-    description: "6 种操作变体、4 种尺寸与禁用状态",
-    group: "actions",
-    imports: "Button",
-    demo: ButtonsDemo,
-  },
-  {
-    id: "button-group",
-    name: "Button Group",
-    title: "按钮组",
-    description: "将有关联的操作聚合在一起",
-    group: "actions",
-    imports: "ButtonGroup",
-    demo: ButtonGroupDemo,
-  },
-  {
-    id: "toggle",
-    name: "Toggle",
-    title: "切换按钮",
-    description: "单个选项的开启、关闭与禁用",
-    group: "actions",
-    imports: "Toggle",
-    demo: ToggleDemo,
-  },
-  {
-    id: "toggle-group",
-    name: "Toggle Group",
-    title: "切换按钮组",
-    description: "支持单选对齐与多选文字样式",
-    group: "actions",
-    imports: "ToggleGroup, ToggleGroupItem",
-    demo: ToggleGroupDemo,
-  },
-];

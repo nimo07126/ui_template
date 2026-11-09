@@ -1,17 +1,12 @@
 "use client";
 
-import { Badge } from "@/shared/ui/badge";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/shared/ui/select";
+import { Badge } from "@/shared/arc/badge/badge";
+import { Select } from "@/shared/arc/select/select";
 import { themes } from "@template/design-tokens/themes";
 import { ArrowUpRight } from "lucide-react";
 import Link from "next/link";
-import { componentExamples } from "./component-registry";
+import { arcCatalog } from "./arc-catalog";
+import { componentExamples, componentGroups } from "./component-registry";
 import { useShowcase } from "./showcase-context";
 
 const themeOptions = themes.map((theme) => ({
@@ -37,41 +32,22 @@ export function ShowcaseIntro() {
           从基础操作到浮层交互，每一种状态都遵循同一套主题。选择一个组件，直接体验。
         </p>
         <div className="flex flex-wrap items-center mt-5 text-[length:var(--type-size-xs)] text-[var(--ds-color-muted)] gap-3">
-          <Badge variant="outline">shadcn/ui · Base UI</Badge>
-          <span>{componentExamples.length} 个组件示例</span>
-          <span>6 个分类区块</span>
+          <Badge outline>Arc UI · 免费组件</Badge>
+          <span>{arcCatalog.length} 个 Arc UI 组件</span>
+          <span>{componentExamples.length - arcCatalog.length} 个 shadcn/ui 组件</span>
+          <span>{componentGroups.length} 个分类</span>
         </div>
       </div>
       <div className="grid w-44 shrink-0 border-l border-l-[var(--ds-color-line)] pl-6 gap-2 max-[40rem]:w-full max-[40rem]:max-w-72 max-[40rem]:border-l-0 max-[40rem]:pl-0">
-        <label
-          className="text-[var(--ds-color-muted)] text-[length:var(--type-size-xs)]"
-          id="component-theme-label"
-        >
-          预览主题
-        </label>
         <Select
-          items={themeOptions}
+          label="预览主题"
+          options={themeOptions}
           value={activeId}
           onValueChange={(value) => {
             const selected = themes.find((theme) => theme.id === value);
             if (selected) selectTheme(selected.id);
           }}
-        >
-          <SelectTrigger
-            aria-labelledby="component-theme-label"
-            className="w-full"
-          >
-            <span className="size-2 shrink-0 rounded-full bg-primary" />
-            <SelectValue />
-          </SelectTrigger>
-          <SelectContent>
-            {themes.map((theme) => (
-              <SelectItem key={theme.id} value={theme.id}>
-                {theme.name}
-              </SelectItem>
-            ))}
-          </SelectContent>
-        </Select>
+        />
         <Link
           className="inline-flex items-center w-[fit-content] mt-1 text-[length:var(--type-size-xs)] text-[var(--ds-color-accent-ink)] gap-1"
           href="/colors"

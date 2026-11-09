@@ -36,7 +36,8 @@ apps/
     src/shared/
       layout/                  公共侧栏、页头与 SectionShared
       providers/               跨页面共享的主题状态
-      ui/                      shadcn/ui 基础组件库
+      arc/                     Arc UI 免费组件源码与澄序主题映射
+      ui/                      兼容组件及保留的 shadcn/ui 组件
       hooks/                   公共 hooks
       lib/                     公共工具
 packages/
@@ -55,21 +56,21 @@ packages/
 | `/colors`     | 三套浅色、一套深色主题与可编辑的功能颜色矩阵 |
 | `/typography` | 字体分类与完整参数                           |
 | `/spacing`    | 间距、圆角与形状                             |
-| `/showcase`   | 33 个 shadcn/ui 组件示例，按 6 类区块预览    |
+| `/showcase`   | 121 个 Arc UI 免费组件与 5 个 shadcn/ui 示例，按 6 类预览 |
 
-侧栏使用 shadcn/ui Sidebar；通用控件直接引用 `src/shared/ui/` 中的 shadcn 组件。旧地址 `/components` 永久重定向到 `/showcase`。
+侧栏使用 shadcn/ui Sidebar。新页面可按需引用 `src/shared/arc/` 中的组件。旧地址 `/components` 永久重定向到 `/showcase`。
 
 页面采用“总分”结构：`page.tsx` 只组合布局、Provider 和内容组件；标题、说明、数据展示和业务交互由当前路由 `components/` 下的组件负责。页面私有的数据、类型、工具和状态放在同一目录，仅跨页面复用的代码进入 `shared/`。组件文件夹内不放 `page.tsx` 或 `route.ts`，普通组件不会成为公开路由。
 
-公共布局统一从 `shared/layout/` 引用；页面专属状态由路由内的 Provider 管理，全站主题状态保留在 `shared/providers/`。源码按职责拆分，当前 `apps/web/src` 下单个 TypeScript/TSX 文件均不超过 300 行；组件示例按六类拆分，侧栏基础实现按状态、框架、结构和菜单拆分。
+公共布局统一从 `shared/layout/` 引用。页面专属状态由路由内的 Provider 管理，全站主题状态保留在 `shared/providers/`。项目代码按职责拆分，Arc UI 源码沿用上游组件的文件组织。
 
 ## Token 约定
 
 - 修改 `packages/design-tokens/tokens.json`，不要直接编辑生成文件。
 - 自定义页面样式通过 `--ds-color-*`、`--space-*`、`--ds-radius-*`、`--type-*` 等变量读取设计 token。
 - `pnpm tokens:build` 重新生成目标文件；`pnpm tokens:check` 检查生成产物是否与源一致。
-- 样式直接平铺在 JSX 节点的 Tailwind className 中，不新增 CSS Modules 或页面 CSS。
-- `src/app/tailwind.css` 仅保留 Tailwind 入口、主题映射与基础层工具类；主题变量通过生成的 `tokenVariables` 注入根节点。
+- 项目页面在 JSX 中使用 Tailwind 类。Arc UI 源码沿用上游 CSS Modules。
+- 主题变量由 `tokenVariables` 和 `themeStyle` 注入根节点，Web 的 Arc 样式从这些变量派生 `--arc-*` 变量。
 - 新的产品颜色应先加入 token，再在节点工具类中引用。
 
 ## 常用命令
@@ -111,11 +112,9 @@ packages/
 
 ## 组件预览库
 
-`/showcase` 按基础操作、表单输入、导航切换、数据展示、反馈状态、浮层交互分为六个区块，提供 33 个组件示例，支持中英文名称/用途搜索、分类筛选、四套主题预览、复制引用与官方文档跳转。示例操作只在本地演示，不会请求业务接口。
+`/showcase` 按六类浏览 121 个 Arc UI 免费组件和 5 个保留的 shadcn/ui 组件。支持中英文搜索、分类筛选、四套主题切换、复制导入语句和跳转官方文档。点击「打开预览」时加载可操作的本地演示。
 
-- 通用组件：`apps/web/src/shared/ui/`，保持当前 `base-nova` / Base UI 配置。
-- 示例与分类：`apps/web/src/app/showcase/components/demos/` 按六个分类分别维护示例及注册信息，`component-registry.ts` 统一汇总，分类计数自动更新。
-- 预览容器与筛选：`app/showcase/components/component-preview.tsx`、`showcase-toolbar.tsx` 和 `showcase-context.tsx`；布局样式直接写在对应 JSX 节点的 Tailwind 类中。
-- 源码于 2026-10-23 对照 [shadcn 官方 registry](https://ui.shadcn.com/r/styles/base-nova/button.json) 同步，当前 CLI 为 4.22.1。图标使用 Lucide，内部引用改为项目别名；按钮、输入框和 Sheet 保留已有主题定制。
-- 新增组件通过 `--theme-control-*`、`--theme-field-*`、`--theme-progress-*`、`--theme-segment-*`、`--theme-backdrop` 和既有 shadcn 变量读取主题，不引入默认品牌色。后续使用 `pnpm --dir apps/web exec shadcn add <组件名> --dry-run` 检查上游更新，合入时保留本项目的语义颜色映射。
-- Toast 使用当前 Base UI 版 `Toaster` 与 `toast.add(...)`；在使用通知的页面或布局挂载一次 `Toaster`。
+- Arc UI 源码来自[固定的上游提交](https://github.com/kuratlielia/arc-library/tree/8302b52ed9dc79ae7ca699b158a98dfdf09656f7)，MIT 声明随 `apps/web/src/shared/arc/` 一同保存。目录包含免费组件与共享支持文件，构建直接使用本地源码。
+- 升级时对照上游 `public/r/` 的免费组件清单，合并同路径的共享文件，保留 Web 专用主题桥接、深色选择器和可访问性调整。
+- 组件元数据和按需加载入口在 `apps/web/src/app/showcase/components/`。保留的 shadcn/ui 示例是 AlertDialog、InputGroup、Separator、Spinner 和独立 Toggle。
+- 页面内连续通知使用 Arc 的 `ToastStackProvider` 和 `useToastStack`，展示页共用一个通知容器。

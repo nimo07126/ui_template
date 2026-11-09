@@ -1,15 +1,9 @@
 "use client";
 
 import { useThemeEditor } from "@/shared/providers/theme-provider";
-import { Badge } from "@/shared/ui/badge";
-import {
-  Breadcrumb,
-  BreadcrumbItem,
-  BreadcrumbLink,
-  BreadcrumbList,
-  BreadcrumbPage,
-  BreadcrumbSeparator,
-} from "@/shared/ui/breadcrumb";
+import { Badge } from "@/shared/arc/badge/badge";
+import { Breadcrumb } from "@/shared/arc/breadcrumb/breadcrumb";
+import { ArcProvider } from "@/shared/arc/lib/arc-provider";
 import { Separator } from "@/shared/ui/separator";
 import { SidebarTrigger } from "@/shared/ui/sidebar";
 import { themes } from "@template/design-tokens/themes";
@@ -29,7 +23,7 @@ const pageTitles: Record<string, string> = {
 };
 
 export function SiteHeader() {
-  const pathname = usePathname();
+  const pathname = usePathname().replace(/\/$/, "") || "/";
   const title = pageTitles[pathname] ?? "设计主题";
   const { activeId, dirty } = useThemeEditor();
   const theme = themes.find((entry) => entry.id === activeId)!;
@@ -38,19 +32,10 @@ export function SiteHeader() {
     <header className="z-20 flex h-14 shrink-0 items-center gap-3 border-b border-border/80 bg-surface px-4 md:px-6">
       <SidebarTrigger aria-label="切换导航栏" className="-ml-1" />
       <Separator className="h-4" orientation="vertical" />
-      <Breadcrumb>
-        <BreadcrumbList>
-          <BreadcrumbItem>
-            <BreadcrumbLink render={<Link href="/" />}>设计系统</BreadcrumbLink>
-          </BreadcrumbItem>
-          <BreadcrumbSeparator />
-          <BreadcrumbItem>
-            <BreadcrumbPage>{title}</BreadcrumbPage>
-          </BreadcrumbItem>
-        </BreadcrumbList>
-      </Breadcrumb>
-      <Badge className="ml-auto gap-2 font-normal" variant="outline">
-        <span className="size-1.5 rounded-full bg-primary" />
+      <ArcProvider link={Link}>
+        <Breadcrumb ariaLabel="当前位置" items={[{ label: "设计系统", href: "/" }, { label: title }]} />
+      </ArcProvider>
+      <Badge className="ml-auto shrink-0" size="sm" tone="info" outline dot>
         {theme.name}
         {dirty ? " · 预览" : ""}
       </Badge>

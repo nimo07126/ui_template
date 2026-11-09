@@ -1,7 +1,7 @@
 "use client";
 
 import { Button } from "@/shared/ui/button";
-import { Slider } from "@/shared/ui/slider";
+import { Slider } from "@/shared/arc/slider/slider";
 import { Check, ChevronDown, Copy, Pause, Play, RotateCcw } from "lucide-react";
 import { useState } from "react";
 import type { MotionCatalogItem } from "./motion-catalog";
@@ -101,23 +101,16 @@ export function MotionPreviewCard({ item }: { item: MotionCatalogItem }) {
 
               const numericValue = Number(value);
               return (
-                <label className="grid gap-2" key={parameter.id}>
-                  <span className="flex items-center justify-between text-[length:var(--type-size-xs)] text-[var(--ds-color-muted)]">
-                    <span>{parameter.label}</span>
-                    <span className="tabular-nums">{formatValue(numericValue, parameter.unit)}</span>
-                  </span>
-                  <Slider
-                    aria-label={parameter.label}
-                    max={parameter.max}
-                    min={parameter.min}
-                    onValueChange={(nextValue) => {
-                      const next = Array.isArray(nextValue) ? nextValue[0] : nextValue;
-                      if (typeof next === "number") setParams((current) => ({ ...current, [parameter.id]: next }));
-                    }}
-                    step={parameter.step}
-                    value={[numericValue]}
-                  />
-                </label>
+                <Slider
+                  key={parameter.id}
+                  label={parameter.label}
+                  format={(next) => formatValue(next, parameter.unit)}
+                  max={parameter.max}
+                  min={parameter.min}
+                  onValueChange={(next) => setParams((current) => ({ ...current, [parameter.id]: next }))}
+                  step={parameter.step}
+                  value={numericValue}
+                />
               );
             })}
           </div>

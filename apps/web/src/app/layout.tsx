@@ -10,6 +10,7 @@ import {
 import type { Metadata } from "next";
 import type { CSSProperties, ReactNode } from "react";
 import "./tailwind.css";
+import "@/shared/arc/foundation.css";
 
 export const metadata: Metadata = {
   title: "澄序 · 设计主题样板",
