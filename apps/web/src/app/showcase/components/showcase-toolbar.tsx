@@ -6,84 +6,54 @@ import {
   InputGroupAddon,
   InputGroupInput,
 } from "@/shared/ui/input-group";
-import { Search, SlidersHorizontal, X } from "lucide-react";
-import { componentExamples, componentGroups } from "./component-registry";
+import { ChevronDown, Search, X } from "lucide-react";
+import { componentGroups } from "./component-registry";
 import { useShowcase } from "./showcase-context";
 
 export function ShowcaseToolbar() {
-  const { query, setQuery, category, setCategory, matchesQuery, visible } =
-    useShowcase();
+  const { query, setQuery, category, setCategory, visible } = useShowcase();
+  const filtering = query.trim() !== "" || category !== "all";
+
   return (
-    <div className="grid border-t border-t-[var(--ds-color-line)] border-b border-b-[var(--ds-color-line)] py-5 px-0 gap-4">
-      <div className="flex items-center justify-between gap-4 max-[40rem]:flex-wrap max-[40rem]:gap-2">
-        <InputGroup className="max-w-100 bg-[var(--ds-color-surface)] max-[40rem]:max-w-[none]">
-          <InputGroupAddon>
-            <Search aria-hidden="true" />
+    <div role="search" aria-label="搜索与筛选组件" className="grid min-w-0 max-w-xl grid-cols-[minmax(0,1fr)_auto] items-center gap-x-2.5 gap-y-2">
+      <InputGroup className="h-10">
+        <InputGroupAddon>
+          <Search aria-hidden="true" />
+        </InputGroupAddon>
+        <InputGroupInput
+          aria-label="搜索组件"
+          placeholder="搜索组件…"
+          value={query}
+          onChange={(event) => setQuery(event.target.value)}
+        />
+        {query && (
+          <InputGroupAddon align="inline-end">
+            <Button
+              aria-label="清空搜索"
+              size="icon-xs"
+              variant="ghost"
+              onClick={() => setQuery("")}
+            >
+              <X aria-hidden="true" />
+            </Button>
           </InputGroupAddon>
-          <InputGroupInput
-            aria-label="搜索组件"
-            placeholder="搜索组件名称、用途…"
-            value={query}
-            onChange={(event) => setQuery(event.target.value)}
-          />
-          {query && (
-            <InputGroupAddon align="inline-end">
-              <Button
-                aria-label="清空搜索"
-                size="icon-xs"
-                variant="ghost"
-                onClick={() => setQuery("")}
-              >
-                <X />
-              </Button>
-            </InputGroupAddon>
-          )}
-        </InputGroup>
-        <span
-          className="shrink-0 text-[length:var(--type-size-xs)] text-[var(--ds-color-muted)] tabular-nums"
-          role="status"
-          aria-live="polite"
+        )}
+      </InputGroup>
+      <div className="relative">
+        <select
+          aria-label="按分类筛选"
+          className="h-10 appearance-none rounded-lg border border-input bg-[var(--theme-field-background)] py-0 pr-8 pl-3 text-sm text-foreground"
+          value={category}
+          onChange={(event) => setCategory(event.target.value)}
         >
-          {visible.length} / {componentExamples.length} 个示例
-        </span>
+          <option value="all">全部分类</option>
+          {componentGroups.map(({ id, name }) => <option key={id} value={id}>{name}</option>)}
+        </select>
+        <ChevronDown aria-hidden="true" className="pointer-events-none absolute top-1/2 right-2.5 size-3.5 -translate-y-1/2 text-muted-foreground" />
       </div>
-      <div
-        className="flex flex-wrap items-center gap-2 max-[40rem]:gap-1"
-        role="group"
-        aria-label="组件分类"
-      >
-        <Button
-          size="sm"
-          variant={category === "all" ? "default" : "ghost"}
-          aria-pressed={category === "all"}
-          onClick={() => setCategory("all")}
-        >
-          <SlidersHorizontal />
-          全部组件
-          <span className="text-[length:0.65rem] opacity-65 tabular-nums">
-            {componentExamples.filter(matchesQuery).length}
-          </span>
-        </Button>
-        {componentGroups.map((group) => (
-          <Button
-            key={group.id}
-            size="sm"
-            variant={category === group.id ? "default" : "ghost"}
-            aria-pressed={category === group.id}
-            onClick={() => setCategory(group.id)}
-          >
-            {group.name}
-            <span className="text-[length:0.65rem] opacity-65 tabular-nums">
-              {
-                componentExamples.filter(
-                  (example) =>
-                    example.group === group.id && matchesQuery(example),
-                ).length
-              }
-            </span>
-          </Button>
-        ))}
-      </div>
+      <span className={filtering ? "col-span-full text-xs text-muted-foreground tabular-nums" : "sr-only"} role="status">
+        {filtering ? `${visible.length} 个匹配示例` : ""}
+      </span>
     </div>
   );
 }

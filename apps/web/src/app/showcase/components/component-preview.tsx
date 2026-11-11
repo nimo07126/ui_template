@@ -2,8 +2,8 @@
 
 import { Popover, PopoverContent, PopoverTrigger } from "@/shared/arc/popover/popover";
 import { Button } from "@/shared/ui/button";
-import { BookOpen, Check, CodeXml, Copy } from "lucide-react";
-import { useEffect, useRef, useState, type ComponentType } from "react";
+import { ArrowUpRight, BookOpen, Check, CodeXml, Copy, Ellipsis } from "lucide-react";
+import { useEffect, useId, useRef, useState, type ComponentType } from "react";
 import type { ComponentExample, DemoLoader } from "./example-types";
 
 const observers = new WeakMap<Element | Document, IntersectionObserver>();
@@ -92,16 +92,17 @@ function LiveDemo({ load }: { load: DemoLoader }) {
 }
 
 const sizeClasses = {
-  compact: "@min-[58rem]:col-span-2",
-  wide: "@min-[39rem]:col-span-2 @min-[58rem]:col-span-3",
+  compact: "@min-[64rem]:col-span-2",
+  wide: "@min-[39rem]:col-span-2 @min-[50rem]:col-span-1 @min-[64rem]:col-span-3",
   full: "col-span-full",
 };
 
-const actionClassName = "inline-grid size-8 place-items-center rounded-md text-[var(--ds-color-muted)] hover:bg-[var(--ds-color-accent-soft)] hover:text-[var(--ds-color-accent-ink)]";
+const actionClassName = "flex w-full items-center gap-2.5 rounded-md px-2.5 py-2 text-start text-sm hover:bg-muted [&>svg]:size-4 [&>svg]:shrink-0";
 
 export function ComponentPreview({ example }: { example: ComponentExample }) {
   const [copyState, setCopyState] = useState<"idle" | "copied" | "error">("idle");
   const [showImport, setShowImport] = useState(false);
+  const importId = useId();
   const source = example.source === "shadcn" ? "shadcn/ui" : example.tier ? "Arc Pro" : "Arc UI";
 
   useEffect(() => {
@@ -122,13 +123,13 @@ export function ComponentPreview({ example }: { example: ComponentExample }) {
 
   return (
     <article
-      className={`grid min-w-0 content-start gap-6 ${sizeClasses[example.size ?? "compact"]}`}
+      className={`grid min-w-0 gap-4 border-t border-border/40 pt-4 @min-[39rem]:row-span-2 @min-[39rem]:grid-rows-subgrid @min-[39rem]:gap-y-4 ${sizeClasses[example.size ?? "compact"]}`}
       id={example.id}
       tabIndex={-1}
       aria-labelledby={`${example.id}-title`}
       data-source={example.source}
     >
-      <header className="flex min-w-0 items-start justify-between gap-2 rounded-lg bg-muted px-3 py-2.5">
+      <header className="flex min-w-0 items-start justify-between gap-3">
         <div className="min-w-0">
           <h3 id={`${example.id}-title`} className="text-base leading-snug font-semibold">
             {example.title}
@@ -137,26 +138,38 @@ export function ComponentPreview({ example }: { example: ComponentExample }) {
             {example.name} <span aria-hidden="true">·</span> {source}
           </p>
         </div>
-        <div className="-mt-1 flex shrink-0 items-center gap-0.5">
-          <a
-            className={actionClassName}
-            href={example.docs}
-            target="_blank"
-            rel="noreferrer"
-            title="官方文档"
-            aria-label={`查看 ${example.name} 官方文档`}
+        <Popover onOpenChange={(open) => { if (!open) setShowImport(false); }}>
+          <PopoverTrigger
+            className="-mt-1 inline-grid size-8 shrink-0 place-items-center rounded-md text-muted-foreground hover:bg-muted hover:text-foreground aria-expanded:bg-muted aria-expanded:text-foreground"
+            title="示例操作"
+            aria-label={`${example.title}示例操作`}
           >
-            <BookOpen className="size-4" aria-hidden="true" />
-          </a>
-          <Popover open={showImport} onOpenChange={setShowImport}>
-            <PopoverTrigger
-              className={`${actionClassName} aria-expanded:bg-[var(--ds-color-accent-soft)] aria-expanded:text-[var(--ds-color-accent-ink)]`}
-              title="查看引用"
-              aria-label="查看引用"
+            <Ellipsis className="size-4" aria-hidden="true" />
+          </PopoverTrigger>
+          <PopoverContent align="end" className={showImport ? "w-80" : "w-48"} aria-label={`${example.title}示例操作`}>
+            <a className={actionClassName} href={example.docs} target="_blank" rel="noreferrer">
+              <BookOpen aria-hidden="true" />
+              官方文档
+              <ArrowUpRight className="ml-auto text-muted-foreground" aria-hidden="true" />
+            </a>
+            <button
+              type="button"
+              className={actionClassName}
+              aria-expanded={showImport}
+              aria-controls={importId}
+              onClick={() => setShowImport((visible) => !visible)}
             >
-              <CodeXml className="size-4" aria-hidden="true" />
-            </PopoverTrigger>
-            <PopoverContent align="end" className="w-80" aria-label={`${example.name} 引用`}>
+              <CodeXml aria-hidden="true" />
+              {showImport ? "收起引用" : "查看引用"}
+            </button>
+            <button type="button" className={actionClassName} onClick={copyImport}>
+              {copyState === "copied" ? <Check aria-hidden="true" /> : <Copy aria-hidden="true" />}
+              {copyState === "copied" ? "已复制" : "复制引用"}
+            </button>
+            <span className="sr-only" role="status">
+              {copyState === "copied" ? `${example.name} 引用已复制` : ""}
+            </span>
+            <div id={importId} hidden={!showImport} className="mt-2 rounded-md bg-muted p-3">
               {copyState === "error" && (
                 <p className="mb-2 text-xs text-[var(--ds-color-danger)]" role="alert">
                   复制失败，请手动选择下方引用。
@@ -165,25 +178,9 @@ export function ComponentPreview({ example }: { example: ComponentExample }) {
               <pre className="text-xs leading-relaxed wrap-break-word whitespace-pre-wrap">
                 <code>{example.importStatement}</code>
               </pre>
-            </PopoverContent>
-          </Popover>
-          <button
-            className={actionClassName}
-            type="button"
-            title={copyState === "copied" ? "已复制" : "复制引用"}
-            aria-label="复制引用"
-            onClick={copyImport}
-          >
-            {copyState === "copied" ? (
-              <Check className="size-4" aria-hidden="true" />
-            ) : (
-              <Copy className="size-4" aria-hidden="true" />
-            )}
-          </button>
-          <span className="sr-only" role="status">
-            {copyState === "copied" ? `${example.name} 引用已复制` : ""}
-          </span>
-        </div>
+            </div>
+          </PopoverContent>
+        </Popover>
       </header>
 
       <LiveDemo load={example.loadDemo} />

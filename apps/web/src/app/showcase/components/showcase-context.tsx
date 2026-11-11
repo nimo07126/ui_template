@@ -37,8 +37,6 @@ function useShowcaseState() {
     setCategory,
     activeId,
     selectTheme,
-    normalizedQuery,
-    matchesQuery,
     visible,
     groups,
     reset,

@@ -7,32 +7,26 @@ export const componentGroups = [
   {
     id: "actions",
     name: "基础操作",
-    description: "用清晰的层级表达操作优先级。",
   },
   {
     id: "forms",
     name: "表单输入",
-    description: "从填写到选择，覆盖完整的输入状态。",
   },
   {
     id: "navigation",
     name: "导航切换",
-    description: "组织内容，帮助用户找到当前位置。",
   },
   {
     id: "overlays",
     name: "浮层交互",
-    description: "在需要的时候，展开更多信息与操作。",
   },
   {
     id: "feedback",
     name: "反馈状态",
-    description: "及时回应操作，照顾等待与空白时刻。",
   },
   {
     id: "data",
     name: "数据展示",
-    description: "让信息有层次，让状态一目了然。",
   },
 ] as const;
 

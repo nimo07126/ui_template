@@ -56,7 +56,7 @@ export function ActionButtonDemo() {
 export function SplitButtonDemo() {
   const [result, setResult] = useState("");
   return (
-    <DemoColumn>
+    <DemoColumn className="justify-items-start">
       <SplitButton
         label="导出报告"
         onClick={() => setResult("已模拟导出 PDF")}
@@ -74,7 +74,7 @@ export function FloatingButtonGroupDemo() {
   const [step, setStep] = useState(1);
   const [playing, setPlaying] = useState(false);
   return (
-    <DemoColumn>
+    <DemoColumn className="justify-items-start">
       <FloatingButtonGroup
         label="画板操作"
         variant="floating"
@@ -113,7 +113,7 @@ export function FloatingButtonGroupDemo() {
 export function ExpandingButtonGroupDemo() {
   const [result, setResult] = useState("");
   return (
-    <DemoColumn>
+    <DemoColumn className="justify-items-start">
       <ExpandingButtonGroup
         label="消息操作"
         defaultExpanded="reply"

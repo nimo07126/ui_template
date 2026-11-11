@@ -1,7 +1,7 @@
 import type { ReactNode } from "react";
 
-export function DemoColumn({ children }: { children: ReactNode }) {
-  return <div className="grid w-full max-w-sm min-w-0 gap-3">{children}</div>;
+export function DemoColumn({ children, className = "" }: { children: ReactNode; className?: string }) {
+  return <div className={`grid w-full max-w-sm min-w-0 gap-3 ${className}`}>{children}</div>;
 }
 
 export function DemoResult({ children }: { children: ReactNode }) {
