@@ -7,7 +7,7 @@ import { ShowcaseToolbar } from "./components/showcase-toolbar";
 
 export const metadata: Metadata = {
   title: "组件预览 · 澄序",
-  description: "121 个免费 Arc UI 组件与澄序保留的基础组件，共用四套澄序主题。",
+  description: "预览 Arc UI 基础与 Pro 组件，以及澄序保留的 shadcn/ui 组件，支持切换四套主题。",
 };
 
 export default function ShowcasePage() {

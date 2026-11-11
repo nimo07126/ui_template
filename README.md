@@ -36,7 +36,7 @@ apps/
     src/shared/
       layout/                  公共侧栏、页头与 SectionShared
       providers/               跨页面共享的主题状态
-      arc/                     Arc UI 免费组件源码与澄序主题映射
+      arc/                     Arc UI 基础与 Pro 组件源码、澄序主题映射
       ui/                      兼容组件及保留的 shadcn/ui 组件
       hooks/                   公共 hooks
       lib/                     公共工具
@@ -56,7 +56,7 @@ packages/
 | `/colors`     | 三套浅色、一套深色主题与可编辑的功能颜色矩阵 |
 | `/typography` | 字体分类与完整参数                           |
 | `/spacing`    | 间距、圆角与形状                             |
-| `/showcase`   | 121 个 Arc UI 免费组件与 5 个 shadcn/ui 示例，按 6 类预览 |
+| `/showcase`   | Arc UI 基础与 Pro 组件、shadcn/ui 示例，按 6 类预览 |
 
 侧栏使用 shadcn/ui Sidebar。新页面可按需引用 `src/shared/arc/` 中的组件。旧地址 `/components` 永久重定向到 `/showcase`。
 
@@ -112,9 +112,9 @@ packages/
 
 ## 组件预览库
 
-`/showcase` 按六类浏览 121 个 Arc UI 免费组件和 5 个保留的 shadcn/ui 组件。支持中英文搜索、分类筛选、四套主题切换、复制导入语句和跳转官方文档。点击「打开预览」时加载可操作的本地演示。
+`/showcase` 按六类浏览 Arc UI 基础与 Pro 组件和保留的 shadcn/ui 组件。支持中英文搜索、分类筛选、四套主题切换、复制导入语句和跳转官方文档。点击「打开预览」时加载可操作的本地演示。
 
-- Arc UI 源码来自[固定的上游提交](https://github.com/kuratlielia/arc-library/tree/8302b52ed9dc79ae7ca699b158a98dfdf09656f7)，MIT 声明随 `apps/web/src/shared/arc/` 一同保存。目录包含免费组件与共享支持文件，构建直接使用本地源码。
+- Arc UI 基础组件最初取自[固定的上游提交](https://github.com/kuratlielia/arc-library/tree/8302b52ed9dc79ae7ca699b158a98dfdf09656f7)，MIT 声明随 `apps/web/src/shared/arc/` 保存。基础与 Pro 组件分别存放在 `arc/` 和 `arc/pro/`，构建直接使用本地源码。
 - 升级时对照上游 `public/r/` 的免费组件清单，合并同路径的共享文件，保留 Web 专用主题桥接、深色选择器和可访问性调整。
 - 组件元数据和按需加载入口在 `apps/web/src/app/showcase/components/`。保留的 shadcn/ui 示例是 AlertDialog、InputGroup、Separator、Spinner 和独立 Toggle。
 - 页面内连续通知使用 Arc 的 `ToastStackProvider` 和 `useToastStack`，展示页共用一个通知容器。

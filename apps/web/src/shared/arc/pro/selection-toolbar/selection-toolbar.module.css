@@ -1,0 +1,26 @@
+.bar { display: inline-flex; max-width: 100%; min-height: 46px; align-items: center; gap: 8px; border: 1px solid var(--arc-border); border-radius: var(--arc-radius-panel); padding: 5px 6px 5px 14px; background: var(--arc-surface-raised); box-shadow: var(--arc-shadow-raised); color: var(--arc-foreground); transform-origin: 50% 100%; }
+.count { position: relative; flex: 0 0 auto; color: var(--arc-text-secondary); font-size: var(--arc-text-xs); white-space: nowrap; }
+/* The count's width springs to its content; the number rolls and the words glide, so nothing beside it jumps. */
+.countSlot { display: inline-flex; min-width: 0; }
+.countRow { display: inline-flex; flex: none; align-items: baseline; white-space: pre; }
+.countNumber { position: relative; display: inline-flex; min-width: 1ch; color: var(--arc-accent); font-weight: 500; font-variant-numeric: tabular-nums; }
+.digits, .words, .plural, .selected { display: inline-block; }
+.words { position: relative; }
+.divider { width: 1px; height: 20px; flex: 0 0 auto; background: var(--arc-border); }
+.actions { display: flex; min-width: 0; align-items: center; gap: 2px; }
+/* Compact buttons press in and release on the spring; color answers at the same moment. */
+.actions button, .clear { display: inline-flex; min-height: 34px; align-items: center; justify-content: center; gap: 7px; border: 0; border-radius: calc(var(--arc-radius-panel) - 6px); padding: 0 10px; background: transparent; color: var(--arc-foreground); font: inherit; font-size: var(--arc-text-xs); white-space: nowrap; cursor: pointer; -webkit-tap-highlight-color: transparent; transition: background-color var(--arc-duration-fast) var(--arc-ease-standard), color var(--arc-duration-fast) var(--arc-ease-standard), transform var(--arc-duration-spring) var(--arc-ease-spring); }
+.actions button:active, .clear:active { background: var(--arc-surface-muted); transform: scale(.97); transition-duration: var(--arc-duration-fast), var(--arc-duration-fast), var(--arc-duration-instant); transition-timing-function: var(--arc-ease-standard); }
+.clear:active { transform: scale(.96); }
+.actionIcon { display: inline-flex; align-items: center; color: currentColor; }
+@media (hover: hover) and (pointer: fine) {
+  .actions button:hover, .clear:hover { background: var(--arc-surface-muted); }
+  .actions .destructive:hover { background: color-mix(in oklab, var(--arc-danger) 9%, var(--arc-surface)); }
+}
+.actions .destructive { color: var(--arc-danger); }
+.actions .destructive:active { background: color-mix(in oklab, var(--arc-danger) 12%, var(--arc-surface)); }
+.clear { width: 34px; flex: 0 0 auto; padding: 0; color: var(--arc-text-muted); }
+.srOnly { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
+/* Narrow: the count and clear share the top row, and the actions take the full row below. */
+@media (max-width: 520px) { .bar { flex-wrap: wrap; width: 100%; }.count { flex: 1 1 auto; min-width: 0; }.divider { display: none; }.actions { flex: 1 0 100%; flex-wrap: wrap; border-top: 1px solid var(--arc-border-subtle); padding-top: 4px; }.actions button { flex: 1 1 auto; padding-inline: 6px; }.clear { order: 1; }.actions { order: 2; } }
+@media (prefers-reduced-motion: reduce) { .actions button, .clear { transition: none; } .actions button:active, .clear:active { transform: none; } }

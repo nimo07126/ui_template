@@ -1,0 +1,195 @@
+/* Segment colors come from the chart series (set per segment inline as --c). The new message is neutral: it is the part
+   that changes every time. Solid fills are tokens the model processed; light fills with a hairline are read from the cache. */
+.root {
+  --pc-new: color-mix(in oklab, var(--arc-foreground) 76%, var(--arc-surface));
+  --pc-track: var(--arc-surface-muted);
+  --pc-bar: 10px;
+  --pc-gap: 2px;
+  --pc-radius: 3px;
+  position: relative;
+  container: pc / inline-size;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  width: 100%;
+  min-width: 0;
+  box-sizing: border-box;
+  gap: var(--arc-space-5);
+  padding: var(--arc-space-6);
+  border: 1px solid var(--arc-border);
+  border-radius: var(--arc-radius-surface);
+  background: var(--arc-surface);
+  color: var(--arc-foreground);
+  font-family: var(--arc-font-body);
+  font-size: var(--arc-text-sm);
+  letter-spacing: var(--arc-tracking-body);
+  line-height: var(--arc-leading-body);
+  -webkit-tap-highlight-color: transparent;
+}
+.tabular { font-variant-numeric: tabular-nums; }
+
+/* Header */
+/* The controls wrap under the title when a very narrow container cannot hold both. */
+.header { display: flex; flex-wrap: wrap; align-items: flex-start; justify-content: space-between; gap: var(--arc-space-3) var(--arc-space-4); }
+.heading { display: grid; min-width: 0; gap: 2px; }
+.title { margin: 0; font-size: var(--arc-text-base); font-weight: 500; letter-spacing: var(--arc-tracking-body); line-height: var(--arc-leading-body); }
+.model { display: flex; flex-wrap: wrap; align-items: center; gap: 4px 8px; margin: 0; color: var(--arc-text-secondary); }
+.modelName { display: inline-flex; align-items: center; gap: 6px; white-space: nowrap; }
+.modelMark { display: inline-flex; width: 14px; height: 14px; flex: none; }
+.modelMark svg { width: 100%; height: 100%; }
+.modelTtl { display: inline-flex; align-items: center; gap: 8px; white-space: nowrap; }
+.modelTtl::before { width: 3px; height: 3px; flex: none; border-radius: 50%; background: var(--arc-text-muted); content: ""; }
+.controls { display: flex; flex: none; gap: var(--arc-space-2); }
+.controls .iconButton { width: var(--arc-control-height-sm); padding-inline: 0; }
+.iconButton svg { width: 16px; height: 16px; stroke-width: 1.75; }
+.glyph { display: inline-grid; width: 16px; height: 16px; }
+.glyph svg { grid-area: 1 / 1; transition: opacity var(--arc-duration-fast) var(--arc-ease-standard); }
+.glyph svg[data-on="false"] { opacity: 0; transition-duration: 100ms; }
+
+/* Legend */
+.legend { display: flex; flex-wrap: wrap; align-items: center; gap: 6px 16px; margin: 0; padding: 0; list-style: none; color: var(--arc-text-secondary); font-size: var(--arc-text-xs); }
+.legendItem { display: inline-flex; align-items: center; gap: 6px; white-space: nowrap; }
+.legendTokens { color: var(--arc-text-muted); font-variant-numeric: tabular-nums; }
+.keys { display: inline-flex; flex-wrap: wrap; gap: 4px 14px; color: var(--arc-text-muted); }
+.swatch, .keySolid, .keyCached { width: 10px; height: 10px; flex: none; border-radius: var(--pc-radius); }
+.swatch { background: var(--c); }
+.keySolid { background: var(--arc-text-secondary); }
+.keyCached { background: color-mix(in oklab, var(--arc-text-secondary) 20%, var(--arc-surface)); box-shadow: inset 0 0 0 1px color-mix(in oklab, var(--arc-text-secondary) 50%, transparent); }
+
+/* Layout: the requests and the cache beside them; the cache moves above the requests in narrow containers. */
+.main { display: grid; grid-template-columns: minmax(0, 1fr) 12rem; align-items: start; gap: var(--arc-space-6); }
+
+/* Requests: one grid for the whole stack, so the metric columns size to their content and line up across rows. */
+.stack { display: grid; min-width: 0; grid-template-columns: minmax(0, 1fr) repeat(3, minmax(3.5rem, max-content)); align-content: start; column-gap: var(--arc-space-3); row-gap: var(--arc-space-3); }
+.columns, .rows, .row { display: grid; grid-column: 1 / -1; grid-template-columns: subgrid; }
+.columns { align-items: end; padding-bottom: var(--arc-space-2); border-bottom: 1px solid var(--arc-border-subtle); color: var(--arc-text-muted); font-size: var(--arc-text-xs); }
+.metricHead { text-align: right; white-space: nowrap; }
+.rows { row-gap: var(--arc-space-4); margin: 0; padding: 0; list-style: none; }
+.row { row-gap: 6px; align-items: center; }
+.rowHead { display: flex; grid-row: 1; grid-column: 1; min-width: 0; height: 20px; align-items: center; gap: var(--arc-space-2); }
+.rowTitle { flex: none; font-weight: 500; white-space: nowrap; transition: color var(--arc-duration-standard) var(--arc-ease-standard); }
+.row[data-state="queued"] .rowTitle { color: var(--arc-text-muted); }
+.rowTime { color: var(--arc-text-muted); font-variant-numeric: tabular-nums; }
+.row:not([data-state="queued"]) .rowTime { animation: pc-fade var(--arc-duration-fast) var(--arc-ease-standard) backwards; }
+.rowStatus { min-width: 0; margin-left: auto; color: var(--arc-text-secondary); justify-items: end; }
+.metric { display: flex; grid-row: 1 / span 2; justify-content: flex-end; font-variant-numeric: tabular-nums; white-space: nowrap; }
+.metricValue { color: var(--arc-foreground); }
+.metricValue[data-empty] { color: var(--arc-text-muted); }
+
+/* Bars */
+.bar { display: flex; grid-row: 2; grid-column: 1; min-width: 0; height: var(--pc-bar); gap: var(--pc-gap); }
+.prefix { display: flex; flex-basis: 0; min-width: 0; gap: var(--pc-gap); container-type: inline-size; }
+.seg, .boxSeg, .ghostSeg { position: relative; flex-basis: 0; flex-shrink: 1; min-width: 0; height: var(--pc-bar); }
+.clip { position: absolute; inset: 0; overflow: hidden; border-radius: var(--pc-radius); background: var(--pc-track); }
+.fill { position: absolute; inset: 0; border-radius: inherit; transform: scaleX(0); transform-origin: 0 50%; }
+.seg[data-mode="process"] .fill { background: var(--c); }
+.seg[data-mode="cached"] .fill, .boxFill, .ghostSeg { background: color-mix(in oklab, var(--c) 28%, var(--arc-surface)); box-shadow: inset 0 0 0 1px color-mix(in oklab, var(--c) 55%, transparent); }
+.seg[data-mode="cached"] .fill, .row[data-state="done"] .fill { transform: none; }
+/* Animation times are divided by the speed prop, so CSS motion keeps pace with the clock. */
+.row[data-state="run"] .seg[data-mode="process"] .fill { animation: pc-fill calc(var(--t) / var(--pc-rate, 1)) linear calc(var(--d) / var(--pc-rate, 1)) both; }
+.row[data-state="run"] .seg[data-mode="cached"] .fill { animation: pc-fade var(--arc-duration-fast) var(--arc-ease-standard) backwards; }
+@keyframes pc-fill { from { transform: scaleX(0); } to { transform: scaleX(1); } }
+@keyframes pc-fade { from { opacity: 0; } }
+
+/* A cache read: one band of the segment color passes once across the whole prefix, segment by segment. */
+.band { position: absolute; top: 0; bottom: 0; left: 0; width: 34cqw; background: linear-gradient(90deg, transparent, color-mix(in oklab, var(--c) 80%, var(--arc-surface)), transparent); animation: pc-sweep calc(520ms / var(--pc-rate, 1)) var(--arc-ease-in-out) both; }
+@keyframes pc-sweep {
+  from { transform: translateX(calc(-34cqw - var(--l) * 100cqw)); }
+  to { transform: translateX(calc(100cqw - var(--l) * 100cqw)); }
+}
+
+/* The break: where prefix matching stops, a short line taller than the bar sits in the gap before the first changed segment. */
+.mark { position: absolute; z-index: 1; top: -5px; bottom: -5px; left: calc(var(--pc-gap) * -1); width: var(--pc-gap); border-radius: 1px; background: var(--arc-warning); }
+.row[data-state="run"] .mark { animation: pc-mark 200ms var(--arc-ease-standard) calc(var(--m) / var(--pc-rate, 1)) backwards; }
+@keyframes pc-mark { from { opacity: 0; transform: scaleY(0); } }
+
+/* Status labels */
+.swap { display: inline-grid; min-width: 0; }
+.swapItem { display: inline-flex; grid-area: 1 / 1; align-items: center; gap: 6px; white-space: nowrap; }
+.statusIcon { width: 14px; height: 14px; flex: none; color: var(--arc-text-muted); stroke-width: 1.75; }
+.statusIcon[data-tone="success"] { color: var(--arc-success); }
+.statusIcon[data-tone="warning"] { color: var(--arc-warning); }
+.statusIcon[data-tone="info"] { color: var(--arc-accent); }
+.shimmer { font: inherit; }
+
+/* The cache */
+.box { display: grid; min-width: 0; box-sizing: border-box; grid-template-areas: "head" "bar" "tokens" "prices"; gap: var(--arc-space-3); padding: var(--arc-space-4); border: 1px solid var(--arc-border); border-radius: calc(var(--arc-radius-surface) - var(--arc-space-3)); transition: border-color var(--arc-duration-standard) var(--arc-ease-standard); }
+.box[data-mode="empty"], .box[data-mode="expired"] { border-style: dashed; border-color: var(--arc-border-strong); }
+.boxHead { display: grid; grid-area: head; grid-template-columns: auto minmax(0, 1fr); align-items: center; gap: var(--arc-space-3); margin-bottom: var(--arc-space-1); }
+.boxTitle { display: grid; min-width: 0; }
+.boxName { font-weight: 500; }
+.boxStatus { color: var(--arc-text-secondary); justify-items: start; }
+.ring { display: block; width: 36px; height: 36px; flex: none; }
+.ring svg { display: block; width: 100%; height: 100%; transform: rotate(-90deg); }
+.ringTrack { fill: none; stroke: var(--arc-border); stroke-width: 3; }
+.ringArc { fill: none; stroke: var(--arc-accent); stroke-width: 3; stroke-linecap: round; transition: stroke var(--arc-duration-standard) var(--arc-ease-standard), opacity var(--arc-duration-fast) var(--arc-ease-standard); }
+.ring[data-low="true"] .ringArc { stroke: var(--arc-warning); }
+.boxBar { display: flex; grid-area: bar; gap: var(--pc-gap); container-type: inline-size; }
+.boxFill { position: absolute; inset: 0; border-radius: inherit; opacity: 0; transition: opacity 180ms var(--arc-ease-standard) calc(var(--i) * 30ms); }
+.boxSeg[data-on="true"] .boxFill { opacity: 1; transition: none; }
+.boxTokens { grid-area: tokens; color: var(--arc-text-secondary); font-size: var(--arc-text-xs); white-space: nowrap; }
+.pricing { display: grid; grid-area: prices; gap: var(--arc-space-1); padding-top: var(--arc-space-3); border-top: 1px solid var(--arc-border-subtle); font-size: var(--arc-text-xs); }
+.prices { display: grid; gap: var(--arc-space-1); margin: 0; }
+.price { display: flex; justify-content: space-between; gap: var(--arc-space-2); }
+.price dt { color: var(--arc-text-secondary); }
+.price dd { margin: 0; font-variant-numeric: tabular-nums; }
+.priceNote { margin: 0; color: var(--arc-text-muted); }
+
+/* What gets written travels from the request into the cache, changing from processed to cached on the way. */
+.ghost { position: absolute; z-index: 3; display: flex; gap: var(--pc-gap); pointer-events: none; transform-origin: 0 0; animation: pc-fly calc(var(--fly) / var(--pc-rate, 1)) var(--arc-ease-standard) both; }
+@keyframes pc-fly { to { width: var(--w1); height: var(--h1); transform: translate(var(--dx), var(--dy)); } }
+.ghostSeg { flex-grow: 1; height: auto; overflow: hidden; border-radius: var(--pc-radius); }
+.ghostSolid { position: absolute; inset: 0; background: var(--c); animation: pc-solid calc(var(--fly) / var(--pc-rate, 1)) var(--arc-ease-standard) both; }
+@keyframes pc-solid { to { opacity: 0; } }
+
+/* Narration and summary */
+.caption { min-height: calc(2 * 1.4em); color: var(--arc-text-secondary); }
+.caption > .swapItem { display: block; white-space: normal; text-wrap: pretty; }
+.footer { display: flex; flex-wrap: wrap; align-items: flex-end; justify-content: space-between; gap: var(--arc-space-4) var(--arc-space-6); padding-top: var(--arc-space-5); border-top: 1px solid var(--arc-border-subtle); }
+/* Fixed stat columns, so a detail line that appears or grows never moves the stat beside it. */
+.stats { display: grid; min-width: 0; grid-template-columns: repeat(2, 12rem); gap: var(--arc-space-6); }
+.stat { display: grid; min-width: 0; gap: 2px; }
+.statValue { font-size: var(--arc-text-xl); font-weight: 500; letter-spacing: var(--arc-tracking-body); line-height: 1.2; font-variant-numeric: tabular-nums; }
+.statValue[data-empty] { color: var(--arc-text-muted); }
+.statLabel { color: var(--arc-text-secondary); justify-items: start; }
+.statDetail { color: var(--arc-text-muted); font-size: var(--arc-text-xs); font-variant-numeric: tabular-nums; justify-items: start; }
+.footer .change svg { width: 15px; height: 15px; color: var(--arc-text-secondary); stroke-width: 1.75; transition: color var(--arc-duration-fast) var(--arc-ease-standard); }
+.footer .change[aria-pressed="true"] { border-color: var(--arc-control-on); background: var(--arc-control-on-subtle); color: var(--arc-foreground); }
+.footer .change[aria-pressed="true"] svg { color: var(--arc-control-on); }
+
+/* Clearing a finished round fades the results out before the next round starts. */
+.root[data-clearing] .row :is(.fill, .mark, .rowTime, .rowStatus, .metric) { opacity: 0; transition: opacity 240ms var(--arc-ease-standard); }
+.root[data-paused] :is(.fill, .band, .mark, .ghost, .ghostSolid) { animation-play-state: paused; }
+
+.srOnly { position: absolute; width: 1px; height: 1px; margin: -1px; padding: 0; overflow: hidden; clip-path: inset(50%); white-space: nowrap; border: 0; }
+
+@container pc (width < 660px) {
+  .main { grid-template-columns: minmax(0, 1fr); gap: var(--arc-space-5); }
+  .box { order: -1; }
+  .pricing { grid-template-columns: minmax(0, 1fr) auto; align-items: baseline; }
+  .prices { display: flex; flex-wrap: wrap; gap: 4px 16px; }
+  .price { gap: 6px; }
+}
+
+@container pc (width < 480px) {
+  .root { padding: var(--arc-space-5); gap: var(--arc-space-4); }
+  .model { flex-direction: column; align-items: flex-start; gap: 0; }
+  .modelTtl::before { display: none; }
+  .stack { grid-template-columns: repeat(3, minmax(0, 1fr)); column-gap: var(--arc-space-3); }
+  .columns { row-gap: var(--arc-space-2); }
+  .columns > .keys { grid-column: 1 / -1; }
+  .metricHead { text-align: left; }
+  .rowHead, .bar { grid-column: 1 / -1; }
+  .metric { grid-row: 3; justify-content: flex-start; }
+  .caption { min-height: calc(3 * 1.4em); }
+  .footer { flex-direction: column; align-items: stretch; }
+  .stats { grid-template-columns: minmax(0, 1fr); gap: var(--arc-space-4); }
+  .pricing { grid-template-columns: minmax(0, 1fr); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .row .fill, .mark, .ghost, .ghostSolid, .rowTime { animation: none !important; }
+  .row[data-state="run"] .seg[data-mode="process"] .fill { transform: none; }
+  .band { display: none; }
+  .glyph svg, .rowTitle, .box, .ringArc { transition-duration: var(--arc-duration-instant); }
+  .boxFill { transition: opacity var(--arc-duration-instant) linear; }
+}

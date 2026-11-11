@@ -1,6 +1,5 @@
 "use client";
 
-import { Badge } from "@/shared/arc/badge/badge";
 import { Select } from "@/shared/arc/select/select";
 import { themes } from "@template/design-tokens/themes";
 import { ArrowUpRight } from "lucide-react";
@@ -32,7 +31,6 @@ export function ShowcaseIntro() {
           从基础操作到浮层交互，每一种状态都遵循同一套主题。选择一个组件，直接体验。
         </p>
         <div className="flex flex-wrap items-center mt-5 text-[length:var(--type-size-xs)] text-[var(--ds-color-muted)] gap-3">
-          <Badge outline>Arc UI · 免费组件</Badge>
           <span>{arcCatalog.length} 个 Arc UI 组件</span>
           <span>{componentExamples.length - arcCatalog.length} 个 shadcn/ui 组件</span>
           <span>{componentGroups.length} 个分类</span>

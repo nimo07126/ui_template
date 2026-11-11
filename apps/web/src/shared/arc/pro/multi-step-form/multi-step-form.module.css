@@ -1,0 +1,265 @@
+.form {
+  border: 1px solid var(--arc-border);
+  border-radius: var(--arc-radius-surface);
+  padding: var(--arc-space-5);
+  background: var(--arc-surface);
+  box-shadow: var(--arc-shadow-resting);
+}
+
+.progress {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--arc-space-4);
+  margin: calc(var(--arc-space-5) * -1) calc(var(--arc-space-5) * -1) var(--arc-space-6);
+  padding: var(--arc-space-4) var(--arc-space-5);
+  border-bottom: 1px solid var(--arc-border-subtle);
+}
+
+.progressList {
+  display: flex;
+  min-width: 0;
+  gap: var(--arc-space-4);
+  margin: 0;
+  padding: 0;
+  overflow-x: auto;
+  list-style: none;
+  scrollbar-width: none;
+}
+
+.progressList::-webkit-scrollbar { display: none; }
+
+.progressItem {
+  display: inline-flex;
+  flex: 0 0 auto;
+  align-items: center;
+  gap: var(--arc-space-2);
+  color: var(--arc-text-muted);
+  font-size: var(--arc-text-xs);
+  font-weight: 400;
+  line-height: var(--arc-leading-body);
+  white-space: nowrap;
+  transition: color var(--arc-duration-standard) var(--arc-ease-standard);
+}
+
+/* Labels reserve their medium weight width, so the current step never nudges the others. */
+.progressLabel { display: inline-flex; flex-direction: column; }
+
+.progressLabel::after {
+  height: 0;
+  overflow: hidden;
+  content: attr(data-label);
+  font-weight: 500;
+  visibility: hidden;
+  user-select: none;
+  pointer-events: none;
+}
+
+.progressMarker {
+  display: grid;
+  width: 1.25rem;
+  height: 1.25rem;
+  place-items: center;
+  border: 1px solid var(--arc-border-strong);
+  border-radius: var(--arc-radius-pill);
+  color: var(--arc-text-muted);
+  font-size: var(--arc-text-xs);
+  font-variant-numeric: tabular-nums;
+  transition: border-color var(--arc-duration-standard) var(--arc-ease-standard), background-color var(--arc-duration-standard) var(--arc-ease-standard), color var(--arc-duration-standard) var(--arc-ease-standard);
+}
+
+.markerGlyph { display: grid; grid-area: 1 / 1; place-items: center; }
+
+.progressItem.current {
+  color: var(--arc-accent);
+  font-weight: 500;
+}
+
+.progressItem.current .progressMarker {
+  border-color: var(--arc-accent);
+  background: var(--arc-accent);
+  color: var(--arc-accent-foreground);
+}
+
+.progressItem.complete { color: var(--arc-text-secondary); }
+
+.progressItem.complete .progressMarker {
+  border-color: var(--arc-success);
+  color: var(--arc-success);
+}
+
+.progressCount {
+  flex: 0 0 auto;
+  color: var(--arc-text-muted);
+  font-size: var(--arc-text-xs);
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+}
+
+.viewport { display: grid; min-height: 14rem; }
+
+/* While the shell changes height it clips vertically only, so the sideways step slide is never cut off. */
+.viewport[data-resizing="true"] { overflow: visible clip; }
+
+.swap { display: inline-grid; }
+
+.swap > span { grid-area: 1 / 1; }
+
+.countValue { min-width: 1ch; text-align: center; }
+
+.srOnly {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+  white-space: nowrap;
+}
+
+.step,
+.success {
+  grid-area: 1 / 1;
+  min-width: 0;
+  border: 0;
+  padding: 0;
+  margin: 0;
+}
+
+/* Content sits one step below the title when a step has no description. */
+.step legend + .content { margin-top: var(--arc-space-5); }
+
+.step legend {
+  max-width: 100%;
+  padding: 0;
+  color: var(--arc-foreground);
+  font-size: var(--arc-text-lg);
+  font-weight: 500;
+  line-height: var(--arc-leading-body);
+}
+
+/* Two classes, so a host's generic `p` rule cannot strip the spacing or size. */
+.step .description {
+  margin: var(--arc-space-2) 0 var(--arc-space-5);
+  color: var(--arc-text-secondary);
+  font-size: var(--arc-text-sm);
+  line-height: var(--arc-leading-body);
+}
+
+.actionsShell { display: flow-root; }
+
+.actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: var(--arc-space-3);
+  margin-top: var(--arc-space-6);
+}
+
+.back,
+.next {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--arc-space-2);
+  min-height: var(--arc-control-height-sm);
+  border: 1px solid var(--arc-border-strong);
+  border-radius: var(--arc-radius-control);
+  padding: 0 var(--arc-space-3);
+  background: var(--arc-surface);
+  color: var(--arc-foreground);
+  font: inherit;
+  font-size: var(--arc-text-sm);
+  font-weight: 500;
+  line-height: 1;
+  cursor: pointer;
+  transition: border-color var(--arc-duration-fast), background-color var(--arc-duration-fast), color var(--arc-duration-fast), box-shadow var(--arc-duration-fast), transform var(--arc-duration-spring) var(--arc-ease-spring);
+}
+
+.back:active:not(:disabled),
+.next:active {
+  transform: scale(.97);
+  transition-duration: var(--arc-duration-fast), var(--arc-duration-fast), var(--arc-duration-fast), var(--arc-duration-fast), 100ms;
+  transition-timing-function: ease, ease, ease, ease, ease-out;
+}
+
+/* The submit label can change on the last step; its box follows the new width on a spring. */
+.morph { position: relative; display: inline-flex; }
+
+.morphBox { display: inline-flex; overflow-x: clip; white-space: nowrap; }
+
+.sizer {
+  position: absolute;
+  top: 0;
+  left: 0;
+  white-space: nowrap;
+  visibility: hidden;
+  pointer-events: none;
+}
+
+.next {
+  border-color: var(--arc-accent);
+  background: var(--arc-accent);
+  color: var(--arc-accent-foreground);
+}
+
+@media (hover: hover) and (pointer: fine) {
+  .back:hover:not(:disabled) { border-color: var(--arc-foreground); background: var(--arc-surface-muted); }
+  .next:hover { border-color: var(--arc-accent-strong); background: var(--arc-accent-strong); }
+}
+
+.back:disabled { cursor: not-allowed; opacity: .45; }
+
+.success {
+  display: flex;
+  min-height: 14rem;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+}
+
+.successIcon {
+  display: grid;
+  width: 2rem;
+  height: 2rem;
+  place-items: center;
+  color: var(--arc-success);
+}
+
+.success h2 {
+  margin: var(--arc-space-3) 0 0;
+  color: var(--arc-foreground);
+  font-size: var(--arc-text-lg);
+  font-weight: 500;
+  line-height: var(--arc-leading-body);
+}
+
+.success .successNote {
+  margin: var(--arc-space-2) 0 0;
+  color: var(--arc-text-secondary);
+  font-size: var(--arc-text-sm);
+  line-height: var(--arc-leading-body);
+}
+
+@media (max-width: 420px) {
+  .form { padding: var(--arc-space-4); }
+  .progress {
+    align-items: flex-start;
+    flex-direction: column;
+    gap: var(--arc-space-2);
+    margin: calc(var(--arc-space-4) * -1) calc(var(--arc-space-4) * -1) var(--arc-space-5);
+    padding: var(--arc-space-3) var(--arc-space-4);
+  }
+  .progressList { width: 100%; gap: var(--arc-space-3); }
+  .progressCount { order: -1; }
+  .viewport { min-height: 15rem; }
+  .actions { margin-top: var(--arc-space-5); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .back,
+  .next,
+  .progressItem,
+  .progressMarker { transition: none; }
+  .back:active:not(:disabled),
+  .next:active { transform: none; }
+}

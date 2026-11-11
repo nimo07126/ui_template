@@ -1,6 +1,6 @@
 import type { ComponentGroupId } from "./example-types";
 
-// Arc UI registry snapshot 8302b52ed9dc79ae7ca699b158a98dfdf09656f7.
+// The original entries use Arc UI snapshot 8302b52ed9dc79ae7ca699b158a98dfdf09656f7.
 export const arcCatalog = [
   ["button", "actions", "按钮", "Button", "6 种操作变体、4 种尺寸与禁用状态", "import { Button } from \"@/shared/ui/button\";"],
   ["action-swap", "actions", "操作状态切换", "Action swap", "Swap an action label while preserving its place and intent.", "import { ActionSwap } from \"@/shared/arc/action-swap/action-swap\";"],
@@ -123,6 +123,18 @@ export const arcCatalog = [
   ["slot-text", "data", "滚动文字", "Slot text", "Text and numbers that spin into their new value on staggered slot machine reels.", "import { SlotText } from \"@/shared/arc/slot-text/slot-text\";"],
   ["toggle-group", "actions", "切换按钮组", "Toggle group", "支持单选对齐与多选文字样式", "import { ToggleGroup, ToggleGroupItem } from \"@/shared/arc/toggle-group/toggle-group\";"],
   ["expandable-text", "overlays", "可展开文字", "Expandable text", "Long text clamped to a few lines with a soft fade that glides open with Read more and closes with Show less, shown only when the text overflows.", "import { ExpandableText } from \"@/shared/arc/expandable-text/expandable-text\";"],
+  ["command-palette", "overlays", "命令面板", "Command palette", "搜索命令并用键盘选择操作。", "import { CommandPalette } from \"@/shared/arc/command-palette/command-palette\";"],
+  ["file-upload", "forms", "文件上传", "File upload", "选择或拖入文件，查看上传进度与结果。", "import { FileUpload } from \"@/shared/arc/file-upload/file-upload\";"],
+  ["notification-center", "feedback", "通知中心", "Notification center", "集中查看未读通知，并标记已读或移除。", "import { NotificationCenter } from \"@/shared/arc/notification-center/notification-center\";"],
+  ["otp-input", "forms", "验证码输入", "OTP input", "逐位输入或一次粘贴整组验证码。", "import { OtpInput } from \"@/shared/arc/otp-input/otp-input\";"],
+  ["agent-loop", "data", "Agent 执行循环", "Agent loop", "逐步回放收集上下文、调用工具和验证结果的过程。", "import { AgentLoop } from \"@/shared/arc/pro/agent-loop/agent-loop\";"],
+  ["gradient-mesh", "data", "网格渐变编辑器", "Gradient mesh", "拖动色点并调整颜色，编辑网格渐变。", "import { GradientMesh } from \"@/shared/arc/pro/gradient-mesh/gradient-mesh\";"],
+  ["mixture-of-experts", "data", "混合专家路由", "Mixture of experts", "观察 token 如何分配给不同专家。", "import { MixtureOfExperts } from \"@/shared/arc/pro/mixture-of-experts/mixture-of-experts\";"],
+  ["multi-step-form", "forms", "分步表单", "Multi-step form", "把长表单分成多个步骤，并显示填写进度。", "import { MultiStepForm } from \"@/shared/arc/pro/multi-step-form/multi-step-form\";"],
+  ["prompt-cache", "data", "提示词缓存", "Prompt cache", "观察共享前缀的缓存命中、失效及成本变化。", "import { PromptCache } from \"@/shared/arc/pro/prompt-cache/prompt-cache\";"],
+  ["reasoning-tree", "data", "推理搜索树", "Reasoning tree", "逐步查看搜索分支的展开与剪枝。", "import { ReasoningTree } from \"@/shared/arc/pro/reasoning-tree/reasoning-tree\";"],
+  ["selection-toolbar", "actions", "批量操作工具栏", "Selection toolbar", "选中多条记录后执行批量操作或清除选择。", "import { SelectionToolbar } from \"@/shared/arc/pro/selection-toolbar/selection-toolbar\";"],
+  ["speculative-decoding", "data", "推测解码", "Speculative decoding", "对比草稿模型批量猜测和目标模型逐个生成 token 的过程。", "import { SpeculativeDecoding } from \"@/shared/arc/pro/speculative-decoding/speculative-decoding\";"],
 ] as const satisfies readonly (readonly [
   slug: string,
   group: ComponentGroupId,

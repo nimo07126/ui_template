@@ -1,0 +1,187 @@
+/* The root is the size container; the card reads it, so padding and header layout follow the card's own width. */
+.root { container-type: inline-size; width: 100%; min-width: 0; }
+
+.card {
+  /* First and second choice colors. Override on the root to rebrand the routes. */
+  --moe-first: var(--arc-series-1);
+  --moe-second: var(--arc-series-2);
+  --moe-line: var(--arc-border);
+  --moe-flow: var(--arc-border-strong);
+  --moe-ink: var(--arc-foreground);
+  display: grid;
+  min-width: 0;
+  gap: var(--arc-space-5);
+  padding: var(--arc-space-6);
+  border: 1px solid var(--arc-border);
+  border-radius: var(--arc-radius-surface);
+  background: var(--arc-surface);
+  color: var(--arc-foreground);
+  font-size: var(--arc-text-sm);
+  letter-spacing: var(--arc-tracking-body);
+  line-height: var(--arc-leading-body);
+  -webkit-tap-highlight-color: transparent;
+}
+:global([data-theme="night"]) .card { --moe-line: color-mix(in oklab, var(--arc-border-strong) 70%, var(--arc-border)); --moe-flow: color-mix(in oklab, var(--arc-text-muted) 55%, var(--arc-border-strong)); }
+@container (width < 480px) { .card { gap: var(--arc-space-4); padding: var(--arc-space-4); border-radius: var(--arc-radius-panel); } }
+
+.card [data-rank="0"] { --rank: var(--moe-first); }
+.card [data-rank="1"] { --rank: var(--moe-second); }
+
+/* Header: top k on the left, the active parameter readout beside it, play and pause on the right. */
+.header { display: flex; flex-wrap: wrap; align-items: center; gap: var(--arc-space-3) var(--arc-space-4); min-width: 0; }
+.params { display: inline-flex; min-width: 0; align-items: baseline; gap: 6px; margin: 0; white-space: nowrap; }
+.paramsLabel { color: var(--arc-text-secondary); }
+.paramsValue { display: inline-flex; align-items: baseline; color: var(--arc-foreground); font-weight: 500; font-variant-numeric: tabular-nums; }
+.play { position: relative; display: grid; flex: none; place-items: center; width: 32px; height: 32px; margin-left: auto; padding: 0; border: 1px solid var(--arc-border); border-radius: 50%; background: var(--arc-surface); color: var(--arc-text-secondary); cursor: pointer; transition: color var(--arc-duration-fast) var(--arc-ease-standard), border-color var(--arc-duration-fast) var(--arc-ease-standard), background-color var(--arc-duration-fast) var(--arc-ease-standard); }
+@media (hover: hover) and (pointer: fine) { .play:hover:not(:disabled) { border-color: var(--arc-border-strong); color: var(--arc-foreground); } }
+.play:active:not(:disabled) { background: var(--arc-surface-muted); }
+.play:disabled { opacity: .5; cursor: default; }
+.playIcon { display: grid; place-items: center; grid-area: 1 / 1; }
+@container (width < 480px) {
+  .play { order: 1; }
+  .params { order: 2; flex-basis: 100%; }
+}
+
+/* Rolling digits: each column is a one-line window over a strip of ten digits. */
+.roll { display: inline-flex; font-variant-numeric: tabular-nums; }
+.digit { position: relative; display: inline-block; height: 1.4em; overflow: hidden; line-height: 1.4em; -webkit-mask-image: linear-gradient(to bottom, transparent, #000 .2em, #000 calc(100% - .2em), transparent); mask-image: linear-gradient(to bottom, transparent, #000 .2em, #000 calc(100% - .2em), transparent); }
+.sizer { visibility: hidden; }
+.strip { position: absolute; inset: 0 0 auto; display: flex; flex-direction: column; text-align: center; }
+.strip > span { display: block; height: 1.4em; }
+
+/* The stage reserves the height of its layout before it is measured, then takes the exact height of the diagram. */
+.stage { position: relative; width: 100%; min-width: 0; height: var(--moe-narrow-h); }
+@container (width >= 568px) { .stage:not([data-ready]) { height: var(--moe-wide-h); } }
+@container (width < 568px) and (width >= 480px) { .stage:not([data-ready]) { height: var(--moe-narrow-h); } }
+.stage > * { animation: stageIn var(--arc-duration-considered) var(--arc-ease-standard) both; }
+@keyframes stageIn { from { opacity: 0; } }
+.lines, .packets { position: absolute; inset: 0; overflow: visible; pointer-events: none; }
+.packets { z-index: 3; transition: opacity var(--arc-duration-fast) var(--arc-ease-standard); }
+.card[data-inspect] .packets { opacity: 0; }
+
+.stageLabel { position: absolute; z-index: 1; color: var(--arc-text-muted); font-size: var(--arc-text-xs); line-height: 1; white-space: nowrap; transform: translateY(-50%); pointer-events: none; }
+.stageLabel[data-align="center"] { transform: translate(-50%, -50%); }
+.stageLabel[data-align="end"] { transform: translate(-100%, -50%); }
+
+/* Connectors: quiet hairlines that take the route's color while a packet uses them. */
+.flow, .gate, .curve { fill: none; stroke-width: 1; stroke-linecap: round; transition: stroke var(--arc-duration-standard) var(--arc-ease-standard), stroke-width var(--arc-duration-standard) var(--arc-ease-standard); }
+.flow { stroke: var(--moe-flow); }
+.flow[data-on] { stroke: color-mix(in oklab, var(--moe-ink) 45%, var(--moe-flow)); }
+.gate, .curve { stroke: var(--moe-line); }
+.gate[data-rank], .curve[data-rank] { stroke: color-mix(in oklab, var(--rank) 70%, transparent); stroke-width: 1.5; }
+.gate[data-dropped] { stroke: color-mix(in oklab, var(--arc-warning) 70%, transparent); stroke-dasharray: 3 3; }
+.joint { fill: var(--arc-surface); stroke: var(--moe-flow); stroke-width: 1; }
+
+/* Packets: a dot with a short soft trail that follows it along the connector. */
+.packet { --c: var(--rank); }
+.packet[data-slot="flow"] { --c: var(--moe-ink); }
+.packet[data-slot="0"] { --c: var(--moe-first); }
+.packet[data-slot="1"] { --c: var(--moe-second); }
+.trailLong, .trailShort { fill: none; stroke: var(--c); stroke-linecap: round; }
+.trailLong { stroke-width: 2; stroke-opacity: .16; }
+.trailShort { stroke-width: 2; stroke-opacity: .38; }
+.dot { fill: var(--c); stroke: var(--arc-surface); stroke-width: 1.5; }
+
+/* The router: a muted panel with one score track per expert. */
+.router { position: absolute; z-index: 1; box-sizing: border-box; border: 1px solid var(--arc-border); border-radius: 14px; background: var(--arc-surface-muted); transition: border-color var(--arc-duration-standard) var(--arc-ease-standard); }
+.router[data-live] { border-color: color-mix(in oklab, var(--arc-border-strong) 60%, var(--arc-border)); }
+:global([data-theme="night"]) .router { background: color-mix(in oklab, var(--arc-surface-muted) 70%, var(--arc-surface)); }
+.track { position: absolute; z-index: 1; overflow: hidden; border-radius: var(--arc-radius-pill); background: color-mix(in oklab, var(--arc-foreground) 7%, transparent); }
+.fill { position: absolute; inset: 0; border-radius: inherit; background: color-mix(in oklab, var(--arc-text-muted) 55%, transparent); transform: scaleX(var(--s, 0)); transform-origin: 0 50%; transition: transform var(--arc-duration-standard) var(--arc-ease-standard), background-color var(--arc-duration-standard) var(--arc-ease-standard); }
+.stage[data-layout="narrow"] .fill { transform: scaleY(var(--s, 0)); transform-origin: 50% 100%; }
+.track:not([data-live]) .fill { background: color-mix(in oklab, var(--arc-text-muted) 30%, transparent); }
+.track[data-rank] .fill { background: var(--rank); }
+.score { position: absolute; z-index: 1; color: var(--arc-text-muted); font-size: var(--arc-text-xs); font-variant-numeric: tabular-nums; line-height: 16px; text-align: right; white-space: nowrap; transition: color var(--arc-duration-standard) var(--arc-ease-standard); }
+.stage[data-layout="narrow"] .score { text-align: center; }
+.score:not([data-live]) { color: color-mix(in oklab, var(--arc-text-muted) 60%, transparent); }
+.score[data-rank] { color: var(--arc-foreground); font-weight: 500; }
+
+/* Experts: one quiet tile each. A faint gauge fills toward capacity; a route lights the tile in its rank color. */
+.tiles { display: contents; }
+.tile { position: absolute; z-index: 1; display: flex; box-sizing: border-box; align-items: center; gap: 8px; overflow: hidden; padding: 0 10px; border: 1px solid var(--arc-border); border-radius: 10px; background: var(--arc-surface); color: var(--arc-foreground); font: inherit; font-size: var(--arc-text-sm); text-align: left; cursor: pointer; transition: border-color var(--arc-duration-considered) var(--arc-ease-standard), background-color var(--arc-duration-considered) var(--arc-ease-standard), color var(--arc-duration-standard) var(--arc-ease-standard); }
+/* Capacity: a hairline along the bottom edge that fills as the expert takes tokens. */
+.gauge { position: absolute; inset: auto 0 0; height: 2px; background: color-mix(in oklab, var(--arc-text-muted) 28%, transparent); transform: scaleX(var(--g, 0)); transform-origin: 0 50%; transition: transform var(--arc-duration-considered) var(--arc-ease-standard), background-color var(--arc-duration-standard) var(--arc-ease-standard); pointer-events: none; }
+.tile[data-full] .gauge { background: color-mix(in oklab, var(--arc-text-secondary) 55%, transparent); }
+.tile[data-rank] .gauge { background: color-mix(in oklab, var(--rank) 70%, transparent); }
+.tileIcon { position: relative; display: grid; flex: none; place-items: center; width: 14px; height: 14px; color: var(--arc-text-muted); transition: color var(--arc-duration-standard) var(--arc-ease-standard); }
+.tileName { position: relative; flex: 1; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.tileCount { position: relative; flex: none; color: var(--arc-text-muted); font-size: var(--arc-text-xs); font-variant-numeric: tabular-nums; }
+.initial { font-size: var(--arc-text-xs); font-weight: 500; line-height: 1; }
+@media (hover: hover) and (pointer: fine) { .tile:hover { border-color: var(--arc-border-strong); } }
+.tile[data-inspect], .tile[data-pinned] { border-color: var(--arc-border-strong); background: var(--arc-surface-muted); }
+.tile[data-rank] { border-color: color-mix(in oklab, var(--rank) 55%, var(--arc-border)); background: color-mix(in oklab, var(--rank) 9%, var(--arc-surface)); transition-duration: var(--arc-duration-fast); }
+.tile[data-rank] .tileIcon { color: var(--rank); }
+.tile[data-rank] .tileCount { color: var(--arc-foreground); }
+.tile[data-dropped] { border-color: color-mix(in oklab, var(--arc-warning) 55%, var(--arc-border)); border-style: dashed; transition-duration: var(--arc-duration-fast); }
+.tile[data-dropped] .tileIcon { color: var(--arc-warning); }
+.stage[data-layout="narrow"] .tile { flex-direction: column; justify-content: center; gap: 6px; padding: 0; border-radius: 9px; }
+.stage[data-layout="narrow"] .tileName { position: absolute; width: 1px; height: 1px; overflow: hidden; clip-path: inset(50%); }
+
+/* Token chips on the stage. The input hugs its connector; the output carries a dot per expert that shaped it. */
+.slot { position: absolute; z-index: 2; display: grid; align-items: center; justify-items: center; pointer-events: none; }
+.stage[data-layout="wide"] .slot[data-side="in"] { justify-items: end; }
+.stage[data-layout="wide"] .slot[data-side="out"] { justify-items: start; }
+.chip { display: inline-flex; box-sizing: border-box; max-width: 100%; height: 28px; grid-area: 1 / 1; align-items: center; gap: 6px; overflow: hidden; padding: 0 10px; border: 1px solid var(--arc-border-strong); border-radius: 9px; background: var(--arc-surface); color: var(--arc-foreground); font-size: var(--arc-text-sm); font-weight: 500; text-overflow: ellipsis; white-space: pre; transition: color var(--arc-duration-standard) var(--arc-ease-standard), border-color var(--arc-duration-standard) var(--arc-ease-standard); }
+.chip[data-spent] { border-color: var(--arc-border); color: var(--arc-text-secondary); }
+.chip[data-empty] { border-style: dashed; border-color: var(--arc-border-strong); color: var(--arc-text-muted); font-weight: 400; }
+.chip[data-pass] { border-style: dashed; }
+.chipDots { display: inline-flex; flex: none; gap: 2px; }
+.chipDots:empty { display: none; }
+.chipDots i { width: 6px; height: 6px; border-radius: 50%; background: var(--rank); }
+
+/* The token sequence: routed tokens solid, the current one outlined, the rest waiting. */
+.sequence { display: flex; flex-wrap: wrap; align-items: center; gap: 4px; min-width: 0; padding-top: var(--arc-space-4); border-top: 1px solid var(--arc-border); }
+.token { position: relative; display: inline-flex; box-sizing: border-box; height: 28px; align-items: center; padding: 0 8px; border: 1px solid transparent; border-radius: 8px; background: transparent; color: var(--arc-text-muted); font: inherit; font-size: var(--arc-text-sm); white-space: pre; cursor: pointer; transition: color var(--arc-duration-standard) var(--arc-ease-standard), background-color var(--arc-duration-standard) var(--arc-ease-standard), border-color var(--arc-duration-standard) var(--arc-ease-standard), opacity var(--arc-duration-standard) var(--arc-ease-standard); }
+.token[data-state="done"] { background: var(--arc-surface-muted); color: var(--arc-foreground); }
+.token[data-state="current"] { border-color: color-mix(in oklab, var(--arc-foreground) 40%, var(--arc-border-strong)); background: var(--arc-surface); color: var(--arc-foreground); }
+@media (hover: hover) and (pointer: fine) { .token:hover { border-color: var(--arc-border-strong); color: var(--arc-foreground); } }
+.token[data-inspect], .token[aria-pressed="true"] { border-color: var(--moe-ink); background: var(--arc-surface); color: var(--arc-foreground); }
+.token[data-rank] { border-color: color-mix(in oklab, var(--rank) 55%, transparent); background: color-mix(in oklab, var(--rank) 12%, var(--arc-surface)); color: var(--arc-foreground); }
+.token[data-dropped] { border-color: color-mix(in oklab, var(--arc-warning) 60%, transparent); border-style: dashed; color: var(--arc-foreground); }
+.token[data-fade] { opacity: .45; }
+.sequenceEmpty { color: var(--arc-text-muted); }
+
+/* Footer: the route readout on the left, load balance on the right. */
+.footer { display: grid; grid-template-columns: minmax(0, 1fr) minmax(180px, 220px); align-items: start; gap: var(--arc-space-4) var(--arc-space-8); min-width: 0; }
+@container (width < 640px) { .footer { grid-template-columns: minmax(0, 1fr); } }
+.inspector { display: grid; min-width: 0; gap: 4px; }
+.line { position: relative; display: grid; min-width: 0; min-height: 28px; align-items: center; }
+.lineInner { display: flex; min-width: 0; grid-area: 1 / 1; align-items: center; gap: 8px; overflow: hidden; white-space: nowrap; }
+.lineChip { display: inline-flex; flex: none; height: 24px; align-items: center; padding: 0 8px; border: 1px solid var(--arc-border-strong); border-radius: 7px; font-weight: 500; white-space: pre; }
+.lineArrow { flex: none; color: var(--arc-text-muted); }
+/* Narrow cards drop the token from the readout; the stage and the sequence already show it. */
+@container (width < 480px) { .lineChip, .lineArrow { display: none; } }
+.lineName { font-weight: 500; }
+.lineMeta, .lineMuted { color: var(--arc-text-muted); }
+.lineIcon { display: grid; flex: none; place-items: center; width: 14px; height: 14px; color: var(--arc-text-secondary); }
+.lineShimmer { color: var(--arc-text-secondary); }
+.pick { display: inline-flex; min-width: 0; align-items: center; gap: 6px; }
+.pick + .pick { margin-left: 4px; }
+.swatch { flex: none; width: 8px; height: 8px; border-radius: 50%; background: var(--rank); }
+.pickName { overflow: hidden; text-overflow: ellipsis; }
+.pickValue { color: var(--arc-text-secondary); font-variant-numeric: tabular-nums; }
+.pick[data-dropped] .pickName { color: var(--arc-text-secondary); }
+.pick[data-dropped] .pickValue { color: var(--arc-text-muted); }
+.warnIcon { flex: none; color: var(--arc-warning); }
+.okIcon { flex: none; color: var(--arc-success); }
+.note { position: relative; display: grid; min-width: 0; min-height: calc(2 * 1.4em); }
+.noteInner { display: flex; grid-area: 1 / 1; align-items: flex-start; gap: 6px; margin: 0; color: var(--arc-text-secondary); text-wrap: pretty; }
+.noteInner > svg { margin-top: .2em; }
+.tokenRef { padding: 0 4px; border-radius: 4px; background: var(--arc-surface-muted); color: var(--arc-foreground); white-space: pre; }
+
+.load { display: grid; min-width: 0; gap: 10px; padding-top: 4px; }
+.loadHead { display: flex; align-items: baseline; justify-content: space-between; gap: var(--arc-space-3); color: var(--arc-text-secondary); }
+.loadValue { display: inline-flex; align-items: baseline; color: var(--arc-foreground); font-weight: 500; font-variant-numeric: tabular-nums; }
+.loadValue .lineMuted { font-weight: 400; }
+.loadBar { display: flex; height: 8px; overflow: hidden; border-radius: var(--arc-radius-pill); background: color-mix(in oklab, var(--arc-foreground) 6%, transparent); }
+.seg { flex: 0 1 0; min-width: 0; background: color-mix(in oklab, var(--arc-text-muted) 45%, transparent); background-clip: padding-box; border-left: 2px solid var(--arc-surface); transition: flex-grow var(--arc-duration-considered) var(--arc-ease-standard), background-color var(--arc-duration-standard) var(--arc-ease-standard), border-left-width var(--arc-duration-considered) var(--arc-ease-standard); }
+.seg:first-child, .seg[data-zero] { border-left-width: 0; }
+.seg[data-rank] { background: var(--rank); }
+.seg[data-inspect] { background: var(--arc-text-secondary); }
+
+.srOnly { position: absolute; width: 1px; height: 1px; overflow: hidden; clip-path: inset(50%); white-space: nowrap; }
+
+@media (prefers-reduced-motion: reduce) {
+  .stage > * { animation: none; }
+  .play, .flow, .gate, .curve, .router, .fill, .score, .tile, .gauge, .tileIcon, .chip, .token, .packets, .seg { transition-duration: 0ms; }
+}
