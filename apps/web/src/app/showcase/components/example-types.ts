@@ -9,6 +9,7 @@ export type ComponentGroupId =
   | "overlays";
 
 export type DemoLoader = () => Promise<{ default: ComponentType }>;
+export type DemoSize = "compact" | "wide" | "full";
 
 export type ComponentExample = {
   id: string;
@@ -18,6 +19,8 @@ export type ComponentExample = {
   description: string;
   group: ComponentGroupId;
   source: "arc" | "shadcn";
+  tier?: "pro";
+  size?: DemoSize;
   docs: string;
   importStatement: string;
   loadDemo: DemoLoader;

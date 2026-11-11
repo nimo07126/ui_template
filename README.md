@@ -112,7 +112,7 @@ packages/
 
 ## 组件预览库
 
-`/showcase` 按六类浏览 Arc UI 基础与 Pro 组件和保留的 shadcn/ui 组件。支持中英文搜索、分类筛选、四套主题切换、复制导入语句和跳转官方文档。点击「打开预览」时加载可操作的本地演示。
+`/showcase` 按六类浏览 Arc UI 基础与 Pro 组件和保留的 shadcn/ui 示例。可操作的本地演示在滚动到附近时自动加载，组件目录默认显示分类，展开后可跳到具体示例。页面支持中英文搜索、分类筛选、四套主题切换、复制导入语句和跳转官方文档。
 
 - Arc UI 基础组件最初取自[固定的上游提交](https://github.com/kuratlielia/arc-library/tree/8302b52ed9dc79ae7ca699b158a98dfdf09656f7)，MIT 声明随 `apps/web/src/shared/arc/` 保存。基础与 Pro 组件分别存放在 `arc/` 和 `arc/pro/`，构建直接使用本地源码。
 - 升级时对照上游 `public/r/` 的免费组件清单，合并同路径的共享文件，保留 Web 专用主题桥接、深色选择器和可访问性调整。

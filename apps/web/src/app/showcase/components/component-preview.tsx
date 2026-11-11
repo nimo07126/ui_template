@@ -1,146 +1,192 @@
 "use client";
 
+import { Popover, PopoverContent, PopoverTrigger } from "@/shared/arc/popover/popover";
 import { Button } from "@/shared/ui/button";
-import { ArrowUpRight, Check, ChevronDown, Copy } from "lucide-react";
-import { useEffect, useState, type ComponentType } from "react";
-import type { ComponentExample as Example, DemoLoader } from "./example-types";
-import { useShowcase } from "./showcase-context";
+import { BookOpen, Check, CodeXml, Copy } from "lucide-react";
+import { useEffect, useRef, useState, type ComponentType } from "react";
+import type { ComponentExample, DemoLoader } from "./example-types";
 
-function LiveDemo({ load }: { load: DemoLoader }) {
-  const [Demo, setDemo] = useState<ComponentType>();
-  const [failed, setFailed] = useState(false);
+const observers = new WeakMap<Element | Document, IntersectionObserver>();
+const pendingDemos = new WeakMap<Element, () => void>();
 
-  useEffect(() => {
-    let active = true;
-    load().then(
-      ({ default: Component }) => { if (active) setDemo(() => Component); },
-      () => { if (active) setFailed(true); },
-    );
-    return () => { active = false; };
-  }, [load]);
+function loadNearViewport(target: Element, load: () => void) {
+  if (typeof IntersectionObserver === "undefined") {
+    load();
+    return () => {};
+  }
 
-  if (failed) return <p role="alert">预览加载失败。请收起后重新打开。</p>;
-  if (!Demo) return <p role="status">正在加载预览…</p>;
-  return <Demo />;
+  const root = target.closest('[data-slot="page-scroll"]');
+  const key = root ?? target.ownerDocument;
+  let observer = observers.get(key);
+  if (!observer) {
+    observer = new IntersectionObserver((entries, currentObserver) => {
+      for (const entry of entries) {
+        if (!entry.isIntersecting) continue;
+        currentObserver.unobserve(entry.target);
+        const start = pendingDemos.get(entry.target);
+        pendingDemos.delete(entry.target);
+        start?.();
+      }
+    }, { root, rootMargin: "400px 0px" });
+    observers.set(key, observer);
+  }
+
+  pendingDemos.set(target, load);
+  observer.observe(target);
+  return () => {
+    observer.unobserve(target);
+    pendingDemos.delete(target);
+  };
 }
 
-export function ComponentPreview({ example }: { example: Example }) {
-  const { openExample, toggleExample } = useShowcase();
-  const isOpen = openExample === example.id;
-  const [copyState, setCopyState] = useState<"idle" | "copied" | "error">(
-    "idle",
+function LiveDemo({ load }: { load: DemoLoader }) {
+  const targetRef = useRef<HTMLDivElement>(null);
+  const [Demo, setDemo] = useState<ComponentType | "failed">();
+  const [attempt, setAttempt] = useState(0);
+
+  useEffect(() => {
+    const target = targetRef.current;
+    if (!target) return;
+
+    let active = true;
+    const stop = loadNearViewport(target, () => {
+      load().then(
+        ({ default: Component }) => { if (active) setDemo(() => Component); },
+        () => { if (active) setDemo("failed"); },
+      );
+    });
+
+    return () => {
+      active = false;
+      stop();
+    };
+  }, [load, attempt]);
+
+  return (
+    <div
+      ref={targetRef}
+      className="relative grid min-h-16 min-w-0 content-start items-start justify-items-start [&>*]:min-w-0 [&>*]:max-w-full"
+      data-live-demo={Demo && Demo !== "failed" ? "ready" : Demo ?? "pending"}
+    >
+      {Demo === "failed" ? (
+        <div className="flex flex-wrap items-center gap-2 text-sm text-[var(--ds-color-muted)]">
+          <p role="alert">预览加载失败。</p>
+          <Button
+            size="xs"
+            variant="ghost"
+            onClick={() => {
+              setDemo(undefined);
+              setAttempt((current) => current + 1);
+            }}
+          >
+            重试
+          </Button>
+        </div>
+      ) : Demo ? (
+        <Demo />
+      ) : (
+        <p className="text-xs text-[var(--ds-color-muted)]">正在加载预览…</p>
+      )}
+    </div>
   );
+}
+
+const sizeClasses = {
+  compact: "@min-[58rem]:col-span-2",
+  wide: "@min-[39rem]:col-span-2 @min-[58rem]:col-span-3",
+  full: "col-span-full",
+};
+
+const actionClassName = "inline-grid size-8 place-items-center rounded-md text-[var(--ds-color-muted)] hover:bg-[var(--ds-color-accent-soft)] hover:text-[var(--ds-color-accent-ink)]";
+
+export function ComponentPreview({ example }: { example: ComponentExample }) {
+  const [copyState, setCopyState] = useState<"idle" | "copied" | "error">("idle");
   const [showImport, setShowImport] = useState(false);
-  const source = example.importStatement;
-  const copyImport = async () => {
+  const source = example.source === "shadcn" ? "shadcn/ui" : example.tier ? "Arc Pro" : "Arc UI";
+
+  useEffect(() => {
+    if (copyState !== "copied") return;
+    const timeout = window.setTimeout(() => setCopyState("idle"), 2000);
+    return () => window.clearTimeout(timeout);
+  }, [copyState]);
+
+  async function copyImport() {
     try {
-      await navigator.clipboard.writeText(source);
+      await navigator.clipboard.writeText(example.importStatement);
       setCopyState("copied");
-      setTimeout(() => setCopyState("idle"), 2000);
     } catch {
       setCopyState("error");
       setShowImport(true);
     }
-  };
+  }
+
   return (
     <article
-      className="flex min-w-0 flex-col border border-[var(--ds-color-line)] rounded-[var(--ds-radius-lg)] bg-[var(--ds-color-surface)] overflow-hidden scroll-mt-8 data-[expanded=true]:col-span-full"
+      className={`grid min-w-0 content-start gap-6 ${sizeClasses[example.size ?? "compact"]}`}
       id={example.id}
+      tabIndex={-1}
       aria-labelledby={`${example.id}-title`}
-      data-expanded={isOpen}
       data-source={example.source}
     >
-      <header className="flex flex-1 items-start justify-between p-5 gap-3 max-[40rem]:p-4">
+      <header className="flex min-w-0 items-start justify-between gap-2 rounded-lg bg-muted px-3 py-2.5">
         <div className="min-w-0">
-          <h3
-            className="flex flex-wrap items-baseline gap-x-2 gap-y-1 text-[length:var(--type-size-sm)] font-[number:var(--type-weight-semibold)] m-0"
-            id={`${example.id}-title`}
-          >
+          <h3 id={`${example.id}-title`} className="text-base leading-snug font-semibold">
             {example.title}
-            <span className="text-[length:var(--type-size-xs)] font-[number:var(--type-weight-regular)] text-[var(--ds-color-muted)]">
-              {example.name}
-            </span>
           </h3>
-          <span className="mt-2 inline-block rounded-full border px-2 py-0.5 text-[length:var(--type-size-xs)] text-[var(--ds-color-muted)]">
-            {example.source === "arc" ? "Arc UI" : "shadcn/ui"}
-          </span>
-          <p className="mt-2 mb-0 text-[length:var(--type-size-xs)] text-[var(--ds-color-muted)] leading-[var(--type-line-body)] mx-0">
-            {example.description}
+          <p className="mt-1 text-xs text-[var(--ds-color-muted)]">
+            {example.name} <span aria-hidden="true">·</span> {source}
           </p>
         </div>
-        <a
-          className="grid place-items-center shrink-0 w-6 h-6 rounded-[var(--ds-radius-sm)] text-[var(--ds-color-muted)] hover:bg-[var(--ds-color-accent-soft)] hover:text-[var(--ds-color-accent-ink)]"
-          href={example.docs}
-          target="_blank"
-          rel="noreferrer"
-          aria-label={`查看 ${example.name} 官方文档`}
-        >
-          <ArrowUpRight className="w-4 h-4" aria-hidden="true" />
-        </a>
-      </header>
-      <div id={`${example.id}-demo`} hidden={!isOpen}>
-        {isOpen && (
-          <div className="relative grid min-h-44 min-w-0 items-center justify-items-center border-t border-dashed py-6 px-5 [&>*]:min-w-0 [&>*]:max-w-full max-[40rem]:py-5 max-[40rem]:px-4" data-live-demo>
-            <LiveDemo load={example.loadDemo} />
-          </div>
-        )}
-      </div>
-      <footer className="flex flex-wrap items-center border-t border-t-[var(--ds-color-line)] bg-[var(--theme-background-secondary)] py-2 px-4 gap-2">
-        <Button
-          className="mr-auto"
-          size="xs"
-          variant="outline"
-          aria-expanded={isOpen}
-          aria-controls={`${example.id}-demo`}
-          onClick={() => toggleExample(example.id)}
-        >
-          <ChevronDown className={isOpen ? "rotate-180" : undefined} aria-hidden="true" />
-          {isOpen ? "收起预览" : "打开预览"}
-        </Button>
-        <Button
-          className="text-[var(--ds-color-muted)]"
-          size="xs"
-          variant="ghost"
-          aria-expanded={showImport}
-          aria-controls={`${example.id}-import`}
-          onClick={() => setShowImport(!showImport)}
-        >
-          {showImport ? "收起引用" : "查看引用"}
-        </Button>
-        <Button
-          className="text-[var(--ds-color-muted)]"
-          size="xs"
-          variant="ghost"
-          onClick={copyImport}
-        >
-          {copyState === "copied" ? <Check /> : <Copy />}
-          {copyState === "copied" ? "已复制" : "复制引用"}
-        </Button>
-        <span className="sr-only" role="status">
-          {copyState === "copied"
-            ? `${example.name} 引用已复制`
-            : copyState === "error"
-              ? "复制失败，请展开引用后手动复制。"
-              : ""}
-        </span>
-      </footer>
-      <div
-        id={`${example.id}-import`}
-        hidden={!showImport}
-        className="border-t border-t-[var(--ds-color-line)] bg-[var(--theme-background-secondary)] p-4"
-      >
-        {copyState === "error" && (
-          <p
-            className="mt-0 mb-2 text-[var(--ds-color-danger)] text-[length:var(--type-size-xs)] mx-0"
-            role="alert"
+        <div className="-mt-1 flex shrink-0 items-center gap-0.5">
+          <a
+            className={actionClassName}
+            href={example.docs}
+            target="_blank"
+            rel="noreferrer"
+            title="官方文档"
+            aria-label={`查看 ${example.name} 官方文档`}
           >
-            浏览器暂不支持复制，请手动选择下方引用。
-          </p>
-        )}
-        <pre className="overflow-x-auto text-[length:0.7rem] leading-[1.8] m-0">
-          <code>{source}</code>
-        </pre>
-      </div>
+            <BookOpen className="size-4" aria-hidden="true" />
+          </a>
+          <Popover open={showImport} onOpenChange={setShowImport}>
+            <PopoverTrigger
+              className={`${actionClassName} aria-expanded:bg-[var(--ds-color-accent-soft)] aria-expanded:text-[var(--ds-color-accent-ink)]`}
+              title="查看引用"
+              aria-label="查看引用"
+            >
+              <CodeXml className="size-4" aria-hidden="true" />
+            </PopoverTrigger>
+            <PopoverContent align="end" className="w-80" aria-label={`${example.name} 引用`}>
+              {copyState === "error" && (
+                <p className="mb-2 text-xs text-[var(--ds-color-danger)]" role="alert">
+                  复制失败，请手动选择下方引用。
+                </p>
+              )}
+              <pre className="text-xs leading-relaxed wrap-break-word whitespace-pre-wrap">
+                <code>{example.importStatement}</code>
+              </pre>
+            </PopoverContent>
+          </Popover>
+          <button
+            className={actionClassName}
+            type="button"
+            title={copyState === "copied" ? "已复制" : "复制引用"}
+            aria-label="复制引用"
+            onClick={copyImport}
+          >
+            {copyState === "copied" ? (
+              <Check className="size-4" aria-hidden="true" />
+            ) : (
+              <Copy className="size-4" aria-hidden="true" />
+            )}
+          </button>
+          <span className="sr-only" role="status">
+            {copyState === "copied" ? `${example.name} 引用已复制` : ""}
+          </span>
+        </div>
+      </header>
+
+      <LiveDemo load={example.loadDemo} />
     </article>
   );
 }

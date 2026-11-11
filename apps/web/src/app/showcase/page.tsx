@@ -3,6 +3,7 @@ import { ShowcaseProvider } from "./components/showcase-context";
 import { ShowcaseFooter } from "./components/showcase-footer";
 import { ShowcaseGroups } from "./components/showcase-groups";
 import { ShowcaseIntro } from "./components/showcase-intro";
+import { ShowcaseNavigation } from "./components/showcase-navigation";
 import { ShowcaseToolbar } from "./components/showcase-toolbar";
 
 export const metadata: Metadata = {
@@ -18,8 +19,15 @@ export default function ShowcasePage() {
         className="grid min-w-0 gap-8 max-[40rem]:gap-6"
       >
         <ShowcaseIntro />
-        <ShowcaseToolbar />
-        <ShowcaseGroups />
+        <div className="grid min-w-0 items-start gap-6 xl:grid-cols-[minmax(0,1fr)_10rem] xl:gap-x-4 xl:gap-y-8">
+          <ShowcaseNavigation />
+          <div className="min-w-0 xl:col-start-1 xl:row-start-1">
+            <ShowcaseToolbar />
+          </div>
+          <div className="min-w-0 xl:col-start-1 xl:row-start-2">
+            <ShowcaseGroups />
+          </div>
+        </div>
         <ShowcaseFooter />
       </section>
     </ShowcaseProvider>

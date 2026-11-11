@@ -9,11 +9,10 @@ import type { ComponentExample as Example } from "./example-types";
 function useShowcaseState() {
   const [query, setQuery] = useState("");
   const [category, setCategory] = useState("all");
-  const [openExample, setOpenExample] = useState<string | null>(null);
   const { activeId, selectTheme } = useThemeEditor();
   const normalizedQuery = query.trim().toLocaleLowerCase();
   const matchesQuery = (example: Example) =>
-    `${example.title} ${example.name} ${example.id} ${example.slug ?? ""} ${example.description} ${example.source} ${componentGroups.find((group) => group.id === example.group)?.name}`
+    `${example.title} ${example.name} ${example.id} ${example.slug ?? ""} ${example.description} ${example.source} ${example.tier ?? ""} ${componentGroups.find((group) => group.id === example.group)?.name}`
       .toLocaleLowerCase()
       .includes(normalizedQuery);
   const visible = componentExamples.filter(
@@ -30,7 +29,6 @@ function useShowcaseState() {
   const reset = () => {
     setQuery("");
     setCategory("all");
-    setOpenExample(null);
   };
   return {
     query,
@@ -44,8 +42,6 @@ function useShowcaseState() {
     visible,
     groups,
     reset,
-    openExample,
-    toggleExample: (id: string) => setOpenExample((current) => current === id ? null : id),
   };
 }
 
