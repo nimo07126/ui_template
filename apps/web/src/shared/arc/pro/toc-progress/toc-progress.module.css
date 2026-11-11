@@ -1,0 +1,35 @@
+.root { --toc-accent: var(--arc-accent); display: grid; min-width: 0; gap: 10px; color: var(--arc-foreground); font-family: var(--arc-font-body); font-size: var(--arc-text-sm); letter-spacing: var(--arc-tracking-body); line-height: var(--arc-leading-body); }
+
+.head { display: flex; min-width: 0; align-items: baseline; justify-content: space-between; gap: 12px; padding-left: 2px; }
+.title { margin: 0; color: var(--arc-foreground); font-weight: 500; }
+/* The time left rolls to its new value in place; its box never changes width under the title. */
+.time { display: inline-grid; flex: none; justify-items: end; color: var(--arc-text-muted); font-size: var(--arc-text-xs); font-variant-numeric: tabular-nums; }
+.time[data-done] { color: var(--arc-text-secondary); }
+.timeText { display: inline-flex; grid-area: 1 / 1; align-items: center; gap: 4px; white-space: nowrap; }
+.timeText > svg { align-self: center; width: 14px; height: 14px; color: var(--arc-success); stroke-width: 2; }
+
+.body { position: relative; min-width: 0; }
+.line { position: absolute; top: 0; left: 0; overflow: visible; pointer-events: none; }
+.track,
+.progress { fill: none; stroke-linecap: round; stroke-linejoin: round; stroke-width: 1.5; }
+.track { stroke: color-mix(in oklab, var(--arc-border-strong) 60%, var(--arc-border)); }
+.progress { stroke: var(--toc-accent); stroke-width: 2; }
+:global(:root[data-theme="night"]) .track { stroke: var(--arc-border-strong); }
+.markerDot { fill: var(--toc-accent); }
+
+.list { position: relative; display: grid; margin: 0; padding: 0; list-style: none; }
+.row { display: flex; min-width: 0; }
+/* The label indent follows the lane of the line for its level. */
+.link { display: block; min-width: 0; flex: 1; padding: 4px 8px 4px 22px; border-radius: 10px; color: var(--arc-text-muted); text-decoration: none; text-wrap: pretty; -webkit-tap-highlight-color: transparent; transition: color var(--arc-duration-standard) var(--arc-ease-standard), background-color var(--arc-duration-fast) var(--arc-ease-standard); }
+.row[data-level="2"] .link { padding-left: 34px; }
+.row[data-level="3"] .link { padding-left: 46px; }
+.row[data-state="read"] .link { color: var(--arc-text-secondary); }
+.row[data-state="current"] .link { color: var(--arc-foreground); }
+.link:focus-visible { background: color-mix(in oklab, var(--arc-foreground) 4.5%, transparent); color: var(--arc-foreground); }
+@media (hover: hover) and (pointer: fine) {
+  .link:hover { color: var(--arc-foreground); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .link { transition: none; }
+}

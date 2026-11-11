@@ -1,0 +1,141 @@
+/* Enrich column. A card holding a two column table: the company, then the AI column whose prompt runs down every row.
+   Geometry: rows are 44px; table edges pad 20px so text lines up with the title above; status icons are 16px with an
+   8px gap; every swap stacks old and new content in one grid cell so nothing shifts while it crossfades. */
+.root { container-type: inline-size; width: 100%; max-width: 760px; min-width: 0; color: var(--arc-foreground); font-family: var(--arc-font-body); font-size: var(--arc-text-sm); letter-spacing: var(--arc-tracking-body); line-height: 20px; }
+.srOnly { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0, 0, 0, 0); white-space: nowrap; }
+.card { overflow: hidden; border: 1px solid var(--arc-border); border-radius: var(--arc-radius-panel); background: var(--arc-surface); }
+
+/* Top bar: title and row count, then the one primary action. */
+.top { display: flex; align-items: center; gap: 12px; min-height: 60px; padding: 12px 12px 12px 20px; }
+.heading { display: flex; flex: 1; align-items: baseline; gap: 8px; min-width: 0; }
+.title { overflow: hidden; font-size: var(--arc-text-base); font-weight: 500; line-height: 24px; text-overflow: ellipsis; white-space: nowrap; }
+.count { flex: none; color: var(--arc-text-muted); font-size: var(--arc-text-xs); line-height: 16px; white-space: nowrap; }
+.run { flex: none; min-width: 140px; }
+
+/* Edit panel: opens under the top bar, above the column it changes. */
+.editorClip { overflow: hidden; }
+.editor { display: grid; gap: 12px; padding: 4px 20px 16px; }
+.editor textarea { min-height: 64px; height: 64px; resize: vertical; }
+.editorActions { display: flex; align-items: center; justify-content: flex-end; gap: 8px; }
+.hint { flex: 1; min-width: 0; overflow: hidden; color: var(--arc-text-muted); font-size: var(--arc-text-xs); line-height: 16px; text-overflow: ellipsis; white-space: nowrap; }
+
+/* Table. One hairline between rows, one between the two columns, never doubled at the card edge. */
+.tableWrap { border-top: 1px solid var(--arc-border-subtle); }
+.table { width: 100%; border-collapse: collapse; table-layout: fixed; }
+.colCompany { width: 30%; }
+.table th, .table td { padding: 0 12px; border-bottom: 1px solid var(--arc-border-subtle); font-weight: 400; text-align: left; vertical-align: middle; }
+.table tr > :first-child { padding-left: 20px; }
+.table tr > :last-child { padding-right: 8px; border-left: 1px solid var(--arc-border-subtle); }
+.table tbody tr:last-child > * { border-bottom: 0; }
+
+.headCompany { height: 60px; color: var(--arc-text-muted); font-size: var(--arc-text-xs); line-height: 16px; }
+.headAi { height: 60px; }
+.aiHead { display: grid; grid-template-columns: 16px minmax(0, 1fr) 28px; align-items: center; column-gap: 8px; }
+.aiIcon { color: var(--arc-accent); }
+.aiText { display: grid; min-width: 0; }
+.aiTextInner { display: grid; min-width: 0; }
+.aiName { overflow: hidden; font-weight: 500; line-height: 20px; text-overflow: ellipsis; white-space: nowrap; }
+.aiPrompt { overflow: hidden; color: var(--arc-text-muted); font-size: var(--arc-text-xs); line-height: 16px; text-overflow: ellipsis; white-space: nowrap; }
+
+/* Rows */
+.companyCell { height: 44px; }
+.company { display: flex; align-items: center; gap: 12px; min-width: 0; }
+.logo, .logoFallback { display: grid; flex: none; width: 16px; height: 16px; place-items: center; color: var(--arc-foreground); }
+.logo svg { display: block; width: 16px; height: 16px; }
+.logoFallback { border-radius: 4px; background: var(--arc-surface-muted); color: var(--arc-text-secondary); font-size: 10px; font-weight: 500; line-height: 1; }
+.companyText { display: flex; align-items: baseline; gap: 8px; min-width: 0; }
+.name { flex: 0 1 auto; min-width: 0; overflow: hidden; font-weight: 500; text-overflow: ellipsis; white-space: nowrap; }
+.domain { flex: 0 100 auto; min-width: 0; overflow: hidden; color: var(--arc-text-muted); font-size: var(--arc-text-xs); line-height: 16px; text-overflow: ellipsis; white-space: nowrap; }
+
+/* The AI cell picks up a faint accent wash while it runs, so the eye can follow the work down the column. */
+.aiCell { height: 44px; transition: background-color var(--arc-duration-fast) var(--arc-ease-standard); }
+.aiCell[data-status="running"] { background: color-mix(in oklab, var(--arc-accent) 5%, transparent); }
+.aiCell[data-status="failed"] { background: color-mix(in oklab, var(--arc-danger) 4%, transparent); }
+.cell { display: grid; grid-template-columns: 16px minmax(0, 1fr) auto 28px; align-items: center; column-gap: 8px; min-width: 0; height: 44px; }
+
+.stack { grid-area: 1 / 1; min-width: 0; }
+.statusIcon { display: grid; width: 16px; height: 16px; place-items: center; }
+.statusIcon > .stack { display: grid; place-items: center; }
+.statusIcon svg { display: block; }
+.statusIcon [data-status="queued"] { color: var(--arc-text-muted); }
+.statusIcon [data-status="running"] { color: var(--arc-accent); }
+.statusIcon [data-status="done"] { color: var(--arc-success); }
+.statusIcon [data-status="failed"] { color: var(--arc-danger); }
+.spinner { animation: enrich-spin .7s linear infinite; }
+@keyframes enrich-spin { to { transform: rotate(360deg); } }
+
+.content { display: grid; min-width: 0; }
+.content > .stack { display: block; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.muted { color: var(--arc-text-muted); }
+.shimmer { color: var(--arc-text-secondary); white-space: nowrap; }
+.failText { display: inline; }
+.failLabel { color: var(--arc-foreground); }
+.failReason { margin-left: 8px; color: var(--arc-text-secondary); font-size: var(--arc-text-xs); }
+
+.aside { display: grid; justify-items: end; min-width: 0; }
+.aside > .stack { display: flex; align-items: center; }
+.source { display: inline-flex; align-items: center; gap: 4px; max-width: 168px; margin-right: -4px; padding: 4px; border-radius: 8px; color: var(--arc-text-muted); font-size: var(--arc-text-xs); line-height: 16px; text-decoration: none; transition: color var(--arc-duration-fast) var(--arc-ease-standard), background-color var(--arc-duration-fast) var(--arc-ease-standard); }
+.sourceLabel { min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.sourceIcon { flex: none; }
+.source:active { background: var(--arc-surface-muted); }
+.retry { min-height: 28px; margin-right: -4px; padding-inline: 8px; gap: 4px; font-size: var(--arc-text-xs); }
+
+/* Small icon buttons: the column's edit control and each row's run or re-run. */
+.actionSlot { display: grid; width: 28px; height: 28px; place-items: center; }
+.iconButton { display: grid; width: 28px; height: 28px; flex: none; margin: 0; padding: 0; place-items: center; border: 0; border-radius: 999px; background: transparent; color: var(--arc-text-muted); cursor: pointer; -webkit-tap-highlight-color: transparent; transition: color var(--arc-duration-fast) var(--arc-ease-standard), background-color var(--arc-duration-fast) var(--arc-ease-standard), opacity var(--arc-duration-instant) var(--arc-ease-standard), transform var(--arc-duration-instant) var(--arc-ease-standard); }
+.iconButton:active { transform: scale(.94); background: var(--arc-surface-muted); }
+.iconButton[data-active] { background: var(--arc-surface-muted); color: var(--arc-foreground); }
+.rowAction { opacity: 0; }
+.table tbody tr:focus-within .rowAction, .rowAction:focus-visible { opacity: 1; }
+@media (hover: hover) and (pointer: fine) {
+  .table tbody tr:hover .rowAction { opacity: 1; }
+  .iconButton:hover { background: var(--arc-surface-muted); color: var(--arc-foreground); }
+  .source:hover { background: var(--arc-surface-muted); color: var(--arc-foreground); }
+}
+@media (hover: none) { .rowAction { opacity: 1; } }
+
+.empty { height: 88px; color: var(--arc-text-muted); text-align: center !important; }
+
+/* Footer: the model on the left, progress on the right. */
+.foot { display: flex; align-items: center; justify-content: space-between; gap: 12px; min-height: 44px; padding: 12px 20px; border-top: 1px solid var(--arc-border-subtle); color: var(--arc-text-muted); font-size: var(--arc-text-xs); line-height: 16px; }
+.model { display: inline-flex; align-items: center; gap: 8px; min-width: 0; }
+.modelMark { display: grid; flex: none; width: 14px; height: 14px; place-items: center; }
+.modelMark svg { display: block; width: 14px; height: 14px; }
+.modelName { overflow: hidden; color: var(--arc-text-secondary); text-overflow: ellipsis; white-space: nowrap; }
+.modelDetail { color: var(--arc-text-muted); }
+.progress { display: inline-flex; flex: none; align-items: center; gap: 12px; white-space: nowrap; }
+/* The done count keeps the width of the row total, so the words after it never move while it counts. */
+.num { display: inline-grid; justify-items: end; font-variant-numeric: tabular-nums; }
+.num > * { grid-area: 1 / 1; }
+.numGhost { visibility: hidden; }
+.progressFailed { display: inline-flex; align-items: center; gap: 4px; color: var(--arc-text-secondary); }
+.progressFailed svg { color: var(--arc-danger); }
+
+/* Narrow: the domain and the source text fold away; the source keeps its arrow link. */
+@container (max-width: 560px) {
+  .domain { display: none; }
+  .sourceLabel { display: none; }
+  .source { padding: 6px; }
+  .modelDetail { display: none; }
+}
+@container (max-width: 440px) {
+  .top { padding-left: 16px; }
+  .table tr > :first-child { padding-left: 16px; }
+  .foot { padding-inline: 16px; }
+  .editor { padding-inline: 16px; }
+  .colCompany { width: 32%; }
+  .company { gap: 8px; }
+  /* Values wrap to two lines instead of truncating to a few words; every row grows together to 60px. */
+  .companyCell, .aiCell, .cell { height: 60px; }
+  .content > .stack { display: -webkit-box; overflow: hidden; -webkit-box-orient: vertical; -webkit-line-clamp: 2; line-height: 18px; white-space: normal; }
+  .count { display: none; }
+  .run { min-width: 0; }
+  .hint { display: none; }
+  .failReason { display: none; }
+  .retryLabel { display: none; }
+  .retry { padding-inline: 6px; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .spinner { animation-duration: 1.6s; }
+}

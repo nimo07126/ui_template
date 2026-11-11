@@ -1,0 +1,138 @@
+/* AI translate. One card: byline and detected chip, the paragraph, then the picker, the original toggle and a status line.
+   Spacing runs on 4/8/12/16/20. Controls are 32px tall; the card radius steps down to the controls and menu rows. */
+.root {
+  container-type: inline-size;
+  box-sizing: border-box;
+  width: 100%;
+  max-width: 620px;
+  min-width: 0;
+  padding: 20px;
+  border: 1px solid var(--arc-border);
+  border-radius: var(--arc-radius-panel);
+  background: var(--arc-surface);
+  color: var(--arc-foreground);
+  font-family: var(--arc-font-body);
+  font-size: var(--arc-text-sm);
+  letter-spacing: var(--arc-tracking-body);
+  line-height: 20px;
+}
+.srOnly { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0, 0, 0, 0); white-space: nowrap; }
+
+/* Byline */
+.head { display: flex; min-height: 36px; align-items: center; justify-content: space-between; gap: 12px; }
+.author { display: flex; min-width: 0; align-items: center; gap: 12px; }
+.avatar { flex: none; }
+.byline { display: grid; min-width: 0; }
+.name, .meta { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.name { font-weight: 500; line-height: 20px; }
+.meta { color: var(--arc-text-muted); font-size: var(--arc-text-xs); line-height: 16px; }
+.chip { display: inline-flex; flex: none; height: 24px; align-items: center; gap: 4px; padding-inline: 10px; border: 1px solid var(--arc-border-subtle); border-radius: var(--arc-radius-pill); color: var(--arc-foreground); font-size: var(--arc-text-xs); line-height: 16px; white-space: nowrap; }
+.chipLabel { color: var(--arc-text-muted); }
+
+/* Paragraph. The clip springs to the text height; every version shares one grid cell so a crossfade never stacks. */
+.textClip { margin-block: 14px 16px; }
+.textStack { display: grid; }
+.text { grid-area: 1 / 1; margin: 0; color: var(--arc-foreground); font-size: var(--arc-text-base); line-height: 24px; overflow-wrap: break-word; text-wrap: pretty; }
+.empty { color: var(--arc-text-muted); }
+.chunk { animation: ait-in 140ms cubic-bezier(.22, 1, .36, 1) both; }
+.pending { color: var(--arc-text-secondary); animation: ait-dim 200ms cubic-bezier(.22, 1, .36, 1) both; }
+.pendingStill { animation: none; opacity: .45; }
+@keyframes ait-in { from { opacity: 0; } to { opacity: 1; } }
+@keyframes ait-dim { from { opacity: 1; } to { opacity: .45; } }
+
+/* Footer */
+.foot { display: flex; min-height: 32px; align-items: center; justify-content: space-between; gap: 8px 12px; }
+.controls { display: flex; min-width: 0; align-items: center; gap: 8px; }
+
+.trigger, .toggle {
+  display: inline-flex;
+  height: 32px;
+  flex: none;
+  align-items: center;
+  gap: 6px;
+  margin: 0;
+  border: 1px solid var(--arc-border);
+  border-radius: var(--arc-radius-control);
+  background: var(--arc-surface);
+  color: var(--arc-foreground);
+  font: inherit;
+  font-size: var(--arc-text-sm);
+  line-height: 20px;
+  cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
+  transition: background-color 120ms ease-out, border-color 120ms ease-out, color 120ms ease-out, transform 120ms ease-out;
+}
+.trigger { padding-inline: 10px 8px; }
+.toggle { padding-inline: 12px; color: var(--arc-text-secondary); }
+.toggle[aria-pressed="true"] { background: var(--arc-surface-muted); border-color: var(--arc-border); color: var(--arc-foreground); }
+.trigger:active:not(:disabled), .toggle:active:not(:disabled) { transform: scale(.97); background: var(--arc-surface-muted); }
+.trigger[data-state="open"] { background: var(--arc-surface-muted); }
+.trigger:disabled, .toggle:disabled { cursor: default; color: var(--arc-text-muted); border-color: var(--arc-border-subtle); }
+@media (hover: hover) and (pointer: fine) {
+  .trigger:hover:not(:disabled), .toggle:hover:not(:disabled) { background: var(--arc-surface-muted); color: var(--arc-foreground); }
+}
+.triggerIcon { flex: none; color: var(--arc-text-secondary); }
+.trigger:disabled .triggerIcon { color: var(--arc-text-muted); }
+.chevron { flex: none; color: var(--arc-text-muted); transition: transform 200ms cubic-bezier(.22, 1, .36, 1); }
+.trigger[data-state="open"] .chevron { transform: rotate(180deg); }
+
+/* Label stacks: every label shares one cell, so the control is as wide as its longest label and never resizes. */
+.stack { display: inline-grid; justify-items: start; }
+.toggle .stack { justify-items: center; }
+.stackItem { grid-area: 1 / 1; opacity: 0; white-space: nowrap; pointer-events: none; user-select: none; transition: opacity 100ms ease-out; }
+.stackItem[data-active] { opacity: 1; pointer-events: auto; user-select: auto; transition: opacity 160ms cubic-bezier(.22, 1, .36, 1); }
+
+/* Status line: mark and label, right-aligned. Versions share one cell and crossfade. */
+.status { display: grid; min-width: 0; justify-items: end; }
+.statusItem { display: inline-flex; grid-area: 1 / 1; min-width: 0; max-width: 100%; height: 32px; align-items: center; gap: 8px; color: var(--arc-text-secondary); font-size: var(--arc-text-xs); white-space: nowrap; }
+.statusText { min-width: 0; overflow: hidden; text-overflow: ellipsis; }
+.mark { display: grid; flex: none; width: 16px; height: 16px; place-items: center; }
+.mark svg { display: block; width: 16px; height: 16px; }
+.errorIcon { flex: none; color: var(--arc-danger); }
+.statusItem[data-tone="error"] { color: var(--arc-foreground); }
+.retry.retry { min-height: 28px; gap: 6px; margin-left: -2px; padding-inline: 10px; font-size: var(--arc-text-xs); }
+
+/* Narrow cards: the status drops to its own line under the controls, left-aligned with the text. */
+@container (max-width: 470px) {
+  .foot { flex-wrap: wrap; }
+  .status { flex-basis: 100%; justify-items: start; }
+}
+@container (max-width: 380px) {
+  .chipLabel { display: none; }
+}
+
+/* Language menu: a floating layer, so it is the one place with a shadow. */
+.menu {
+  z-index: 60;
+  box-sizing: border-box;
+  min-width: 220px;
+  padding: 4px;
+  border: 1px solid var(--arc-border);
+  border-radius: 16px;
+  background: var(--arc-surface-raised, var(--arc-surface));
+  box-shadow: var(--arc-shadow-floating);
+  color: var(--arc-foreground);
+  font-family: var(--arc-font-body);
+  font-size: var(--arc-text-sm);
+  letter-spacing: var(--arc-tracking-body);
+  line-height: 20px;
+  transform-origin: var(--radix-dropdown-menu-content-transform-origin);
+}
+.menu[data-state="open"] { animation: ait-menu-in 150ms cubic-bezier(.22, 1, .36, 1); }
+.menu[data-state="closed"] { animation: ait-menu-out 100ms ease-out forwards; }
+@keyframes ait-menu-in { from { opacity: 0; transform: scale(.98); } }
+@keyframes ait-menu-out { to { opacity: 0; transform: scale(.98); } }
+.menuLabel { padding: 6px 10px 4px; color: var(--arc-text-muted); font-size: var(--arc-text-xs); line-height: 16px; }
+.item { display: grid; height: 32px; grid-template-columns: 14px minmax(0, 1fr) auto; align-items: center; gap: 8px; padding-inline: 8px 10px; border-radius: 12px; cursor: pointer; user-select: none; }
+.item[data-highlighted] { background: var(--arc-surface-muted); }
+.itemCheck { display: grid; width: 14px; height: 14px; place-items: center; color: var(--arc-foreground); }
+.itemName { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.itemMeta { color: var(--arc-text-muted); font-size: var(--arc-text-xs); }
+.item[data-state="checked"] .itemName { font-weight: 500; }
+
+@media (max-width: 420px) { .root { padding: 16px; } }
+
+@media (prefers-reduced-motion: reduce) {
+  .chunk, .menu[data-state="open"], .menu[data-state="closed"] { animation: none; }
+  .stackItem, .stackItem[data-active], .chevron, .trigger, .toggle { transition: none; }
+}

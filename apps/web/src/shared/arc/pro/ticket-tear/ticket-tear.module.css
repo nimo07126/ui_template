@@ -1,0 +1,53 @@
+.root { --paper: var(--ticket-paper, var(--arc-surface-raised)); position: relative; display: flex; width: 100%; -webkit-user-select: none; user-select: none; -webkit-touch-callout: none; }
+
+:global(:root[data-theme="night"]) .root { --paper: var(--ticket-paper, color-mix(in oklab, var(--arc-surface-raised) 94%, white)); }
+
+/* Shadows sit on wrappers: a masked element would clip its own shadow away. */
+.bodyWrap, .stubWrap { filter: drop-shadow(0 1px 1px oklch(0% 0 0 / .06)) drop-shadow(0 8px 18px oklch(0% 0 0 / .08)); }
+:global(:root[data-theme="night"]) .bodyWrap, :global(:root[data-theme="night"]) .stubWrap { filter: drop-shadow(0 0 0 oklch(100% 0 0 / 0)) drop-shadow(0 10px 22px oklch(0% 0 0 / .4)); }
+
+.bodyWrap { position: relative; flex: 1; min-width: 0; margin-right: calc(var(--stub) - var(--pad)); }
+.body { position: relative; }
+
+.body, .stub {
+  height: 100%;
+  background: var(--paper);
+  -webkit-mask-composite: source-in;
+  mask-composite: intersect;
+}
+.body {
+  -webkit-mask:
+    radial-gradient(circle var(--notch) at calc(100% - var(--pad)) 0, #0000 calc(100% - .5px), #000 100%),
+    radial-gradient(circle var(--notch) at calc(100% - var(--pad)) 100%, #0000 calc(100% - .5px), #000 100%),
+    radial-gradient(circle 1.9px at calc(100% - var(--pad)) 50%, #0000 calc(100% - .5px), #000 100%) 0 0 / 100% var(--hole) repeat-y;
+  mask:
+    radial-gradient(circle var(--notch) at calc(100% - var(--pad)) 0, #0000 calc(100% - .5px), #000 100%),
+    radial-gradient(circle var(--notch) at calc(100% - var(--pad)) 100%, #0000 calc(100% - .5px), #000 100%),
+    radial-gradient(circle 1.9px at calc(100% - var(--pad)) 50%, #0000 calc(100% - .5px), #000 100%) 0 0 / 100% var(--hole) repeat-y;
+  -webkit-mask-composite: source-in;
+  mask-composite: intersect;
+}
+
+.stubWrap { position: absolute; top: 0; right: 0; bottom: 0; width: calc(var(--stub) + var(--pad)); cursor: grab; touch-action: none; will-change: transform; }
+.stubWrap:active { cursor: grabbing; }
+.stub {
+  position: absolute;
+  inset: 0;
+  -webkit-mask:
+    radial-gradient(circle var(--notch) at var(--pad) 0, #0000 calc(100% - .5px), #000 100%),
+    radial-gradient(circle var(--notch) at var(--pad) 100%, #0000 calc(100% - .5px), #000 100%),
+    radial-gradient(circle 1.9px at var(--pad) 50%, #0000 calc(100% - .5px), #000 100%) 0 0 / 100% var(--hole) repeat-y;
+  mask:
+    radial-gradient(circle var(--notch) at var(--pad) 0, #0000 calc(100% - .5px), #000 100%),
+    radial-gradient(circle var(--notch) at var(--pad) 100%, #0000 calc(100% - .5px), #000 100%),
+    radial-gradient(circle 1.9px at var(--pad) 50%, #0000 calc(100% - .5px), #000 100%) 0 0 / 100% var(--hole) repeat-y;
+  -webkit-mask-composite: source-in;
+  mask-composite: intersect;
+  padding-left: var(--pad);
+}
+.flap { will-change: transform, clip-path; }
+
+/* Paper fibers: a rougher layer one or two pixels past each torn edge, in the paper's raw core color. */
+.rim { position: absolute; inset: 0; background: var(--ticket-fiber, color-mix(in oklab, var(--paper) 84%, var(--arc-foreground))); }
+
+.status { position: absolute; width: 1px; height: 1px; overflow: hidden; clip-path: inset(50%); white-space: nowrap; }

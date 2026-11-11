@@ -1,0 +1,105 @@
+/* Connector setup. Geometry: the card pads 8px and rows pad 12px, so marks, the search icon's column and the header text all
+   start 20px in; row text, search text and the details all start at 44px inside the list. Radii step 26 -> 18. */
+.root { container-type: inline-size; box-sizing: border-box; width: 100%; max-width: 520px; padding: 8px; border: 1px solid var(--arc-border); border-radius: var(--arc-radius-panel); background: var(--arc-surface); color: var(--arc-foreground); font-family: var(--arc-font-body); font-size: var(--arc-text-sm); line-height: 20px; letter-spacing: var(--arc-tracking-body, normal); }
+.root *, .root *::before, .root *::after { box-sizing: border-box; }
+.srOnly { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0, 0, 0, 0); white-space: nowrap; }
+.ellipsis { display: block; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+
+/* Header */
+.header { display: flex; align-items: flex-start; justify-content: space-between; gap: 16px; padding: 12px 12px 16px; }
+.headText { min-width: 0; }
+.title { margin: 0; font-size: var(--arc-text-base); font-weight: 500; line-height: 24px; letter-spacing: -.01em; }
+.description { margin: 0; color: var(--arc-text-secondary); font-size: var(--arc-text-sm); line-height: 20px; text-wrap: pretty; }
+.count { display: inline-flex; flex: none; align-items: center; gap: 4px; color: var(--arc-text-muted); font-size: var(--arc-text-xs); line-height: 24px; white-space: nowrap; }
+.countVisual { display: inline-flex; align-items: center; gap: 4px; }
+.countNum { color: var(--arc-text-secondary); font-variant-numeric: tabular-nums; }
+
+/* Search */
+.search { position: relative; margin-bottom: 8px; }
+.searchIcon { position: absolute; top: 50%; left: 14px; color: var(--arc-text-muted); pointer-events: none; transform: translateY(-50%); }
+.searchInput { width: 100%; height: 40px; margin: 0; padding: 0 44px 0 43px; border: 1px solid var(--arc-border); border-radius: var(--arc-radius-control); background: var(--arc-surface); color: var(--arc-foreground); font: inherit; font-size: var(--arc-text-sm); line-height: 20px; appearance: none; transition: border-color var(--arc-duration-fast, .16s) var(--arc-ease-standard, ease-out), background-color var(--arc-duration-fast, .16s) var(--arc-ease-standard, ease-out); }
+.searchInput::placeholder { color: var(--arc-text-muted); opacity: 1; }
+.searchInput::-webkit-search-cancel-button, .searchInput::-webkit-search-decoration { appearance: none; }
+.searchInput:focus { border-color: color-mix(in oklab, var(--arc-foreground) 28%, var(--arc-border)); }
+@media (hover: hover) and (pointer: fine) { .searchInput:hover:not(:focus) { border-color: color-mix(in oklab, var(--arc-foreground) 16%, var(--arc-border)); } }
+.clear { position: absolute; top: 50%; right: 6px; display: grid; width: 28px; height: 28px; margin: -14px 0 0; padding: 0; place-items: center; border: 0; border-radius: 14px; background: transparent; color: var(--arc-text-muted); cursor: pointer; -webkit-tap-highlight-color: transparent; transition: background-color .12s ease-out, color .12s ease-out; }
+.clear:active { background: var(--arc-surface-muted); color: var(--arc-foreground); }
+@media (hover: hover) and (pointer: fine) { .clear:hover { background: var(--arc-surface-muted); color: var(--arc-foreground); } }
+
+/* Rows */
+.list { display: flex; margin: 0; padding: 0; flex-direction: column; gap: 2px; list-style: none; }
+.row { position: relative; border-radius: var(--arc-radius-control); transition: background-color .16s var(--arc-ease-standard, ease-out); }
+.row[data-active] { background: color-mix(in oklab, var(--arc-surface-muted) 72%, transparent); }
+.rowMain { display: grid; min-height: 60px; grid-template-columns: 20px minmax(0, 1fr) auto; align-items: center; column-gap: 12px; padding: 10px 12px; }
+.mark { display: grid; width: 20px; height: 20px; place-items: center; color: var(--arc-foreground); }
+.mark svg { display: block; }
+.text { display: flex; min-width: 0; flex-direction: column; }
+.name { overflow: hidden; font-weight: 500; line-height: 20px; text-overflow: ellipsis; white-space: nowrap; }
+.line { min-height: 18px; color: var(--arc-text-muted); font-size: var(--arc-text-xs); line-height: 18px; }
+.lineLive { color: var(--arc-text-secondary); }
+.lineError { color: var(--arc-danger); }
+.syncLine { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.num { display: inline-grid; justify-items: end; font-variant-numeric: tabular-nums; }
+.num > * { grid-area: 1 / 1; }
+.numGhost { visibility: hidden; }
+.errorLine { display: inline-flex; min-width: 0; align-items: center; gap: 4px; }
+.errorLine svg { flex: none; }
+
+/* One grid cell holds the outgoing and incoming content while they crossfade, so nothing reflows mid-swap. */
+.swap { display: grid; min-width: 0; }
+.swapItem { display: flex; min-width: 0; align-items: center; overflow: hidden; grid-area: 1 / 1; }
+.swapItem[data-leaving] { pointer-events: none; }
+.line .swapItem > :global(*) { min-width: 0; max-width: 100%; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.actionSlot { display: flex; min-width: 0; justify-content: flex-end; }
+.actionSwap { justify-items: end; }
+.actionSwap .swapItem { overflow: visible; }
+
+/* Compact row actions: the shared Button at 32px. Connect and Retry take the accent tint; everything else stays quiet. */
+.action.action { min-height: 32px; padding-inline: 12px; font-size: var(--arc-text-sm); }
+.connect.connect { border-color: transparent; background: var(--arc-accent-subtle); color: var(--arc-accent); }
+.connect.connect:active:not(:disabled) { background: color-mix(in oklab, var(--arc-accent) 22%, transparent); color: var(--arc-accent); }
+@media (hover: hover) and (pointer: fine) { .connect.connect:hover:not(:disabled) { background: color-mix(in oklab, var(--arc-accent) 17%, transparent); box-shadow: none; } }
+.connectedBtn.connectedBtn { gap: 6px; padding-inline: 10px 8px; color: var(--arc-text-secondary); }
+.ok { color: var(--arc-success); }
+.chevron { color: var(--arc-text-muted); transition: transform .2s var(--arc-ease-standard, ease-out); }
+.chevron[data-open] { transform: rotate(180deg); }
+
+/* Progress: a 2px hairline under the text column while a connection is in flight. */
+.track { position: absolute; right: 12px; bottom: 5px; left: 44px; height: 2px; overflow: hidden; border-radius: 1px; background: var(--arc-border-subtle, var(--arc-border)); pointer-events: none; }
+.fill { display: block; width: 100%; height: 100%; border-radius: inherit; background: var(--arc-accent); transform-origin: left center; }
+
+/* Details: scopes granted and the disconnect path, aligned to the row's text column. */
+.detailsClip { overflow: hidden; }
+.details { padding: 0 12px 12px 44px; }
+.detailsLabel { display: block; margin-bottom: 4px; color: var(--arc-text-muted); font-size: var(--arc-text-xs); line-height: 18px; }
+.scopes { display: grid; margin: 0; padding: 0; gap: 4px; list-style: none; }
+.scope { display: flex; min-width: 0; align-items: flex-start; gap: 8px; color: var(--arc-text-secondary); line-height: 20px; }
+.scope svg { flex: none; margin-top: 2px; color: var(--arc-success); }
+.scopeText { min-width: 0; text-wrap: pretty; }
+.detailsFoot { margin-top: 12px; padding-top: 12px; border-top: 1px solid var(--arc-border-subtle, var(--arc-border)); }
+.footSwap { width: 100%; }
+.footRow { display: flex; width: 100%; min-height: 32px; align-items: center; justify-content: space-between; gap: 8px; }
+.footText { color: var(--arc-text-muted); font-size: var(--arc-text-xs); line-height: 18px; }
+.footActions { display: flex; flex: none; align-items: center; gap: 4px; }
+.keep.keep { padding-inline: 10px; }
+
+/* Empty search */
+.empty { display: grid; min-height: 184px; padding: 24px 16px; place-content: center; justify-items: center; gap: 4px; text-align: center; }
+.emptyTitle { margin: 0; font-weight: 500; line-height: 20px; overflow-wrap: anywhere; }
+.emptyCopy { margin: 0 0 12px; color: var(--arc-text-muted); font-size: var(--arc-text-xs); line-height: 18px; }
+
+.footer { display: flex; align-items: center; gap: 8px; margin-top: 8px; padding: 12px 12px 6px; border-top: 1px solid var(--arc-border-subtle, var(--arc-border)); color: var(--arc-text-muted); font-size: var(--arc-text-xs); line-height: 18px; }
+.footer svg { flex: none; }
+
+/* Narrow cards keep the check and chevron and drop the word, so the account line keeps its room. The button keeps its full aria-label. */
+@container (max-width: 440px) {
+  .header { flex-direction: column; gap: 4px; }
+  .count { line-height: 18px; }
+  .connectedLabel { display: none; }
+  .confirmText { visibility: hidden; }
+  .connectedBtn.connectedBtn { padding-inline: 8px; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .row, .chevron, .searchInput, .clear { transition: none; }
+}

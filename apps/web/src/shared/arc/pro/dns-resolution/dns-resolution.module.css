@@ -1,0 +1,143 @@
+.root {
+  --dns-accent: var(--arc-accent);
+  --dns-top: var(--arc-surface-raised);
+  --dns-left: color-mix(in oklab, var(--arc-surface-muted) 80%, var(--arc-surface-raised));
+  --dns-right: color-mix(in oklab, var(--arc-surface-muted) 70%, var(--arc-border));
+  --dns-edge: color-mix(in oklab, var(--arc-border-strong) 88%, var(--arc-surface-raised));
+  --mono: ui-monospace, "SFMono-Regular", Menlo, Consolas, monospace;
+  display: grid;
+  width: 100%;
+  max-width: 1080px;
+  min-width: 0;
+  margin: 0 auto;
+  gap: var(--arc-space-4);
+  container-type: inline-size;
+  color: var(--arc-foreground);
+  -webkit-tap-highlight-color: transparent;
+}
+:global(:root[data-theme="night"]) .root {
+  --dns-top: color-mix(in oklab, var(--arc-surface-raised) 88%, var(--arc-foreground));
+  --dns-left: var(--arc-surface-raised);
+  --dns-right: color-mix(in oklab, var(--arc-surface) 70%, var(--arc-background));
+  --dns-edge: color-mix(in oklab, var(--arc-border-strong) 80%, var(--arc-foreground));
+}
+
+/* The stage reserves its shape before it is measured, then takes the exact ratio of the drawing. */
+.stage { position: relative; width: 100%; min-width: 0; aspect-ratio: 1000 / 612; }
+@container (width < 640px) { .root:not([data-ready]) .stage { aspect-ratio: 390 / 700; } }
+.stage > :is(.svg, .label) { opacity: 0; transition: opacity var(--arc-duration-considered) var(--arc-ease-standard); }
+.root[data-ready] .stage > :is(.svg, .label) { opacity: 1; }
+
+.svg { position: absolute; inset: 0; display: block; width: 100%; height: 100%; overflow: visible; }
+.svg :is(path, polygon, line, circle, ellipse) { vector-effect: non-scaling-stroke; }
+
+/* Slabs: three faces with a hairline edge; the top face edge takes the accent when something lands. */
+.node { --hit: 0; transition: opacity var(--arc-duration-standard) var(--arc-ease-standard); }
+.node[data-dim] { opacity: .5; }
+.faceTop, .faceLeft, .faceRight { stroke: var(--dns-edge); stroke-width: 1; stroke-linejoin: round; }
+.faceTop { fill: var(--dns-top); stroke: color-mix(in oklab, var(--dns-accent) calc(var(--hit) * 70%), var(--dns-edge)); transition: stroke var(--arc-duration-standard) var(--arc-ease-standard); }
+.faceLeft { fill: var(--dns-left); }
+.faceRight { fill: var(--dns-right); }
+.node[data-on] .faceTop { stroke: color-mix(in oklab, var(--dns-accent) 60%, var(--dns-edge)); }
+.rack { stroke: var(--arc-border); stroke-width: 1; }
+.ledBase { fill: var(--dns-top); stroke: var(--dns-edge); stroke-width: 1; }
+.led { fill: var(--dns-accent); }
+.hit { fill: transparent; stroke: none; pointer-events: all; }
+.svg { pointer-events: none; }
+
+/* The browser's top face is a small page: an address bar, then lines that draw in once it connects. */
+.bar { fill: none; stroke: var(--arc-border); stroke-width: 5; stroke-linecap: round; }
+.lockBase { fill: var(--arc-text-muted); }
+.lock { fill: var(--arc-success); }
+.ghost { fill: none; stroke: var(--arc-border-subtle); stroke-width: 3; stroke-linecap: round; }
+.pageLine { fill: none; stroke: color-mix(in oklab, var(--arc-text-muted) 70%, var(--arc-border-strong)); stroke-width: 3; stroke-linecap: round; }
+
+/* The TTL ring on the resolver's cache tier. */
+.ringTrack { fill: none; stroke: var(--arc-border); stroke-width: 2; }
+.ring { fill: none; stroke: var(--dns-accent); stroke-width: 2; stroke-linecap: round; }
+
+.portBase { fill: var(--dns-top); stroke: var(--dns-edge); stroke-width: 1; }
+.port { fill: var(--dns-accent); }
+
+/* Routes: quiet hairlines in the air with a dashed shadow on the floor. A route stays tinted once a query has used it. */
+.floor { fill: none; stroke: var(--arc-border); stroke-width: 1; stroke-dasharray: 2 4; transition: opacity var(--arc-duration-standard) var(--arc-ease-standard); }
+.floor[data-dim] { opacity: .4; }
+.shadow { fill: var(--arc-foreground); fill-opacity: .12; }
+.route { transition: opacity var(--arc-duration-standard) var(--arc-ease-standard); }
+.route[data-dim] { opacity: .3; }
+.edge { --lit: 0; fill: none; stroke: color-mix(in oklab, var(--dns-accent) calc(var(--lit) * 55%), var(--arc-border-strong)); stroke-width: 1; transition: stroke var(--arc-duration-standard) var(--arc-ease-standard); }
+.route[data-on] .edge { stroke: color-mix(in oklab, var(--dns-accent) 70%, var(--arc-border-strong)); }
+.trail { fill: none; stroke: var(--dns-accent); stroke-opacity: .55; stroke-width: 2; stroke-linecap: round; }
+.packet { fill: var(--dns-accent); stroke: var(--arc-surface); stroke-width: 1.5; }
+.packet[data-kind="referral"] { fill: var(--arc-surface); stroke: var(--dns-accent); stroke-width: 1.75; }
+.packet[data-kind="answer"] { fill: var(--dns-accent); stroke: color-mix(in oklab, var(--dns-accent) 35%, var(--arc-surface)); stroke-width: 3; }
+
+/* Labels are HTML placed by percentage, so text keeps its real size at every width. */
+.label[data-above] { transform: translate(-50%, -100%); }
+.label { position: absolute; z-index: 1; display: grid; justify-items: center; width: max-content; min-width: 0; max-width: 11.5rem; transform: translateX(-50%); text-align: center; cursor: default; }
+.name { display: inline-flex; align-items: center; gap: 6px; max-width: 100%; overflow: hidden; font-size: var(--arc-text-sm); font-weight: 500; letter-spacing: var(--arc-tracking-body); line-height: var(--arc-leading-body); text-overflow: ellipsis; white-space: nowrap; }
+.mark { display: grid; flex: none; place-items: center; width: 14px; height: 14px; color: var(--arc-text-secondary); object-fit: contain; }
+.mark > svg { width: 14px; height: 14px; stroke-width: 1.75; }
+.meta { max-width: 100%; overflow: hidden; color: var(--arc-text-muted); font-family: var(--mono); font-size: var(--arc-text-xs); letter-spacing: 0; line-height: 1.5; text-overflow: ellipsis; white-space: nowrap; }
+
+.status { display: inline-flex; align-items: center; gap: 6px; max-width: 100%; margin-top: 4px; padding: 1px 8px 1px 7px; border: 1px solid var(--arc-border-subtle); border-radius: var(--arc-radius-pill); color: var(--arc-text-secondary); background: var(--arc-surface); font-size: var(--arc-text-xs); font-variant-numeric: tabular-nums; letter-spacing: var(--arc-tracking-body); line-height: 1.5; white-space: nowrap; }
+.dot { flex: none; width: 6px; height: 6px; border: 1.25px solid var(--arc-border-strong); border-radius: 50%; box-sizing: border-box; transition: background-color var(--arc-duration-standard) var(--arc-ease-standard), border-color var(--arc-duration-standard) var(--arc-ease-standard); }
+.status[data-state="idle"] { color: var(--arc-text-muted); }
+.status[data-state="busy"] .dot { border-color: var(--dns-accent); background: color-mix(in oklab, var(--dns-accent) 35%, transparent); }
+.status[data-state="refer"] .dot { border-color: var(--dns-accent); }
+.status[data-state="done"] { color: var(--arc-foreground); }
+.status[data-state="done"] .dot { border-color: var(--arc-success); background: var(--arc-success); }
+
+/* The cached record sits under the resolver while its TTL runs. */
+.record { display: grid; gap: 1px; margin-top: var(--arc-space-2); padding: 5px 10px 6px; border: 1px solid var(--arc-border); border-radius: 12px; background: var(--arc-surface-raised); text-align: left; transition: border-color var(--arc-duration-standard) var(--arc-ease-standard); white-space: nowrap; }
+.record[data-state="hit"] { border-color: color-mix(in oklab, var(--dns-accent) 60%, var(--arc-border)); }
+.recordName { color: var(--arc-text-muted); font-family: var(--mono); font-size: var(--arc-text-xs); line-height: 1.5; }
+.recordRow { display: flex; align-items: baseline; gap: var(--arc-space-3); }
+.recordValue { font-family: var(--mono); font-size: var(--arc-text-xs); line-height: 1.5; }
+.recordTtl { min-width: 7ch; color: var(--dns-accent); font-size: var(--arc-text-xs); font-variant-numeric: tabular-nums; font-weight: 500; letter-spacing: var(--arc-tracking-body); text-align: right; }
+.record[data-state="expired"] .recordTtl { color: var(--arc-text-muted); }
+
+/* The record a packet carries, riding just above it. */
+.msg { position: absolute; top: 0; left: 0; z-index: 2; padding: 1px 7px; border: 1px solid var(--arc-border); border-radius: var(--arc-radius-pill); color: var(--arc-text-secondary); background: var(--arc-surface-raised); font-family: var(--mono); font-size: var(--arc-text-xs); line-height: 1.5; white-space: nowrap; pointer-events: none; will-change: transform, opacity; }
+.msg[data-kind="answer"] { border-color: color-mix(in oklab, var(--dns-accent) 45%, var(--arc-border)); color: var(--arc-foreground); }
+
+/* A small tag with one line of detail, shown while its node is hovered. */
+.tag { position: absolute; z-index: 3; padding: 3px var(--arc-space-2); border-radius: var(--arc-radius-pill); color: var(--arc-background); background: var(--arc-foreground); font-size: var(--arc-text-xs); font-weight: 500; letter-spacing: var(--arc-tracking-body); line-height: 1.3; white-space: nowrap; opacity: 0; pointer-events: none; --tx: -50%; transform: translate(var(--tx), -100%) translateY(4px) scale(.96); transform-origin: 50% 100%; transition: opacity var(--arc-duration-fast) var(--arc-ease-standard), transform var(--arc-duration-fast) var(--arc-ease-standard); }
+.tag[data-align="end"] { --tx: calc(-100% + 24px); transform-origin: 100% 100%; }
+.tag[data-align="start"] { --tx: -24px; transform-origin: 0 100%; }
+.tag[data-show] { opacity: 1; transform: translate(var(--tx), -100%); transition: opacity var(--arc-duration-standard) var(--arc-ease-standard), transform var(--arc-duration-spring) var(--arc-ease-spring); }
+
+/* Scrubber: one segment per stage that fills as the story plays; tap one to jump there. */
+.controls { display: flex; align-items: flex-start; gap: var(--arc-space-3); width: 100%; max-width: 640px; margin-inline: auto; }
+.toggle { display: grid; flex: none; place-items: center; width: 36px; height: 36px; margin-top: 2px; padding: 0; border: 1px solid var(--arc-border); border-radius: 50%; color: var(--arc-text-secondary); background: var(--arc-surface); cursor: pointer; transition: color var(--arc-duration-fast) var(--arc-ease-standard), background-color var(--arc-duration-fast) var(--arc-ease-standard), transform var(--arc-duration-spring) var(--arc-ease-spring); }
+@media (hover: hover) and (pointer: fine) { .toggle:not(:disabled):hover { color: var(--arc-foreground); background: var(--arc-surface-muted); } }
+.toggle:not(:disabled):active { transform: scale(.97); }
+.toggle:disabled { cursor: default; opacity: .5; }
+.segments { display: grid; flex: 1; grid-template-columns: repeat(6, minmax(0, 1fr)); gap: 6px; min-width: 0; }
+.seg { display: grid; gap: 8px; min-width: 0; min-height: 44px; align-content: start; padding: 10px 0 0; border: 0; color: var(--arc-text-muted); background: none; font: inherit; cursor: pointer; transition: color var(--arc-duration-fast) var(--arc-ease-standard); }
+.seg[data-current="true"] { color: var(--arc-foreground); }
+@media (hover: hover) and (pointer: fine) { .seg:hover { color: var(--arc-foreground); } }
+.track { display: block; height: 3px; overflow: hidden; border-radius: 2px; background: var(--arc-border); }
+.fill { display: block; height: 100%; border-radius: inherit; background: var(--dns-accent); transform: scaleX(0); transform-origin: 0 50%; }
+.segLabel { overflow: hidden; font-size: var(--arc-text-xs); letter-spacing: var(--arc-tracking-body); line-height: 1.3; text-align: left; text-overflow: ellipsis; white-space: nowrap; }
+
+.caption { display: grid; justify-items: center; gap: 2px; min-height: calc(var(--arc-text-sm) * 1.4 * 3); margin: 0 auto; max-width: 560px; padding-inline: var(--arc-space-4); text-align: center; }
+.capTitle { font-size: var(--arc-text-sm); font-weight: 500; letter-spacing: var(--arc-tracking-body); line-height: var(--arc-leading-body); }
+.capText { color: var(--arc-text-secondary); font-size: var(--arc-text-sm); letter-spacing: var(--arc-tracking-body); line-height: var(--arc-leading-body); text-wrap: balance; }
+
+@container (width < 640px) {
+  .label { max-width: 9.5rem; }
+  .recordName { display: none; }
+  .segLabel { display: none; }
+  .seg { min-height: 36px; padding-top: 16px; }
+  .controls { align-items: center; }
+  .toggle { margin-top: 0; }
+  .caption { min-height: calc(var(--arc-text-sm) * 1.4 * 4); padding-inline: 0; }
+}
+@container (640px <= width < 820px) {
+  .meta { display: none; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .stage > :is(.svg, .label), .node, .route, .floor, .faceTop, .edge, .dot, .tag, .toggle, .seg { transition-duration: var(--arc-duration-instant); }
+}

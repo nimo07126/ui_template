@@ -1,0 +1,210 @@
+/* AI workflow. One card, one hairline rail, compact rows.
+   Grid: the card edge, header copy, row marks and footer copy all sit 16px in (canvas 8px + row 8px). Marks are 16px,
+   so the rail runs through their centers (8px row padding + 8px half mark) and step text starts at 34px.
+   Rows are 32px (44px stacked below 480px), 16px apart. Lines stop 4px short of every mark.
+   Radii step down by inset: card 26px, rows and menu rows 10px, small buttons 8px, tabs 6px. */
+.root {
+  --wf-row: 32px;
+  --wf-gap: 16px;
+  --wf-pad: 8px;
+  --wf-text: 34px;
+  --wf-rail: 15.5px;
+  --wf-line: var(--arc-border);
+  --wf-done: color-mix(in oklab, var(--arc-accent) 60%, var(--arc-border));
+  --wf-hover: color-mix(in oklab, var(--arc-surface-muted) 70%, transparent);
+  --wf-mono: ui-monospace, "SF Mono", "JetBrains Mono", Menlo, monospace;
+  --wf-ease: var(--arc-ease-standard, cubic-bezier(.2, 0, 0, 1));
+  container-type: inline-size;
+  position: relative;
+  width: 100%;
+  max-width: 640px;
+  min-width: 0;
+  border: 1px solid var(--arc-border);
+  border-radius: var(--arc-radius-panel, 26px);
+  background: var(--arc-surface);
+  color: var(--arc-foreground);
+  font-family: var(--arc-font-body);
+  font-size: 13px;
+  line-height: 20px;
+  letter-spacing: -0.003em;
+}
+.root p { margin: 0; }
+.srOnly { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0, 0, 0, 0); white-space: nowrap; }
+.tabular { font-variant-numeric: tabular-nums; }
+
+/* Header. */
+.header { display: flex; align-items: center; gap: 12px; padding: 12px 12px 12px 16px; border-bottom: 1px solid var(--arc-border-subtle, var(--arc-border)); }
+.headText { display: grid; flex: 1; min-width: 0; }
+.title { margin: 0; overflow: hidden; color: var(--arc-foreground); font-size: 13px; font-weight: 500; line-height: 20px; text-overflow: ellipsis; white-space: nowrap; }
+.description { overflow: hidden; color: var(--arc-text-muted); font-size: 12px; line-height: 16px; text-overflow: ellipsis; white-space: nowrap; }
+.runButton.runButton { flex: none; min-width: 96px; min-height: 28px; height: 28px; gap: 6px; padding-inline: 10px; border-radius: 10px; font-size: 13px; }
+
+/* Canvas and steps. */
+.canvas { padding: 12px 8px; }
+.list { margin: 0; padding: 0; list-style: none; }
+/* clip, with a small margin, keeps focus rings visible while the height animation still masks the content. */
+.item { position: relative; overflow: clip; overflow-clip-margin: 4px; }
+.pathItem { position: relative; }
+.inner { position: relative; }
+.inner[data-head] { padding-top: var(--wf-gap); }
+.body { position: relative; }
+
+/* Rail: a head line into each step and a tail line out of it, meeting at the item edge. */
+.head, .tail { position: absolute; left: var(--wf-rail); width: 1px; overflow: hidden; background: var(--wf-line); }
+.head { --wf-head: calc(var(--wf-gap) + (var(--wf-row) - 16px) / 2 - 4px); top: 0; height: var(--wf-head); }
+.tail { top: calc((var(--wf-row) + 16px) / 2 + 4px); bottom: 0; }
+.fill { position: absolute; inset: 0; background: var(--wf-done); transform-origin: 50% 0; opacity: 0; transform: scaleY(0); transition: opacity .16s var(--wf-ease), transform 0s linear .16s; }
+.fill[data-state="done"] { opacity: 1; transform: scaleY(1); transition: opacity .16s var(--wf-ease); }
+.tail .fill[data-state="done"] { transition: opacity .2s var(--wf-ease); }
+.fill[data-state="active"] { opacity: 1; transform: scaleY(1); transition: transform .24s var(--arc-ease-in-out, cubic-bezier(.45, 0, .2, 1)); }
+.dot { --wf-head: calc(var(--wf-gap) + (var(--wf-row) - 16px) / 2 - 4px); position: absolute; top: 0; left: calc(var(--wf-rail) - 2px); width: 5px; height: 5px; border-radius: 50%; background: var(--arc-accent); pointer-events: none; animation: wf-travel .24s var(--arc-ease-in-out, cubic-bezier(.45, 0, .2, 1)) both; }
+@keyframes wf-travel {
+  0% { opacity: 0; transform: translateY(-3px); }
+  25% { opacity: 1; }
+  80% { opacity: 1; }
+  100% { opacity: 0; transform: translateY(calc(var(--wf-head) - 3px)); }
+}
+
+/* Row. */
+.row { position: relative; display: grid; grid-template-columns: 16px minmax(0, 1fr) 72px 24px; align-items: center; column-gap: 10px; height: var(--wf-row); padding: 0 4px 0 var(--wf-pad); border-radius: 10px; transition: background-color .15s var(--wf-ease); }
+.mark { display: grid; width: 16px; height: 16px; place-items: center; color: var(--arc-foreground); }
+.mark svg { display: block; width: 16px; height: 16px; }
+.text { display: flex; align-items: baseline; gap: 8px; min-width: 0; }
+.stepTitle { flex: 0 1 auto; min-width: 0; overflow: hidden; color: var(--arc-foreground); font-size: 13px; font-weight: 500; line-height: 20px; text-overflow: ellipsis; white-space: nowrap; }
+.stepDetail { display: grid; flex: 1 1 0; min-width: 56px; color: var(--arc-text-muted); font-size: 12px; line-height: 20px; }
+.detailText, .activity { grid-area: 1 / 1; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; transition: opacity .16s var(--wf-ease) .06s; }
+.activity { color: var(--arc-text-secondary); }
+.detailText[data-hidden], .activity[data-hidden] { opacity: 0; transition: opacity .1s var(--wf-ease); }
+.body[data-status="skipped"] .row { opacity: .5; }
+
+/* Status: one fixed slot, so a crossfade never moves the title. */
+.status { position: relative; height: 20px; }
+.statusInner { position: absolute; inset: 0; display: flex; align-items: center; justify-content: flex-end; gap: 6px; color: var(--arc-text-muted); font-size: 12px; line-height: 20px; white-space: nowrap; }
+.statusInner svg { flex: none; }
+.statusInner[data-status="running"], .statusInner[data-status="done"] { color: var(--arc-text-secondary); }
+.statusInner[data-status="done"] svg { color: var(--arc-success); }
+.statusInner[data-status="error"] { color: var(--arc-danger); }
+.spinner { color: var(--arc-accent); animation: wf-spin .8s linear infinite; }
+@keyframes wf-spin { to { transform: rotate(360deg); } }
+
+.removeSlot { display: grid; width: 24px; height: 24px; }
+.remove { display: grid; width: 24px; height: 24px; place-items: center; margin: 0; padding: 0; border: 0; border-radius: 8px; background: transparent; color: var(--arc-text-muted); cursor: pointer; transition: opacity .15s var(--wf-ease), background-color .15s var(--wf-ease), color .15s var(--wf-ease); }
+.remove:disabled { cursor: default; opacity: .4; }
+.remove:not(:disabled):active { background: var(--arc-surface-muted); color: var(--arc-foreground); }
+
+/* With a fine pointer: rows tint on hover and the remove button takes over the status slot. Touch keeps its column. */
+@media (hover: hover) and (pointer: fine) {
+  .row { grid-template-columns: 16px minmax(0, 1fr) 72px; padding-right: var(--wf-pad); }
+  .row:hover { background: var(--wf-hover); }
+  .removeSlot { position: absolute; top: 50%; right: 4px; transform: translateY(-50%); }
+  .remove { opacity: 0; pointer-events: none; }
+  .remove:disabled { visibility: hidden; }
+  .status { transition: opacity .1s var(--wf-ease); }
+  .row:hover .remove:not(:disabled), .remove:focus-visible { opacity: 1; pointer-events: auto; transition-duration: .15s; }
+  .row:hover .status:has(+ .removeSlot .remove:not(:disabled)), .status:has(+ .removeSlot .remove:focus-visible) { opacity: 0; }
+  .remove:not(:disabled):hover { background: var(--arc-surface-muted); color: var(--arc-foreground); }
+}
+
+/* Branch path tabs, in the text column under the branch row. */
+.tabs { display: flex; flex-wrap: wrap; gap: 2px; padding: 2px var(--wf-pad) 2px var(--wf-text); }
+.tab { position: relative; display: inline-flex; align-items: center; height: 24px; margin: 0; padding: 0 8px; border: 0; border-radius: 6px; background: transparent; color: var(--arc-text-muted); font: inherit; font-size: 12px; line-height: 16px; cursor: pointer; transition: color .15s var(--wf-ease); }
+.tab[data-selected] { color: var(--arc-foreground); }
+.tabHighlight { position: absolute; inset: 0; border-radius: 6px; background: var(--arc-surface-muted); box-shadow: inset 0 0 0 1px var(--arc-border-subtle, var(--arc-border)); }
+.tabLabel { position: relative; white-space: nowrap; }
+@media (hover: hover) and (pointer: fine) { .tab:not([data-selected]):hover { color: var(--arc-text-secondary); } }
+
+/* Output previews: inline, small and muted, in the text column. */
+.fold { overflow: hidden; }
+.output { display: grid; gap: 2px; padding: 2px var(--wf-pad) 6px var(--wf-text); color: var(--arc-text-secondary); font-size: 12px; line-height: 18px; }
+.outLine { display: flex; align-items: baseline; gap: 8px; min-width: 0; overflow: hidden; white-space: nowrap; }
+.outLine > * { min-width: 0; overflow: hidden; text-overflow: ellipsis; }
+.outLine > :first-child { flex: none; }
+.name { color: var(--arc-foreground); font-weight: 500; }
+.outStrong { color: var(--arc-foreground); }
+.muted { color: var(--arc-text-muted); }
+.mono { color: var(--arc-text-muted); font-family: var(--wf-mono); font-size: 12px; letter-spacing: 0; }
+.clamp1 { min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.clamp2 { display: -webkit-box; overflow: hidden; -webkit-box-orient: vertical; -webkit-line-clamp: 2; }
+.label { display: inline-flex; align-items: center; gap: 6px; height: 20px; padding: 0 8px 0 7px; border: 1px solid var(--arc-border); border-radius: 999px; color: var(--arc-foreground); font-size: 12px; line-height: 18px; }
+.labelDot { width: 6px; height: 6px; border-radius: 50%; background: var(--arc-series-1, var(--arc-accent)); }
+.labelDot[data-tone="urgent"] { background: var(--arc-danger); }
+.chunk { opacity: 0; transition: opacity .14s var(--wf-ease); }
+.chunk[data-shown] { opacity: 1; }
+.errorOut { display: flex; align-items: flex-start; justify-content: space-between; gap: 12px; }
+.errorText { min-width: 0; padding-top: 3px; color: var(--arc-text-secondary); }
+.retry.retry { flex: none; min-height: 24px; height: 24px; gap: 6px; padding-inline: 8px; border-radius: 8px; font-size: 12px; }
+
+.pathEmpty { grid-template-columns: 16px minmax(0, 1fr); }
+.emptyMark { width: 14px; height: 14px; margin: 1px; border: 1px dashed var(--arc-border); border-radius: 50%; }
+
+/* Empty: the triggers are the first choice, as compact rows. */
+.empty { padding: 4px 0 0; }
+.emptyTitle { padding: 0 var(--wf-pad); color: var(--arc-foreground); font-size: 13px; font-weight: 500; line-height: 20px; }
+.emptyText { padding: 0 var(--wf-pad); color: var(--arc-text-muted); font-size: 12px; line-height: 18px; }
+.pathEmpty .emptyText { padding: 0; }
+.triggerList { display: grid; margin: 8px 0 0; padding: 0; list-style: none; }
+.triggerOption { display: grid; grid-template-columns: 16px minmax(0, auto) minmax(0, 1fr); align-items: center; gap: 10px; width: 100%; height: 32px; margin: 0; padding: 0 var(--wf-pad); border: 0; border-radius: 10px; background: transparent; color: var(--arc-foreground); font: inherit; font-size: 13px; text-align: left; cursor: pointer; transition: background-color .15s var(--wf-ease); }
+.triggerOption:active { background: var(--arc-surface-muted); }
+@media (hover: hover) and (pointer: fine) { .triggerOption:hover { background: var(--wf-hover); } }
+.triggerDetail { min-width: 0; overflow: hidden; color: var(--arc-text-muted); font-size: 12px; text-overflow: ellipsis; white-space: nowrap; }
+
+/* Loading. */
+.skeletonMark { border-radius: 4px; background: var(--arc-surface-muted); }
+.skeletonLine { display: block; grid-column: 2 / -1; width: var(--w); height: 8px; border-radius: 4px; background: var(--arc-surface-muted); animation: wf-pulse 1.1s var(--arc-ease-in-out, ease-in-out) infinite alternate; }
+@keyframes wf-pulse { to { opacity: .5; } }
+
+/* Footer: run summary and the add step menu. */
+.footer { display: flex; align-items: center; gap: 12px; min-height: 44px; padding: 8px 8px 8px 16px; border-top: 1px solid var(--arc-border-subtle, var(--arc-border)); }
+.summary { position: relative; flex: 1; min-width: 0; height: 20px; }
+.summaryInner { position: absolute; inset: 0; display: flex; align-items: center; gap: 6px; color: var(--arc-text-muted); font-size: 12px; line-height: 20px; white-space: nowrap; }
+.summaryIcon { display: grid; flex: none; place-items: center; width: 14px; height: 14px; }
+.summaryInner[data-state="passed"] { color: var(--arc-text-secondary); }
+.summaryInner[data-state="passed"] .summaryIcon { color: var(--arc-success); }
+.summaryInner[data-state="failed"] { color: var(--arc-text-secondary); }
+.summaryInner[data-state="failed"] .summaryIcon { color: var(--arc-danger); }
+.liveDot { width: 6px; height: 6px; border-radius: 50%; background: var(--arc-accent); }
+.summaryText { min-width: 0; overflow: hidden; text-overflow: ellipsis; }
+.addButton { display: inline-flex; flex: none; align-items: center; gap: 6px; height: 28px; margin: 0; padding: 0 10px 0 8px; border: 0; border-radius: 8px; background: transparent; color: var(--arc-text-secondary); font: inherit; font-size: 13px; line-height: 20px; white-space: nowrap; cursor: pointer; transition: background-color .15s var(--wf-ease), color .15s var(--wf-ease), opacity .15s var(--wf-ease); }
+.addButton:disabled { cursor: default; opacity: .45; }
+.addButton[data-state="open"], .addButton:not(:disabled):active { background: var(--arc-surface-muted); color: var(--arc-foreground); }
+@media (hover: hover) and (pointer: fine) { .addButton:not(:disabled):hover { background: var(--wf-hover); color: var(--arc-foreground); } }
+.addLabel { max-width: 160px; overflow: hidden; text-overflow: ellipsis; }
+
+/* Add step menu: a small command menu. */
+.menu.menu { --wf-ease: var(--arc-ease-standard, cubic-bezier(.2, 0, 0, 1)); width: 300px; min-width: 0; max-width: calc(100vw - 20px); padding: 0; overflow: hidden; border-radius: 14px; font-family: var(--arc-font-body); font-size: 13px; line-height: 20px; transition: opacity .15s var(--wf-ease), transform .18s var(--wf-ease); }
+.search { display: flex; align-items: center; gap: 8px; height: 40px; padding: 0 12px; border-bottom: 1px solid var(--arc-border-subtle, var(--arc-border)); color: var(--arc-text-muted); }
+.search svg { flex: none; }
+.searchInput { flex: 1; min-width: 0; height: 100%; margin: 0; padding: 0; border: 0; background: transparent; color: var(--arc-foreground); font: inherit; font-size: 13px; }
+.searchInput::placeholder { color: var(--arc-text-muted); }
+.searchInput:focus, .searchInput:focus-visible { outline: none; box-shadow: none; }
+.options { max-height: 264px; margin: 0; padding: 4px; overflow-y: auto; list-style: none; overscroll-behavior: contain; }
+.option { display: grid; grid-template-columns: 16px minmax(0, 1fr) auto; align-items: center; gap: 10px; height: 32px; padding: 0 8px; border-radius: 10px; color: var(--arc-foreground); cursor: pointer; }
+.option[data-active] { background: var(--wf-hover); }
+.optionTitle { min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.optionMeta { display: flex; color: var(--arc-text-muted); font-size: 12px; }
+.noMatch { display: flex; align-items: center; height: 32px; padding: 0 8px; color: var(--arc-text-muted); font-size: 12px; }
+
+/* Narrow cards stack the detail under the title. */
+@container (max-width: 479px) {
+  .root { --wf-row: 44px; }
+  .header { align-items: flex-start; }
+  .title, .description { display: -webkit-box; white-space: normal; -webkit-box-orient: vertical; -webkit-line-clamp: 2; }
+  .runButton.runButton { min-width: 0; }
+  .text { display: grid; gap: 0; }
+  .stepDetail { min-width: 0; line-height: 16px; }
+  .output { padding-top: 4px; }
+  .tabs { padding-top: 4px; }
+  .row { grid-template-columns: 16px minmax(0, 1fr) 64px 24px; }
+  .summarySuffix { display: none; }
+  .triggerOption { grid-template-columns: 16px minmax(0, 1fr); }
+  .triggerDetail { display: none; }
+  @media (hover: hover) and (pointer: fine) { .row { grid-template-columns: 16px minmax(0, 1fr) 64px; } }
+}
+/* The empty path row keeps its own two columns at every width. */
+.row.pathEmpty { grid-template-columns: 16px minmax(0, 1fr); }
+
+@media (prefers-reduced-motion: reduce) {
+  .chunk, .detailText, .activity, .row, .fill, .fill[data-state], .tab, .remove, .status, .addButton { transition: none; }
+  .skeletonLine { animation: none; }
+  .spinner { animation-duration: 1.6s; }
+}

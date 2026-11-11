@@ -1,0 +1,99 @@
+/* Reply draft. A received email on top, the AI reply below: quick replies, the draft box, then Regenerate and Insert.
+   Spacing runs on 4/8/12/16/24. Type: 16 for the subject, 14 for reading text, 12 for meta and controls. */
+.root { container-type: inline-size; width: 100%; max-width: 600px; min-width: 0; color: var(--arc-foreground); font-family: var(--arc-font-body); font-size: var(--arc-text-sm); letter-spacing: var(--arc-tracking-body); line-height: var(--arc-leading-body); }
+.srOnly { position: absolute; width: 1px; height: 1px; margin: -1px; overflow: hidden; clip: rect(0, 0, 0, 0); white-space: nowrap; }
+
+.card { display: grid; gap: 16px; border: 1px solid var(--arc-border); border-radius: var(--arc-radius-panel); padding: 16px; background: var(--arc-surface); }
+@container (min-width: 480px) { .card { padding: 24px; } }
+
+/* The received email */
+.mailHead { display: flex; align-items: flex-start; gap: 12px; }
+.subject { flex: 1; min-width: 0; margin: 0; font-size: var(--arc-text-base); font-weight: 500; line-height: 24px; letter-spacing: -0.01em; text-wrap: pretty; }
+.source { flex: none; display: block; margin-top: 4px; }
+
+.sender { display: grid; grid-template-columns: 36px minmax(0, 1fr) auto; align-items: center; column-gap: 12px; }
+.avatar { flex: none; }
+.senderText { display: grid; min-width: 0; }
+.senderLine { display: flex; min-width: 0; align-items: baseline; gap: 8px; line-height: 20px; }
+.senderName { flex: none; font-weight: 500; }
+.senderEmail { min-width: 0; overflow: hidden; color: var(--arc-text-muted); font-size: var(--arc-text-xs); text-overflow: ellipsis; white-space: nowrap; }
+.meta { color: var(--arc-text-muted); font-size: var(--arc-text-xs); line-height: 16px; }
+.time { align-self: start; color: var(--arc-text-muted); font-size: var(--arc-text-xs); font-variant-numeric: tabular-nums; line-height: 20px; white-space: nowrap; }
+
+.mailBody { display: grid; gap: 8px; color: var(--arc-text-secondary); line-height: 22px; }
+.mailBody p { margin: 0; white-space: pre-line; text-wrap: pretty; }
+@container (min-width: 480px) { .mailBody { padding-left: 48px; } }
+
+/* The reply */
+.reply { display: grid; gap: 12px; min-width: 0; border-top: 1px solid var(--arc-border-subtle); padding-top: 16px; }
+@container (min-width: 480px) { .reply { margin-top: 8px; padding-top: 24px; } }
+
+.suggestions { display: flex; flex-wrap: wrap; gap: 8px; }
+.suggestion { display: inline-flex; height: 32px; align-items: center; border: 1px solid var(--arc-border); border-radius: 999px; padding: 0 12px; background: var(--arc-surface); color: var(--arc-foreground); font: inherit; font-size: var(--arc-text-sm); line-height: 20px; white-space: nowrap; cursor: pointer; -webkit-tap-highlight-color: transparent;
+  transition: background-color var(--arc-duration-fast) var(--arc-ease-standard), border-color var(--arc-duration-fast) var(--arc-ease-standard), color var(--arc-duration-fast) var(--arc-ease-standard), transform 120ms var(--arc-ease-standard); }
+.suggestion:active { transform: scale(.97); }
+.suggestion[aria-pressed="true"] { border-color: color-mix(in oklab, var(--arc-accent) 55%, var(--arc-border)); background: color-mix(in oklab, var(--arc-accent) 9%, var(--arc-surface)); }
+@media (hover: hover) and (pointer: fine) {
+  .suggestion:hover { background: var(--arc-surface-muted); }
+  .suggestion[aria-pressed="true"]:hover { background: color-mix(in oklab, var(--arc-accent) 13%, var(--arc-surface)); }
+}
+
+.draft { min-width: 0; border: 1px solid var(--arc-border); border-radius: var(--arc-radius-control); background: color-mix(in oklab, var(--arc-surface-muted) 45%, var(--arc-surface)); transition: border-color var(--arc-duration-standard) var(--arc-ease-standard); }
+.draft[data-phase="error"] { border-color: color-mix(in oklab, var(--arc-danger) 40%, var(--arc-border)); }
+
+.draftHead { display: flex; min-height: 20px; align-items: center; gap: 12px; padding: 12px 16px 0; }
+.model { display: inline-flex; min-width: 0; align-items: center; gap: 8px; }
+.modelMark { display: grid; flex: none; width: 16px; height: 16px; place-items: center; color: #d97757; }
+.modelMark svg { display: block; width: 16px; height: 16px; }
+.modelName { min-width: 0; overflow: hidden; color: var(--arc-text-secondary); font-size: var(--arc-text-xs); line-height: 20px; text-overflow: ellipsis; white-space: nowrap; }
+
+.status { display: grid; margin-left: auto; justify-items: end; color: var(--arc-text-secondary); font-size: var(--arc-text-xs); line-height: 20px; white-space: nowrap; }
+.statusItem { display: inline-flex; grid-area: 1 / 1; align-items: center; gap: 4px; }
+.statusItem svg { flex: none; }
+.statusItem[data-phase="inserted"] svg { color: var(--arc-success); }
+.statusItem[data-phase="error"] { color: var(--arc-danger); }
+
+.bodyClip { min-width: 0; }
+.body { display: grid; min-height: 66px; padding: 8px 16px 16px; box-sizing: content-box; }
+.body > * { grid-area: 1 / 1; min-width: 0; }
+
+.textLayer { min-width: 0; }
+.text { margin: -2px -6px; border-radius: 8px; padding: 2px 6px; color: var(--arc-foreground); line-height: 22px; white-space: pre-wrap; overflow-wrap: anywhere; outline: none; }
+.text[data-editable] { cursor: text; }
+.text[data-editable]:focus-visible { background: color-mix(in oklab, var(--arc-surface) 70%, transparent); }
+.chunk { animation: rd-chunk-in 140ms var(--arc-ease-standard) both; }
+@keyframes rd-chunk-in { from { opacity: 0; } to { opacity: 1; } }
+
+.placeholder { margin: 0; color: var(--arc-text-muted); line-height: 22px; }
+.skeleton { display: grid; grid-auto-rows: 22px; align-items: center; }
+.skeleton span { display: block; height: 8px; border-radius: 4px; background: color-mix(in oklab, var(--arc-foreground) 7%, transparent); }
+.errorBlock { display: flex; align-items: flex-start; gap: 8px; color: var(--arc-danger); line-height: 22px; }
+.errorBlock svg { flex: none; margin-top: 3px; }
+.errorTitle { color: var(--arc-foreground); font-weight: 500; }
+.errorCopy { color: var(--arc-text-secondary); }
+
+.controls { display: flex; flex-wrap: wrap; align-items: center; gap: 4px 8px; border-top: 1px solid var(--arc-border-subtle); padding: 8px; }
+.divider { width: 1px; height: 16px; background: var(--arc-border); }
+@container (max-width: 459px) { .divider { display: none; } }
+
+.chipGroup { display: inline-flex; gap: 2px; }
+.option { position: relative; display: inline-flex; height: 28px; align-items: center; border: 0; border-radius: 999px; padding: 0 12px; background: transparent; color: var(--arc-text-secondary); font: inherit; font-size: var(--arc-text-xs); line-height: 16px; white-space: nowrap; cursor: pointer; -webkit-tap-highlight-color: transparent; transition: color var(--arc-duration-fast) var(--arc-ease-standard), background-color var(--arc-duration-fast) var(--arc-ease-standard); }
+.option[data-selected] { color: var(--arc-foreground); cursor: default; }
+@media (hover: hover) and (pointer: fine) { .option:not([data-selected]):hover { color: var(--arc-foreground); background: color-mix(in oklab, var(--arc-foreground) 5%, transparent); } }
+.optionHighlight { position: absolute; inset: 0; border-radius: inherit; background: var(--arc-surface); box-shadow: inset 0 0 0 1px var(--arc-border); }
+.optionLabel { position: relative; }
+
+.footer { display: flex; align-items: center; justify-content: space-between; gap: 8px; }
+.footerButton.footerButton { gap: 8px; margin-left: -8px; padding-inline: 8px; }
+.draftButton.draftButton { gap: 8px; }
+.insert.insert { min-width: 88px; }
+.swap { display: inline-grid; justify-items: center; }
+.swap > span { display: inline-flex; grid-area: 1 / 1; align-items: center; gap: 6px; opacity: 0; transition: opacity 100ms var(--arc-ease-standard); }
+.swap > span[data-on] { opacity: 1; transition-duration: 160ms; }
+.swap > span:not([data-on]) { visibility: hidden; transition: opacity 100ms var(--arc-ease-standard), visibility 0s linear 100ms; }
+
+@media (pointer: coarse) { .option { height: 32px; } .suggestion { height: 36px; } }
+@media (prefers-reduced-motion: reduce) {
+  .chunk { animation: none; }
+  .suggestion:active { transform: none; }
+}

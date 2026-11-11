@@ -1,0 +1,157 @@
+/* Image generation. A studio card: the primary canvas on top (its shape follows the aspect ratio), a slim row with the
+   filmstrip of four variations and the actions, then the prompt bar. Geometry: the card insets everything by 8px, so
+   the canvas and the prompt bar take the panel radius minus 8 (18px); thumbnails are 48px at 12px. Images load on a
+   dot matrix (image-generation-dots.tsx). Technical meta (size, seed, time, percent) is set in the mono face. */
+.root {
+  --ig-inset: 8px;
+  --ig-radius: calc(var(--arc-radius-panel) - var(--ig-inset));
+  --ig-mono: var(--font-mono, ui-monospace, "SF Mono", SFMono-Regular, Menlo, Consolas, monospace);
+  --ig-canvas: color-mix(in oklab, var(--arc-surface-muted) 55%, var(--arc-surface));
+  container-type: inline-size;
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  gap: var(--ig-inset);
+  box-sizing: border-box;
+  width: 100%;
+  max-width: 600px;
+  min-width: 0;
+  border: 1px solid var(--arc-border);
+  border-radius: var(--arc-radius-panel);
+  padding: var(--ig-inset);
+  background: var(--arc-surface);
+  color: var(--arc-foreground);
+  font-family: var(--arc-font-body);
+  font-size: var(--arc-text-sm);
+  letter-spacing: var(--arc-tracking-body);
+  line-height: var(--arc-leading-body);
+}
+.srOnly { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0, 0, 0, 0); white-space: nowrap; }
+.mono { font-family: var(--ig-mono); font-size: 11.5px; letter-spacing: 0; font-variant-numeric: tabular-nums; }
+
+/* ── Canvas ── */
+.frame { display: flex; justify-content: center; width: 100%; min-width: 0; }
+.stage { position: relative; flex: none; max-width: 100%; overflow: hidden; border-radius: var(--ig-radius); background: var(--ig-canvas); isolation: isolate; }
+.stage::after { content: ""; position: absolute; z-index: 6; inset: 0; border-radius: inherit; box-shadow: inset 0 0 0 1px color-mix(in oklab, var(--arc-foreground) 6%, transparent); pointer-events: none; }
+.layer { position: absolute; inset: 0; }
+.field { position: absolute; inset: 0; overflow: hidden; }
+.fieldCanvas { position: absolute; inset: 0; display: block; width: 100%; height: 100%; will-change: opacity, filter; }
+/* The blurred twin under the wave: a sharp dot with its soft glow, like a lens. */
+.fieldGlow { position: absolute; inset: 0; display: block; width: 100%; height: 100%; filter: blur(7px); opacity: 0; }
+.bandGlow { position: absolute; inset: 0; display: block; width: 100%; height: 100%; filter: blur(5px); }
+.image { display: block; width: 100%; height: 100%; object-fit: cover; user-select: none; -webkit-user-drag: none; }
+.preview { position: absolute; inset: 0; transform-origin: center; will-change: opacity, filter, transform; }
+.final { position: absolute; inset: 0; }
+.final[data-fade] { animation: ig-resolve .48s var(--arc-ease-standard, ease-out); }
+.soft { filter: blur(3px); transform: scale(1.02); }
+
+/* Floating pills: white, hairline, a soft shadow, like a label laid on the canvas. */
+/* Size top right, like a label on the canvas; what is happening bottom left, out of its way. */
+.statusSlot, .dimsSlot { position: absolute; z-index: 5; display: inline-flex; pointer-events: none; }
+.statusSlot { bottom: 10px; left: 10px; }
+.dimsSlot { top: 10px; right: 10px; }
+.pill { display: inline-flex; align-items: center; gap: 7px; height: 26px; box-sizing: border-box; padding: 0 10px; border-radius: var(--arc-radius-pill); background: color-mix(in oklab, var(--arc-surface) 92%, transparent); box-shadow: 0 0 0 1px var(--arc-border-subtle), 0 1px 3px color-mix(in oklab, #000 8%, transparent); color: var(--arc-text-secondary); font-size: .75rem; font-weight: 500; line-height: 1; white-space: nowrap; backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px); }
+.pill svg { flex: none; }
+.percent { min-width: 4ch; color: var(--arc-text-muted); font-family: var(--ig-mono); font-size: 11.5px; font-weight: 400; letter-spacing: 0; font-variant-numeric: tabular-nums; text-align: right; }
+.danger { color: var(--arc-danger); }
+
+/* 3×3 dot spinner: the nine dots light in turn around the ring. */
+.spinner { display: inline-grid; flex: none; grid-template-columns: repeat(3, 3px); gap: 1.5px; }
+.spinDot { width: 3px; height: 3px; border-radius: 50%; background: currentColor; opacity: .22; animation: ig-spin .81s linear infinite; }
+
+/* Empty: the halftone glow at rest, a line of copy and three prompts. */
+.empty { position: absolute; inset: 0; display: flex; flex-direction: column; align-items: center; justify-content: flex-end; gap: 10px; padding: 16px; text-align: center; }
+.emptyTitle { margin: 0; color: var(--arc-text-secondary); font-size: .8125rem; line-height: 20px; }
+.suggestions { display: flex; flex-wrap: wrap; justify-content: center; gap: 6px; max-width: 100%; min-width: 0; }
+.suggestion { max-width: 100%; overflow: hidden; margin: 0; border: 0; padding: 6px 12px; border-radius: var(--arc-radius-pill); background: var(--arc-surface); box-shadow: 0 0 0 1px var(--arc-border-subtle), 0 1px 3px color-mix(in oklab, #000 6%, transparent); color: var(--arc-text-secondary); font: inherit; font-size: .8125rem; line-height: 18px; text-overflow: ellipsis; white-space: nowrap; cursor: pointer; transition: color .16s var(--arc-ease-standard, ease-out); }
+@media (hover: hover) and (pointer: fine) { .suggestion:hover { color: var(--arc-foreground); } }
+
+/* Failed and stopped: the frozen dots fade back and the state sits in the middle. */
+.halt { position: absolute; z-index: 4; inset: 0; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 8px; padding: 16px; background: color-mix(in oklab, var(--ig-canvas) 72%, transparent); text-align: center; }
+.haltLabel { display: inline-flex; align-items: center; gap: 6px; color: var(--arc-foreground); font-size: .875rem; font-weight: 500; line-height: 1; }
+.haltLabel[data-status="error"] svg { color: var(--arc-danger); }
+.haltMessage { max-width: 32ch; color: var(--arc-text-secondary); font-size: .8125rem; line-height: 18px; }
+.retry.retry { min-height: 30px; gap: 6px; margin-top: 2px; padding-inline: 12px; border-radius: var(--arc-radius-pill); font-size: .8125rem; }
+
+/* ── Filmstrip and actions ── */
+.bar { display: flex; align-items: center; justify-content: space-between; gap: 8px; min-width: 0; }
+.strip { display: flex; flex: 0 1 auto; gap: 6px; min-width: 0; padding: 3px; }
+.thumb, .thumbPlaceholder { position: relative; display: block; flex: 0 1 48px; width: 48px; min-width: 32px; height: auto; aspect-ratio: 1; box-sizing: border-box; margin: 0; border: 0; padding: 0; border-radius: 12px; background: var(--ig-canvas); }
+.thumbPlaceholder { box-shadow: inset 0 0 0 1px var(--arc-border-subtle); }
+.thumb { cursor: pointer; -webkit-tap-highlight-color: transparent; touch-action: manipulation; transition: transform .12s var(--arc-ease-standard, ease-out); }
+.thumb::after { content: ""; position: absolute; inset: 0; border-radius: inherit; box-shadow: inset 0 0 0 1px color-mix(in oklab, var(--arc-foreground) 7%, transparent); pointer-events: none; transition: box-shadow .16s var(--arc-ease-standard, ease-out); }
+.thumb[data-active]::after { box-shadow: 0 0 0 2px var(--arc-accent), inset 0 0 0 1px color-mix(in oklab, var(--arc-foreground) 7%, transparent); }
+@media (hover: hover) and (pointer: fine) { .thumb:not([data-active]):hover::after { box-shadow: inset 0 0 0 1px color-mix(in oklab, var(--arc-foreground) 26%, transparent); } }
+.thumb:active { transform: scale(.96); }
+.thumbMedia { position: absolute; inset: 0; overflow: hidden; border-radius: inherit; }
+.thumbHalt { position: absolute; inset: 0; display: grid; place-items: center; background: color-mix(in oklab, var(--ig-canvas) 70%, transparent); color: var(--arc-text-secondary); }
+.thumbHalt[data-status="error"] { color: var(--arc-danger); }
+
+.actions { display: flex; flex: none; gap: 2px; padding: 2px; border-radius: var(--arc-radius-pill); background: var(--ig-canvas); box-shadow: inset 0 0 0 1px var(--arc-border-subtle); }
+.action.action { min-height: 32px; gap: 6px; padding-inline: 12px; border-color: transparent; border-radius: var(--arc-radius-pill); background: transparent; font-size: .8125rem; }
+@media (hover: hover) and (pointer: fine) { .action.action:hover:not(:disabled) { background: var(--arc-surface); box-shadow: 0 0 0 1px var(--arc-border); } }
+.actionLabel { display: inline; }
+
+/* ── Prompt bar ── */
+.composer { margin: 0; border-radius: var(--ig-radius); background: var(--ig-canvas); box-shadow: inset 0 0 0 1px var(--arc-border-subtle); transition: box-shadow .16s var(--arc-ease-standard, ease-out), background-color .16s var(--arc-ease-standard, ease-out); }
+.composer:has(.prompt:focus) { background: var(--arc-surface); box-shadow: inset 0 0 0 1px color-mix(in oklab, var(--arc-foreground) 22%, var(--arc-border)); }
+.prompt { display: block; box-sizing: border-box; width: 100%; min-height: 52px; max-height: 120px; margin: 0; border: 0; padding: 12px 14px 2px; background: transparent; color: var(--arc-foreground); font: inherit; font-size: var(--arc-text-sm); line-height: 20px; resize: none; field-sizing: content; outline: none; border-radius: var(--ig-radius) var(--ig-radius) 0 0; }
+.prompt::placeholder { color: var(--arc-text-muted); }
+.toolbar { display: flex; flex-wrap: wrap; align-items: center; gap: 6px; padding: 4px 6px 6px 8px; }
+.options { display: flex; flex-wrap: wrap; align-items: center; gap: 4px; min-width: 0; }
+.chips { display: inline-flex; align-items: center; }
+.chips + .chips::before { content: ""; width: 1px; height: 16px; margin: 0 6px 0 2px; background: var(--arc-border); }
+.chip { display: inline-flex; align-items: center; justify-content: center; gap: 6px; height: 30px; margin: 0; border: 0; padding: 0 10px; border-radius: var(--arc-radius-pill); background: transparent; color: var(--arc-text-secondary); font: inherit; font-size: .8125rem; font-weight: 500; line-height: 1; white-space: nowrap; cursor: pointer; -webkit-tap-highlight-color: transparent; transition: background-color .16s var(--arc-ease-standard, ease-out), color .16s var(--arc-ease-standard, ease-out), box-shadow .16s var(--arc-ease-standard, ease-out); }
+.chip[aria-checked="true"] { background: var(--arc-surface); color: var(--arc-foreground); box-shadow: 0 0 0 1px var(--arc-border), 0 1px 2px color-mix(in oklab, #000 6%, transparent); }
+.composer:has(.prompt:focus) .chip[aria-checked="true"] { background: var(--arc-surface-muted); box-shadow: none; }
+@media (hover: hover) and (pointer: fine) { .chip[aria-checked="false"]:hover { color: var(--arc-foreground); background: color-mix(in oklab, var(--arc-foreground) 5%, transparent); } }
+.modelChip { gap: 0; padding: 0 7px; }
+.chipMark { display: grid; width: 16px; height: 16px; flex: none; place-items: center; }
+.chipMark svg { display: block; width: 16px; height: 16px; }
+.chip[aria-checked="false"] .chipMark { opacity: .72; transition: opacity .16s var(--arc-ease-standard, ease-out); }
+.chip[aria-checked="false"]:hover .chipMark { opacity: 1; }
+.chipName { display: inline-block; overflow: hidden; white-space: nowrap; }
+.chipNameText { display: inline-block; padding-left: 6px; padding-right: 3px; }
+.aspectChip { padding: 0 9px 0 8px; }
+.glyph { display: block; flex: none; }
+
+.generate.generate { flex: none; min-height: 34px; margin-left: auto; padding-inline: 14px; border-radius: var(--arc-radius-pill); }
+.count { margin-left: 2px; color: var(--arc-text-muted); font-family: var(--ig-mono); font-size: 11.5px; font-weight: 400; letter-spacing: 0; font-variant-numeric: tabular-nums; }
+.generatePrimary.generatePrimary { border-color: var(--arc-accent); background: var(--arc-accent); color: var(--arc-accent-foreground); }
+@media (hover: hover) and (pointer: fine) { .generatePrimary.generatePrimary:hover:not(:disabled) { border-color: var(--arc-accent-strong, var(--arc-accent)); background: var(--arc-accent-strong, var(--arc-accent)); } }
+.generatePrimary.generatePrimary:disabled { border-color: transparent; background: color-mix(in oklab, var(--arc-foreground) 8%, transparent); color: var(--arc-text-muted); }
+/* Labels that swap inside a button: stacked in one cell so the button never changes width. */
+.stable { display: inline-grid; justify-items: center; }
+.stableItem { display: inline-flex; grid-area: 1 / 1; align-items: center; gap: 6px; white-space: nowrap; opacity: 0; transition: opacity .1s var(--arc-ease-standard, ease-out); }
+.stableItem[data-on] { opacity: 1; transition: opacity .16s var(--arc-ease-standard, ease-out) .04s; }
+
+/* Medium: the actions drop their labels so four thumbnails always fit beside them. */
+@container (max-width: 500px) {
+  .actionLabel { display: none; }
+  .action.action { width: 34px; padding-inline: 0; justify-content: center; }
+  .action .stableItem { gap: 0; }
+}
+/* Narrow: models and Generate share the first row, the ratios take the second. */
+@container (max-width: 440px) {
+  .toolbar { row-gap: 4px; }
+  .options { display: contents; }
+  .chips + .chips { order: 2; flex-basis: 100%; }
+  .chips + .chips::before { display: none; }
+  .generate.generate { flex: 1 0 auto; order: 1; }
+  .thumb, .thumbPlaceholder { flex-basis: 44px; border-radius: 11px; }
+  .strip { gap: 5px; }
+  .pill { height: 24px; padding: 0 8px; gap: 6px; }
+  .statusSlot { bottom: 8px; left: 8px; }
+  .dimsSlot { top: 8px; right: 8px; }
+}
+
+@keyframes ig-spin { 0%, 22% { opacity: 1; } 55%, 100% { opacity: .22; } }
+@keyframes ig-resolve { from { opacity: 0; filter: blur(12px); transform: scale(1.04); } }
+@keyframes ig-in { from { opacity: 0; } }
+@media (prefers-reduced-motion: reduce) {
+  .spinDot { animation: none; }
+  .spinDot[data-center] { opacity: 1; }
+  .thumb, .thumb::after { transition: none; }
+  .thumb:active { transform: none; }
+  .final[data-fade] { animation: ig-in .24s linear; }
+}

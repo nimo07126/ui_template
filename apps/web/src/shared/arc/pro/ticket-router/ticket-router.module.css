@@ -1,0 +1,198 @@
+/* Ticket router. A header, the incoming ticket, a connector, and team lanes.
+   Geometry: the card pads 8px inside a 1px border, and every text column inside starts 20px from the outer edge
+   (header 12px, incoming card 1px border + 11px, lanes 1px border + 3px + 8px row padding).
+   Radii step down by the inset: card 26, ticket and lanes 18, rows 14, chips 8. */
+.root {
+  --tr-row: 56px;
+  --tr-gap: 8px;
+  --tr-stage: 145px;
+  --tr-lane-bg: color-mix(in oklab, var(--arc-surface-muted) 62%, var(--arc-surface));
+  container-type: inline-size;
+  box-sizing: border-box;
+  width: 100%;
+  max-width: 840px;
+  min-width: 0;
+  padding: 8px;
+  border: 1px solid var(--arc-border);
+  border-radius: var(--arc-radius-panel, 26px);
+  background: var(--arc-surface);
+  color: var(--arc-foreground);
+  font-family: var(--arc-font-body);
+  font-size: var(--arc-text-sm);
+  letter-spacing: var(--arc-tracking-body);
+  line-height: 20px;
+}
+.root *, .root *::before, .root *::after { box-sizing: border-box; }
+.srOnly { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0, 0, 0, 0); white-space: nowrap; }
+.truncate { min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.mutedIcon { flex: none; color: var(--arc-text-muted); }
+.reviewIcon { flex: none; color: var(--arc-warning); }
+.doneIcon { flex: none; color: var(--arc-success); }
+
+.mark { display: inline-grid; flex: none; place-items: center; color: var(--arc-foreground); }
+.mark svg { display: block; }
+
+/* Header */
+.header { display: flex; min-height: 48px; align-items: center; gap: 8px; padding: 0 0 0 12px; }
+.modelMark { display: grid; flex: none; width: 16px; height: 16px; place-items: center; color: #d97757; }
+.modelMark svg { display: block; width: 16px; height: 16px; }
+.heading { display: flex; min-width: 0; flex: 1; align-items: baseline; gap: 8px; }
+.title { flex: none; font-weight: 500; }
+.model { min-width: 0; overflow: hidden; color: var(--arc-text-muted); font-size: var(--arc-text-xs); text-overflow: ellipsis; white-space: nowrap; }
+.total { display: inline-flex; flex: none; align-items: baseline; gap: 4px; color: var(--arc-text-muted); font-size: var(--arc-text-xs); white-space: nowrap; }
+.total .roll { min-width: 0 !important; }
+.pause { flex: none; min-width: 92px; }
+
+/* Rolling numbers */
+.roll { position: relative; display: inline-flex; justify-content: flex-end; overflow: hidden; font-variant-numeric: tabular-nums; vertical-align: bottom; }
+.rollValue { display: inline-block; }
+
+/* One crossfade layer per swap */
+.swap { position: absolute; inset: 0; min-width: 0; }
+
+/* Incoming ticket */
+.incoming { position: relative; padding: 12px 11px; border: 1px solid var(--arc-border); border-radius: 18px; background: var(--arc-surface-raised, var(--arc-surface)); }
+.stage { position: relative; height: var(--tr-stage); }
+.ticket { display: flex; height: 88px; flex-direction: column; min-width: 0; }
+.from { display: flex; height: 18px; align-items: center; gap: 8px; min-width: 0; font-size: var(--arc-text-xs); line-height: 18px; }
+.fromText { display: flex; min-width: 0; flex: 1; align-items: baseline; gap: 6px; overflow: hidden; white-space: nowrap; }
+.customer { flex: none; font-weight: 500; }
+.company { min-width: 0; overflow: hidden; color: var(--arc-text-muted); text-overflow: ellipsis; }
+.time { flex: none; color: var(--arc-text-muted); font-variant-numeric: tabular-nums; }
+.subject { margin: 8px 0 0; overflow: hidden; font-weight: 500; text-overflow: ellipsis; white-space: nowrap; }
+.preview { display: -webkit-box; margin: 2px 0 0; overflow: hidden; color: var(--arc-text-secondary); -webkit-box-orient: vertical; -webkit-line-clamp: 2; }
+
+.classifyRow { position: relative; margin-top: 12px; padding-top: 12px; border-top: 1px solid var(--arc-border-subtle); }
+.classifyRow::after { content: ""; display: block; height: 32px; }
+.classifyRow > .swap { top: 12px; }
+.rowInner { display: flex; height: 100%; align-items: center; justify-content: space-between; gap: 12px; min-width: 0; }
+.classifying { color: var(--arc-text-secondary); font-size: var(--arc-text-xs); }
+
+.chips { display: flex; min-width: 0; align-items: center; gap: 6px; }
+.chipSlot { display: inline-flex; flex: none; }
+.chip { display: inline-flex; height: 24px; align-items: center; gap: 6px; padding: 0 8px; border-radius: 8px; background: var(--arc-surface-muted); color: var(--arc-text-secondary); font-size: var(--arc-text-xs); line-height: 16px; white-space: nowrap; }
+.chip svg { flex: none; }
+.chip[data-sentiment="positive"] svg { color: var(--arc-success); }
+.chip[data-sentiment="negative"] svg { color: var(--arc-warning); }
+.chip[data-sentiment="neutral"] svg { color: var(--arc-text-muted); }
+.meter { position: relative; width: 24px; height: 4px; overflow: hidden; border-radius: 2px; background: color-mix(in oklab, var(--arc-foreground) 12%, transparent); }
+.meterFill { position: absolute; inset: 0; border-radius: inherit; background: var(--arc-accent); transform-origin: left center; }
+.chip[data-low] .meterFill { background: var(--arc-warning); }
+.chipNum { min-width: 3ch; font-variant-numeric: tabular-nums; text-align: right; }
+
+.routeSlot { position: relative; display: flex; min-width: 0; flex: 0 1 auto; justify-content: flex-end; }
+.route { display: inline-flex; min-width: 0; align-items: center; gap: 6px; white-space: nowrap; }
+.routeLane { flex: none; font-weight: 500; }
+.routeWho { display: inline-flex; min-width: 0; align-items: center; gap: 6px; margin-left: 2px; color: var(--arc-text-secondary); }
+
+.errorText { display: inline-flex; min-width: 0; align-items: center; gap: 6px; color: var(--arc-danger); font-size: var(--arc-text-xs); }
+.rowActions { display: inline-flex; flex: none; align-items: center; gap: 6px; }
+
+/* Placeholders: connecting, empty, done */
+.placeholder { display: flex; height: 100%; flex-direction: column; align-items: center; justify-content: center; gap: 4px; padding: 0 12px; text-align: center; }
+.placeholderTitle { margin-top: 4px; font-weight: 500; }
+.placeholderText { color: var(--arc-text-secondary); font-size: var(--arc-text-xs); line-height: 18px; }
+
+/* Connector: a static hairline tree from the ticket to every lane; the accent pulse draws to the target lane.
+   Column centers follow the lane grid exactly: i * (column + gap) + column / 2. */
+.connector {
+  --col: calc((100% - (var(--n) - 1) * var(--tr-gap)) / var(--n));
+  position: relative;
+  height: 16px;
+}
+.stubTop, .rail, .stub, .pulseTop, .pulseRail, .pulseStub { position: absolute; display: block; background: var(--arc-border); }
+.stubTop { top: 0; left: 50%; width: 1px; height: 8px; margin-left: -.5px; }
+.rail { top: 8px; left: calc(var(--col) / 2); right: calc(var(--col) / 2); height: 1px; }
+.stub { --x: calc(var(--i) * (var(--col) + var(--tr-gap)) + var(--col) / 2); top: 8px; left: var(--x); width: 1px; height: 8px; margin-left: -.5px; }
+.pulse { --x: calc(var(--i) * (var(--col) + var(--tr-gap)) + var(--col) / 2); position: absolute; inset: 0; }
+.pulseTop, .pulseRail, .pulseStub { background: var(--arc-accent); }
+.pulse[data-review] .pulseTop, .pulse[data-review] .pulseRail, .pulse[data-review] .pulseStub { background: var(--arc-warning); }
+.pulseTop { top: 0; left: 50%; width: 1px; height: 9px; margin-left: -.5px; transform-origin: top center; }
+.pulseRail { top: 8px; height: 1px; }
+.pulseRail[data-side="left"] { left: var(--x); right: 50%; transform-origin: right center; }
+.pulseRail[data-side="right"] { left: 50%; right: calc(100% - var(--x)); transform-origin: left center; }
+.pulseStub { top: 8px; left: var(--x); width: 1px; height: 8px; margin-left: -.5px; transform-origin: top center; }
+
+/* Lanes */
+.lanes { display: grid; grid-template-columns: repeat(var(--n), minmax(0, 1fr)); gap: var(--tr-gap); }
+.lane { min-width: 0; padding: 3px; border: 1px solid transparent; border-radius: 18px; background: var(--tr-lane-bg); transition: border-color var(--arc-duration-fast, .16s) var(--arc-ease-standard, ease-out), background-color var(--arc-duration-fast, .16s) var(--arc-ease-standard, ease-out); }
+.lane[data-target] { border-color: color-mix(in oklab, var(--arc-accent) 50%, transparent); background: color-mix(in oklab, var(--arc-accent) 5%, var(--tr-lane-bg)); }
+.lane[data-target][data-review] { border-color: color-mix(in oklab, var(--arc-warning) 55%, transparent); background: color-mix(in oklab, var(--arc-warning) 5%, var(--tr-lane-bg)); }
+.laneHead { display: flex; height: 32px; align-items: center; justify-content: space-between; gap: 8px; padding: 0 8px; }
+.laneName { min-width: 0; overflow: hidden; font-weight: 500; text-overflow: ellipsis; white-space: nowrap; }
+.laneCount { flex: none; color: var(--arc-text-secondary); font-size: var(--arc-text-xs); }
+.laneBody { position: relative; height: calc(var(--rows) * var(--tr-row)); margin: 0; padding: 0; overflow: hidden; list-style: none; }
+.rowItem { overflow: hidden; }
+.laneEmpty { display: flex; height: var(--tr-row); align-items: center; padding: 0 8px; color: var(--arc-text-muted); font-size: var(--arc-text-xs); }
+
+.row {
+  --focus-outline-offset: -2px;
+  display: grid;
+  width: 100%;
+  height: var(--tr-row);
+  grid-template-columns: 16px minmax(0, 1fr) auto;
+  grid-template-rows: 20px 18px;
+  align-content: center;
+  align-items: center;
+  column-gap: 8px;
+  row-gap: 2px;
+  margin: 0;
+  padding: 0 8px;
+  border: 0;
+  border-radius: 14px;
+  background: transparent;
+  color: inherit;
+  font: inherit;
+  letter-spacing: inherit;
+  text-align: left;
+}
+.row > .mark { justify-self: center; }
+.rowSubject { grid-column: 2 / 4; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.rowWho { display: grid; width: 16px; height: 16px; place-items: center; }
+.rowMeta { min-width: 0; overflow: hidden; color: var(--arc-text-secondary); font-size: var(--arc-text-xs); line-height: 18px; text-overflow: ellipsis; white-space: nowrap; }
+.rowMetaStrong { color: var(--arc-foreground); }
+.rowPct { display: grid; justify-items: end; color: var(--arc-text-muted); font-size: var(--arc-text-xs); font-variant-numeric: tabular-nums; line-height: 18px; }
+.rowPct > * { grid-area: 1 / 1; }
+.rowGo { opacity: 0; color: var(--arc-accent); transition: opacity var(--arc-duration-fast, .16s) var(--arc-ease-standard, ease-out); }
+.row[data-fresh] { animation: tr-land .9s var(--arc-ease-standard, ease-out) both; }
+button.row { cursor: pointer; -webkit-tap-highlight-color: transparent; transition: background-color var(--arc-duration-fast, .16s) var(--arc-ease-standard, ease-out); }
+button.row:active { background: color-mix(in oklab, var(--arc-foreground) 8%, transparent); }
+button.row:focus-visible .rowGo { opacity: 1; }
+button.row:focus-visible .rowPct { color: transparent; }
+@media (hover: hover) and (pointer: fine) {
+  button.row:hover { background: color-mix(in oklab, var(--arc-foreground) 5%, transparent); }
+  button.row:hover .rowGo { opacity: 1; }
+  button.row:hover .rowPct { color: transparent; }
+}
+.rowPct { transition: color var(--arc-duration-fast, .16s) var(--arc-ease-standard, ease-out); }
+
+/* Arc Avatar at row and route sizes */
+.root .avatar16 { width: 16px; height: 16px; font-size: 8px; }
+.root .avatar20 { width: 20px; height: 20px; font-size: 9px; }
+
+@keyframes tr-land {
+  from { background-color: color-mix(in oklab, var(--arc-accent) 14%, transparent); }
+  to { background-color: transparent; }
+}
+
+/* Narrow containers: lanes in a 2 by 2 grid, the connector folds away, labels stack under the chips. */
+@container (max-width: 600px) {
+  .root { --tr-stage: 169px; }
+  .lanes { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .laneBody { height: calc(min(var(--rows), 2) * var(--tr-row)); }
+  .connector { display: none; }
+  .incoming { margin-bottom: 12px; }
+  .classifyRow::after { height: 56px; }
+  .rowInner { flex-direction: column; align-items: flex-start; justify-content: center; gap: 8px; }
+  .routeSlot { min-height: 20px; justify-content: flex-start; }
+  .total { display: none; }
+}
+@container (max-width: 400px) {
+  .meter { display: none; }
+  .model { display: none; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .row[data-fresh] { animation-duration: .01s; }
+  .lane, .rowGo, button.row, .rowPct { transition: none; }
+}

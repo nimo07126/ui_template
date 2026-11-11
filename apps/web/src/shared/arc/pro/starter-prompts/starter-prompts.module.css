@@ -1,0 +1,106 @@
+/* Starter prompts: one surface, three text sizes (22 / 14 / 12), radii stepping 34 > 26 > 18. */
+.root { container-type: inline-size; box-sizing: border-box; width: 100%; max-width: 720px; border: 1px solid var(--arc-border); border-radius: var(--arc-radius-surface); padding: 24px; background: var(--arc-surface); color: var(--arc-foreground); font-size: var(--arc-text-sm); line-height: 20px; }
+.root *, .root *::before, .root *::after { box-sizing: border-box; }
+
+.header { display: grid; gap: 4px; }
+.greeting { margin: 0; font-size: var(--arc-text-xl); line-height: 28px; font-weight: 500; letter-spacing: -.01em; text-wrap: balance; }
+.description { margin: 0; color: var(--arc-text-muted); text-wrap: pretty; }
+
+/* The tabs shrink and scroll inside themselves; Shuffle never wraps. */
+.toolbar { display: flex; align-items: center; gap: 8px; margin-top: 24px; }
+.tabs { flex: 0 1 auto; }
+.shuffle { flex: none; margin-left: auto; }
+.shuffle svg { flex: none; }
+
+.gridWrap { position: relative; margin-top: 12px; }
+.grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 8px; margin: 0; padding: 0; list-style: none; }
+.slot { min-width: 0; }
+
+/* The card frame never changes; only its content crossfades, so a shuffle has no border flicker and no size change. */
+.card { position: relative; display: block; width: 100%; height: 98px; overflow: hidden; border: 1px solid var(--arc-border); border-radius: var(--arc-radius-control); padding: 0; background: var(--arc-surface); color: inherit; font: inherit; text-align: left; cursor: pointer; -webkit-tap-highlight-color: transparent; transition: background-color var(--arc-duration-fast) var(--arc-ease-standard), border-color var(--arc-duration-fast) var(--arc-ease-standard), transform 120ms var(--arc-ease-standard); }
+@media (hover: hover) and (pointer: fine) {
+  .card:hover:not(:disabled) { border-color: color-mix(in oklab, var(--arc-foreground) 18%, var(--arc-border)); background: color-mix(in oklab, var(--arc-surface-muted) 70%, var(--arc-surface)); }
+}
+.card:active:not(:disabled) { transform: scale(.985); background: var(--arc-surface-muted); }
+.card:disabled { cursor: default; }
+.card:disabled .content { opacity: .55; }
+.card[data-picked] { border-color: color-mix(in oklab, var(--arc-accent) 45%, var(--arc-border)); }
+
+.content { position: absolute; inset: 0; display: flex; flex-direction: column; padding: 14px 16px; transition: opacity var(--arc-duration-fast) var(--arc-ease-standard); }
+.meta { display: flex; align-items: center; gap: 6px; min-width: 0; height: 16px; color: var(--arc-text-muted); font-size: var(--arc-text-xs); line-height: 16px; }
+.categoryIcon { display: inline-flex; flex: none; width: 14px; height: 14px; color: var(--arc-text-muted); }
+.categoryIcon[data-series="1"] { color: var(--arc-series-1); }
+.categoryIcon[data-series="2"] { color: var(--arc-series-2); }
+.categoryIcon[data-series="3"] { color: var(--arc-series-3); }
+.categoryIcon[data-series="4"] { color: var(--arc-series-4); }
+.categoryLabel { flex: none; }
+.app { display: inline-flex; align-items: center; gap: 6px; min-width: 0; margin-left: auto; padding-left: 8px; }
+.appMark { display: block; flex: none; color: var(--arc-foreground); }
+.appName { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.title { margin-top: 10px; overflow: hidden; color: var(--arc-foreground); font-weight: 500; text-overflow: ellipsis; white-space: nowrap; }
+.cardDescription { margin-top: 2px; overflow: hidden; color: var(--arc-text-muted); text-overflow: ellipsis; white-space: nowrap; }
+
+/* Loading: the same frame and rhythm, with calm bars that breathe. */
+.skeleton { cursor: default; }
+.bone { display: block; height: 10px; border-radius: 999px; background: var(--arc-surface-muted); animation: breathe 1.4s var(--arc-ease-standard) infinite alternate; }
+.meta .bone { height: 8px; }
+.boneTitle { height: 10px; margin-top: 15px; }
+.boneLine { height: 10px; margin-top: 12px; animation-delay: .15s; }
+@keyframes breathe { from { opacity: 1; } to { opacity: .45; } }
+
+.empty { position: absolute; inset: 0; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 4px; border: 1px dashed var(--arc-border); border-radius: var(--arc-radius-control); padding: 16px; background: var(--arc-surface); text-align: center; }
+.emptyTitle { margin: 0; font-weight: 500; }
+.emptyCopy { margin: 0 0 8px; color: var(--arc-text-muted); }
+.slot[data-empty] { visibility: hidden; height: 98px; }
+
+/* Composer: 26px radius with an 8px inset, so the 36px send button sits concentric in the corner. */
+.composer { margin-top: 16px; border: 1px solid var(--arc-border); border-radius: var(--arc-radius-panel); padding: 14px 8px 8px 16px; background: var(--arc-surface); cursor: text; transition: border-color var(--arc-duration-fast) var(--arc-ease-standard); }
+.composer:focus-within { border-color: color-mix(in oklab, var(--arc-foreground) 34%, var(--arc-border)); }
+.input { display: block; width: 100%; height: 60px; margin: 0; border: 0; padding: 0 8px 0 0; background: transparent; color: var(--arc-foreground); font: inherit; font-size: var(--arc-text-sm); line-height: 20px; resize: none; outline: none; overflow-y: auto; scrollbar-width: thin; }
+.input::placeholder { color: var(--arc-text-muted); opacity: 1; }
+.input[readonly] { color: var(--arc-text-secondary); }
+
+.footer { display: flex; align-items: center; gap: 8px; height: 36px; margin-top: 8px; }
+.footerStatus { position: relative; display: flex; flex: 1; align-items: center; min-width: 0; height: 100%; color: var(--arc-text-muted); font-size: var(--arc-text-xs); line-height: 16px; }
+.statusInner { display: flex; align-items: center; gap: 8px; min-width: 0; max-width: 100%; }
+.ellipsis { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.model { display: inline-flex; align-items: center; gap: 6px; min-width: 0; }
+.modelMark { display: inline-flex; flex: none; }
+.modelMark svg { display: block; width: 14px; height: 14px; }
+.chip { display: inline-flex; align-items: center; gap: 6px; min-width: 0; height: 24px; border: 1px solid var(--arc-border); border-radius: 999px; padding: 0 9px 0 7px; color: var(--arc-text-secondary); }
+.done, .failed { display: inline-flex; align-items: center; gap: 6px; min-width: 0; }
+.done { color: var(--arc-text-secondary); }
+.doneIcon { flex: none; color: var(--arc-success); }
+.failed { color: var(--arc-danger); }
+.failedIcon { flex: none; }
+.retry { flex: none; }
+
+.send { position: relative; display: grid; flex: none; place-items: center; width: 36px; height: 36px; border: 0; border-radius: 50%; padding: 0; background: var(--arc-accent); color: var(--arc-accent-foreground); cursor: pointer; -webkit-tap-highlight-color: transparent; transition: background-color var(--arc-duration-fast) var(--arc-ease-standard), color var(--arc-duration-fast) var(--arc-ease-standard), transform 120ms var(--arc-ease-standard), opacity var(--arc-duration-fast) var(--arc-ease-standard); }
+@media (hover: hover) and (pointer: fine) { .send:hover:not(:disabled) { opacity: .9; } }
+.send:active:not(:disabled) { transform: scale(.94); }
+.send:disabled { background: var(--arc-surface-muted); color: var(--arc-text-muted); cursor: not-allowed; }
+.sendIcon { display: grid; place-items: center; grid-area: 1 / 1; }
+.stopWrap { position: relative; display: grid; place-items: center; width: 16px; height: 16px; }
+.stopSquare { position: absolute; width: 6px; height: 6px; border-radius: 1.5px; background: currentColor; }
+.spinner { position: absolute; inset: 0; animation: spin .8s linear infinite; }
+@keyframes spin { to { transform: rotate(360deg); } }
+
+.srOnly { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); clip-path: inset(50%); white-space: nowrap; }
+
+@container (max-width: 560px) {
+  .grid { grid-template-columns: minmax(0, 1fr); }
+}
+@container (max-width: 440px) {
+  .shuffleLabel { display: none; }
+  .shuffle { width: var(--arc-control-height-sm); padding-inline: 0; }
+}
+@media (max-width: 480px) {
+  .root { border-radius: var(--arc-radius-panel); padding: 16px; }
+  .toolbar { margin-top: 16px; }
+  .composer { padding-left: 14px; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .card, .send, .content, .composer { transition: none; }
+  .bone, .spinner { animation: none; }
+}

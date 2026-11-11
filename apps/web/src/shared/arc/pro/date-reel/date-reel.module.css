@@ -1,0 +1,340 @@
+.root {
+  --dr-accent: var(--arc-accent);
+  --dr-lens: color-mix(in oklab, var(--arc-surface-muted) 92%, transparent);
+  --dr-lens-edge: inset 0 0 0 1px var(--arc-border), inset 0 1px 0 color-mix(in oklab, var(--arc-surface) 70%, transparent), var(--arc-shadow-resting);
+
+  position: relative;
+  display: block;
+  width: 100%;
+  min-width: 0;
+  border: 1px solid var(--arc-border);
+  border-radius: var(--arc-radius-surface);
+  background: var(--arc-surface);
+  color: var(--arc-foreground);
+  font-family: var(--arc-font-body);
+  letter-spacing: var(--arc-tracking-body);
+  line-height: var(--arc-leading-body);
+  container-type: inline-size;
+  -webkit-tap-highlight-color: transparent;
+}
+
+:root[data-theme="night"] .root {
+  --dr-lens: color-mix(in oklab, var(--arc-surface-raised) 88%, transparent);
+  --dr-lens-edge: inset 0 0 0 1px var(--arc-border), inset 0 1px 0 color-mix(in oklab, var(--arc-foreground) 6%, transparent), var(--arc-shadow-resting);
+}
+
+.body {
+  --dr-row: 36px;
+  --dr-pad: var(--arc-space-4);
+  --dr-gutter: var(--arc-space-2);
+
+  display: grid;
+  min-width: 0;
+  gap: var(--arc-space-4);
+  padding: var(--dr-pad);
+}
+
+
+.header {
+  display: grid;
+  gap: var(--arc-space-1);
+  min-width: 0;
+  padding-inline: var(--arc-space-1);
+}
+
+.title {
+  margin: 0;
+  color: var(--arc-text-secondary);
+  font-size: var(--arc-text-sm);
+  font-weight: 400;
+}
+
+.summary {
+  display: grid;
+  gap: 2px;
+  margin: 0;
+  min-width: 0;
+}
+
+.headline {
+  overflow: hidden;
+  font-size: var(--arc-text-xl);
+  font-weight: 500;
+  line-height: 1.25;
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+}
+
+.detail {
+  overflow: hidden;
+  color: var(--arc-text-secondary);
+  font-size: var(--arc-text-sm);
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+}
+
+/* The drum. Items are laid on a cylinder in script; the mask lets the far rows fall away into the card. */
+.stage {
+  position: relative;
+  height: calc(var(--dr-row) * 5.6);
+  min-width: 0;
+  -webkit-mask-image: linear-gradient(to bottom, transparent, black 24%, black 76%, transparent);
+  mask-image: linear-gradient(to bottom, transparent, black 24%, black 76%, transparent);
+}
+
+.lens {
+  position: absolute;
+  z-index: 1;
+  top: 50%;
+  right: 0;
+  left: 0;
+  height: var(--dr-row);
+  border-radius: calc(var(--arc-radius-control) - 6px);
+  background: var(--dr-lens);
+  box-shadow: var(--dr-lens-edge);
+  transform: translateY(-50%);
+  pointer-events: none;
+}
+
+.reels {
+  position: relative;
+  display: flex;
+  justify-content: center;
+  height: 100%;
+  min-width: 0;
+}
+
+.reel {
+  position: relative;
+  display: block;
+  flex: 0 1 auto;
+  min-width: 0;
+  height: 100%;
+  padding-inline: var(--dr-gutter);
+  cursor: grab;
+  font-size: var(--arc-text-lg);
+  font-variant-numeric: tabular-nums;
+  touch-action: pan-x;
+  user-select: none;
+  -webkit-user-select: none;
+}
+
+.root[data-dragging] .reel { cursor: grabbing; }
+
+.sizer {
+  display: grid;
+  font-weight: 500;
+  height: var(--dr-row);
+  line-height: var(--dr-row);
+  white-space: nowrap;
+  visibility: hidden;
+}
+
+.sizer > span { grid-area: 1 / 1; }
+
+.drum,
+.window {
+  position: absolute;
+  right: var(--dr-gutter);
+  left: var(--dr-gutter);
+  pointer-events: none;
+}
+
+/* Rows stay hidden until the intro flicks each reel in, then fade up one reel after another. */
+.drum,
+.window {
+  transition: opacity var(--arc-duration-considered) var(--arc-ease-standard) calc(var(--dr-i, 0) * 70ms);
+}
+
+.root[data-intro] :is(.drum, .window) { opacity: 0; }
+
+.drum {
+  z-index: 0;
+  top: 0;
+  bottom: 0;
+}
+
+.window {
+  z-index: 2;
+  top: 50%;
+  height: var(--dr-row);
+  overflow: hidden;
+  transform: translateY(-50%);
+}
+
+.item,
+.lensItem {
+  position: absolute;
+  top: 50%;
+  right: 0;
+  left: 0;
+  height: var(--dr-row);
+  margin-top: calc(var(--dr-row) / -2);
+  line-height: var(--dr-row);
+  white-space: nowrap;
+  text-align: center;
+  transform-origin: 50% 50%;
+  will-change: transform, opacity;
+}
+
+/* Scale from the aligned edge so receding rows keep a straight column edge. */
+.reel[data-align="end"] :is(.item, .lensItem) { text-align: right; transform-origin: 100% 50%; }
+.reel[data-align="start"] :is(.item, .lensItem) { text-align: left; transform-origin: 0 50%; }
+
+.item { color: var(--arc-text-secondary); transition: color var(--arc-duration-fast) var(--arc-ease-standard); }
+
+.lensItem {
+  color: var(--arc-foreground);
+  font-weight: 500;
+  transition: color var(--arc-duration-fast) var(--arc-ease-standard);
+}
+
+.reel[data-active] .lensItem { color: var(--dr-accent); }
+@media (hover: hover) {
+  .reel:hover .item { color: var(--arc-foreground); }
+}
+
+.item[data-off] { color: color-mix(in oklab, var(--arc-text-muted) 45%, transparent); }
+.lensItem[data-off] { color: var(--arc-text-muted); }
+
+.footer {
+  display: grid;
+  gap: var(--arc-space-3);
+  padding-top: var(--arc-space-4);
+  border-top: 1px solid var(--arc-border-subtle);
+}
+
+.presets {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--arc-space-2);
+  min-width: 0;
+}
+
+.preset {
+  display: inline-flex;
+  flex: 1 1 auto;
+  align-items: center;
+  justify-content: center;
+  height: var(--arc-control-height-sm);
+  padding: 0 var(--arc-space-3);
+  border: 1px solid var(--arc-border);
+  border-radius: var(--arc-radius-pill);
+  background: transparent;
+  color: var(--arc-text-secondary);
+  font: inherit;
+  font-size: var(--arc-text-sm);
+  white-space: nowrap;
+  cursor: pointer;
+  transition:
+    background-color var(--arc-duration-fast) var(--arc-ease-standard),
+    border-color var(--arc-duration-fast) var(--arc-ease-standard),
+    color var(--arc-duration-fast) var(--arc-ease-standard),
+    transform var(--arc-duration-spring) var(--arc-ease-spring);
+}
+
+@media (hover: hover) and (pointer: fine) {
+  .preset:not([aria-pressed="true"]):hover { background: var(--arc-surface-muted); color: var(--arc-foreground); }
+  .confirm:hover { background: var(--arc-accent-strong); }
+}
+.preset:active { transform: scale(.97); }
+
+.preset[aria-pressed="true"] {
+  border-color: color-mix(in oklab, var(--dr-accent) 38%, transparent);
+  background: color-mix(in oklab, var(--dr-accent) 10%, transparent);
+  color: var(--dr-accent);
+}
+
+.confirm {
+  display: grid;
+  height: var(--arc-control-height-md);
+  padding: 0 var(--arc-space-4);
+  border: 0;
+  border-radius: var(--arc-radius-pill);
+  background: var(--arc-accent);
+  color: var(--arc-accent-foreground);
+  font: inherit;
+  font-size: var(--arc-text-sm);
+  font-weight: 500;
+  cursor: pointer;
+  transition: transform var(--arc-duration-spring) var(--arc-ease-spring), background-color var(--arc-duration-fast) var(--arc-ease-standard);
+}
+
+.confirm:active { transform: scale(.97); }
+.confirm[aria-disabled="true"] { cursor: progress; }
+
+.confirmStack {
+  display: grid;
+  align-items: center;
+  justify-items: center;
+}
+
+.confirmStack > span {
+  display: inline-flex;
+  grid-area: 1 / 1;
+  align-items: center;
+  gap: 6px;
+  white-space: nowrap;
+  opacity: 0;
+  transform: translateY(4px);
+  transition: opacity var(--arc-duration-fast) var(--arc-ease-standard), transform var(--arc-duration-spring) var(--arc-ease-spring);
+}
+
+.confirmStack > span[data-show] {
+  opacity: 1;
+  transform: none;
+}
+
+.spin { animation: spin 0.8s linear infinite; }
+
+@keyframes spin { to { transform: rotate(360deg); } }
+
+.srOnly {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+  white-space: nowrap;
+}
+
+@container (min-width: 26rem) {
+  .body {
+    --dr-row: 42px;
+    --dr-pad: var(--arc-space-6);
+    --dr-gutter: var(--arc-space-3);
+  }
+  .reel { font-size: var(--arc-text-xl); }
+}
+
+@container (min-width: 30rem) {
+  .footer {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+  }
+  .preset { flex: 0 0 auto; }
+  .confirm {
+    height: var(--arc-control-height-sm);
+    margin-left: auto;
+  }
+}
+
+@container (max-width: 22rem) {
+  .preset { padding: 0 var(--arc-space-2); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .root[data-intro] :is(.drum, .window) { opacity: 1; }
+  .drum,
+  .window,
+  .item,
+  .lensItem,
+  .preset,
+  .confirm,
+  .confirmStack > span { transition: none; }
+  .spin { animation: none; }
+}

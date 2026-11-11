@@ -1,0 +1,227 @@
+.root {
+  --mt-accent: var(--arc-accent);
+  container-type: inline-size;
+  display: grid;
+  width: 100%;
+  min-width: 0;
+  margin: 0;
+  gap: var(--arc-space-6);
+  overflow-x: clip;
+  color: var(--arc-foreground);
+  -webkit-tap-highlight-color: transparent;
+}
+
+/* The network and the readout sit side by side on wide layouts and stack on narrow ones. */
+.body { display: grid; min-width: 0; gap: var(--arc-space-8); }
+@container (width >= 720px) {
+  .body { grid-template-columns: minmax(0, 1fr) 232px; align-items: center; gap: var(--arc-space-10); }
+}
+
+.diagram { min-width: 0; }
+/* The stage reserves its shape before it is measured, then takes the exact height of the drawing. */
+.stage { position: relative; width: 100%; min-width: 0; }
+.root:not([data-ready]) .stage { height: 316px; }
+@container (width < 480px) { .root:not([data-ready]) .stage { height: 330px; } }
+.stage > *, .panel { opacity: 0; transition: opacity var(--arc-duration-considered) var(--arc-ease-standard); }
+.root[data-ready] .stage > *, .root[data-ready] .panel { opacity: 1; }
+
+.svg { position: absolute; inset: 0; display: block; overflow: visible; pointer-events: none; }
+.hit { fill: transparent; stroke: none; pointer-events: all; cursor: default; }
+
+/* Layers are thin plates with a step behind them, so the network sits in depth. */
+.back { fill: var(--arc-surface-muted); stroke: var(--arc-border); stroke-width: 1; }
+.face { fill: var(--arc-surface); stroke: var(--arc-border); stroke-width: 1; transition: stroke var(--arc-duration-standard) var(--arc-ease-standard); }
+.plate[data-on] .face { stroke: color-mix(in oklab, var(--mt-accent) 60%, var(--arc-border)); }
+
+/* Connections: width and opacity follow the weight, and the strongest ones take on the accent as they are learned. */
+.edge {
+  fill: none;
+  stroke: color-mix(in oklab, var(--mt-accent) calc(var(--k, 0) * 80%), var(--arc-text-muted));
+  stroke-linecap: round;
+}
+.stage[data-hover="l0"] .edge[data-a="0"],
+.stage[data-hover="l1"] .edge[data-a="1"], .stage[data-hover="l1"] .edge[data-b="1"],
+.stage[data-hover="l2"] .edge[data-a="2"], .stage[data-hover="l2"] .edge[data-b="2"],
+.stage[data-hover="l3"] .edge[data-b="3"] { stroke: var(--mt-accent); }
+
+/* Signals travel forward as solid dots; the error travels back as a short dash. */
+.dot { fill: var(--mt-accent); }
+.grad { fill: none; stroke: var(--mt-accent); stroke-width: 2.25; stroke-linecap: round; }
+
+.node { fill: var(--arc-surface-raised); stroke: var(--arc-border-strong); stroke-width: 1.25; }
+:global(:root[data-theme="night"]) .node { stroke: color-mix(in oklab, var(--arc-text-muted) 55%, var(--arc-border-strong)); }
+.act { fill: var(--mt-accent); }
+.ring { fill: none; stroke: var(--mt-accent); stroke-width: 1.25; }
+
+.layerLabel, .stackMeta, .outVal, .tick, .valText {
+  fill: var(--arc-text-muted);
+  font-family: var(--arc-font-body);
+  font-size: var(--arc-text-xs);
+  letter-spacing: var(--arc-tracking-body);
+  font-variant-numeric: tabular-nums;
+}
+.layerLabel { fill: var(--arc-text-secondary); }
+.stackName, .outName { fill: var(--arc-foreground); font-family: var(--arc-font-body); font-size: var(--arc-text-xs); font-weight: 500; letter-spacing: var(--arc-tracking-body); }
+.outName { fill: var(--arc-text-secondary); transition: fill var(--arc-duration-standard) var(--arc-ease-standard); }
+.outRow[data-win="true"] .outName { fill: var(--arc-foreground); }
+.outRow[data-win="true"] .outVal { fill: var(--arc-foreground); }
+.outTrack { fill: var(--arc-surface-muted); stroke: var(--arc-border-subtle); stroke-width: 1; }
+.outBar { fill: var(--arc-text-muted); transition: fill var(--arc-duration-standard) var(--arc-ease-standard); }
+.outRow[data-win="true"] .outBar { fill: var(--mt-accent); }
+
+/* Data sheets: each feature is a line, the held-out set has a dashed edge. */
+.sheetRect { fill: var(--arc-surface-raised); stroke: var(--arc-border); stroke-width: 1; transition: stroke var(--arc-duration-standard) var(--arc-ease-standard); }
+.sheet[data-held] .sheetRect { stroke: var(--arc-border-strong); stroke-dasharray: 3 3; }
+.sheetBar { fill: color-mix(in oklab, var(--arc-text-muted) 45%, transparent); }
+.sheetBarStrong { fill: color-mix(in oklab, var(--arc-text-muted) 75%, transparent); }
+.stage[data-hover="train"] .sheet:not([data-held]) .sheetRect,
+.stage[data-hover="held"] .sheet[data-held] .sheetRect { stroke: color-mix(in oklab, var(--mt-accent) 60%, var(--arc-border)); }
+
+/* Hover tag with one line about the hovered part. */
+.tagWrap { position: absolute; top: 0; left: 0; z-index: 2; pointer-events: none; }
+.tag {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  padding: 3px var(--arc-space-2);
+  border-radius: var(--arc-radius-pill);
+  color: var(--arc-background);
+  background: var(--arc-foreground);
+  font-size: var(--arc-text-xs);
+  font-weight: 500;
+  letter-spacing: var(--arc-tracking-body);
+  line-height: 1.3;
+  white-space: nowrap;
+  transform: translateX(-50%);
+  animation: tagIn var(--arc-duration-standard) var(--arc-ease-standard);
+}
+.tagWrap[data-align="start"] .tag { transform: none; }
+.tagWrap[data-align="end"] .tag { transform: translateX(-100%); }
+@keyframes tagIn { from { opacity: 0; translate: 0 4px; } }
+
+/* The readout: loss and epoch, the loss curve, and the evaluation. */
+.panel { display: grid; min-width: 0; align-content: center; gap: var(--arc-space-4); }
+.stats { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: var(--arc-space-4); }
+.stat { display: grid; min-width: 0; gap: 2px; }
+.statLabel { color: var(--arc-text-secondary); font-size: var(--arc-text-xs); letter-spacing: var(--arc-tracking-body); line-height: var(--arc-leading-body); }
+.statValue { color: var(--arc-foreground); font-size: var(--arc-text-2xl); font-weight: 500; letter-spacing: var(--arc-tracking-body); line-height: 1.15; font-variant-numeric: tabular-nums; opacity: var(--o, .4); }
+.statMeta { min-height: 1.4em; overflow: hidden; color: var(--arc-text-muted); font-size: var(--arc-text-xs); letter-spacing: var(--arc-tracking-body); line-height: var(--arc-leading-body); font-variant-numeric: tabular-nums; text-overflow: ellipsis; white-space: nowrap; opacity: calc(var(--o, .4) * 1.8); }
+
+.chart { position: relative; min-width: 0; height: 112px; }
+.chart > svg { position: absolute; inset: 0; display: block; overflow: visible; }
+.grid { stroke: var(--arc-border-subtle); stroke-width: 1; stroke-dasharray: 2 3; }
+.axis { stroke: var(--arc-border); stroke-width: 1; }
+.line { fill: none; stroke: var(--mt-accent); stroke-width: 1.75; stroke-linecap: round; stroke-linejoin: round; }
+.head { fill: var(--mt-accent); stroke: var(--arc-background); stroke-width: 2; }
+.valDot { fill: var(--arc-background); stroke: var(--arc-text-secondary); stroke-width: 1.5; }
+
+.evalRow { display: grid; grid-template-columns: 24px minmax(0, 1fr) auto; align-items: center; gap: var(--arc-space-3); padding-top: var(--arc-space-4); border-top: 1px solid var(--arc-border-subtle); opacity: var(--o, 1); }
+.evalMark { width: 24px; height: 24px; overflow: visible; }
+.evalTrack { fill: transparent; stroke: var(--arc-border-strong); stroke-width: 1.25; transition: fill var(--arc-duration-standard) var(--arc-ease-standard), stroke var(--arc-duration-standard) var(--arc-ease-standard); }
+.evalSpin { fill: none; stroke: var(--mt-accent); stroke-width: 1.75; stroke-linecap: round; opacity: 0; transition: opacity var(--arc-duration-fast) var(--arc-ease-standard); }
+.evalCheck { fill: none; stroke: var(--arc-success); stroke-width: 1.75; stroke-linecap: round; stroke-linejoin: round; }
+.evalRow[data-state="running"] .evalSpin { opacity: 1; }
+.evalRow[data-state="passed"] .evalTrack { fill: color-mix(in oklab, var(--arc-success) 12%, transparent); stroke: color-mix(in oklab, var(--arc-success) 55%, var(--arc-border)); }
+.evalText { display: grid; min-width: 0; }
+.evalName { overflow: hidden; font-size: var(--arc-text-sm); font-weight: 500; letter-spacing: var(--arc-tracking-body); line-height: var(--arc-leading-body); text-overflow: ellipsis; white-space: nowrap; }
+.evalMeta { color: var(--arc-text-muted); font-size: var(--arc-text-xs); letter-spacing: var(--arc-tracking-body); line-height: var(--arc-leading-body); font-variant-numeric: tabular-nums; }
+.evalRight { display: flex; align-items: center; gap: var(--arc-space-2); }
+/* The score keeps its slot in every state, so the row never shifts while it counts up. */
+.evalValue { min-width: 4.9ch; color: var(--arc-foreground); font-size: var(--arc-text-sm); font-weight: 500; letter-spacing: var(--arc-tracking-body); line-height: var(--arc-leading-body); font-variant-numeric: tabular-nums; text-align: right; }
+.evalRow[data-state="waiting"] .evalValue { visibility: hidden; }
+/* Both tags share one cell, so the row never changes width. */
+.evalTags { display: grid; min-height: 19px; }
+.evalTag {
+  grid-area: 1 / 1;
+  justify-self: end;
+  padding: 1px 7px;
+  border-radius: var(--arc-radius-pill);
+  font-size: var(--arc-text-xs);
+  font-weight: 500;
+  letter-spacing: var(--arc-tracking-body);
+  line-height: 1.35;
+  white-space: nowrap;
+  opacity: 0;
+  transform: scale(.92);
+  transition: opacity var(--arc-duration-fast) var(--arc-ease-exit), transform var(--arc-duration-fast) var(--arc-ease-standard);
+}
+.evalTag[data-kind="waiting"] { color: var(--arc-text-secondary); background: var(--arc-surface-muted); box-shadow: inset 0 0 0 1px var(--arc-border); }
+.evalTag[data-kind="running"] { color: var(--mt-accent); background: color-mix(in oklab, var(--mt-accent) 9%, var(--arc-surface-raised)); box-shadow: inset 0 0 0 1px color-mix(in oklab, var(--mt-accent) 28%, var(--arc-border)); }
+.evalTag[data-kind="passed"] { color: var(--arc-success); background: color-mix(in oklab, var(--arc-success) 10%, var(--arc-surface-raised)); box-shadow: inset 0 0 0 1px color-mix(in oklab, var(--arc-success) 30%, var(--arc-border)); }
+.evalRow[data-state="waiting"] .evalTag[data-kind="waiting"],
+.evalRow[data-state="running"] .evalTag[data-kind="running"],
+.evalRow[data-state="passed"] .evalTag[data-kind="passed"] { opacity: 1; transform: none; transition: opacity var(--arc-duration-standard) var(--arc-ease-standard), transform var(--arc-duration-spring) var(--arc-ease-spring); }
+
+/* Step bar: play and pause, then one button per stage with a track that fills while the stage plays. */
+.controls { display: flex; min-width: 0; align-items: center; gap: var(--arc-space-4); }
+.play {
+  display: grid;
+  flex: none;
+  place-items: center;
+  width: var(--arc-control-height-sm);
+  height: var(--arc-control-height-sm);
+  padding: 0;
+  border: 1px solid var(--arc-border);
+  border-radius: 50%;
+  color: var(--arc-foreground);
+  background: var(--arc-surface);
+  cursor: pointer;
+  transition: background-color var(--arc-duration-fast) var(--arc-ease-standard), transform var(--arc-duration-spring) var(--arc-ease-spring);
+}
+.play:hover { background: var(--arc-surface-muted); }
+.play:active { transform: scale(.97); }
+.play > svg { width: 16px; height: 16px; }
+.steps { display: grid; flex: 1; grid-template-columns: repeat(5, minmax(0, 1fr)); gap: var(--arc-space-2); min-width: 0; margin: 0; padding: 0; list-style: none; }
+.stepItem { min-width: 0; }
+.step {
+  display: grid;
+  width: 100%;
+  min-height: 44px;
+  align-content: center;
+  gap: 7px;
+  padding: 0;
+  border: 0;
+  color: var(--arc-text-muted);
+  background: none;
+  font: inherit;
+  text-align: left;
+  cursor: pointer;
+  transition: color var(--arc-duration-fast) var(--arc-ease-standard);
+}
+.step:hover { color: var(--arc-text-secondary); }
+.step[data-state="current"] { color: var(--arc-foreground); }
+.stepLabel { display: flex; min-width: 0; align-items: baseline; gap: 6px; font-size: var(--arc-text-xs); font-weight: 500; letter-spacing: var(--arc-tracking-body); line-height: 1.3; white-space: nowrap; }
+.stepNumber { flex: none; color: var(--arc-text-muted); font-variant-numeric: tabular-nums; }
+.step[data-state="current"] .stepNumber { color: var(--mt-accent); }
+.stepName { overflow: hidden; text-overflow: ellipsis; }
+.track { position: relative; height: 2px; overflow: hidden; border-radius: var(--arc-radius-pill); background: var(--arc-border); }
+.trackFill { position: absolute; inset: 0; border-radius: inherit; background: var(--arc-text-muted); transform: scaleX(var(--s, 0)); transform-origin: 0 50%; transition: background-color var(--arc-duration-standard) var(--arc-ease-standard); }
+.step[data-state="current"] .trackFill { background: var(--mt-accent); }
+
+.caption {
+  display: grid;
+  min-height: calc(var(--arc-text-sm) * var(--arc-leading-body) * 2);
+  margin: 0;
+  color: var(--arc-text-secondary);
+  font-size: var(--arc-text-sm);
+  letter-spacing: var(--arc-tracking-body);
+  line-height: var(--arc-leading-body);
+  text-align: center;
+  text-wrap: balance;
+}
+.captionStage { display: none; color: var(--arc-foreground); font-weight: 500; }
+
+@container (width < 560px) {
+  .root { gap: var(--arc-space-5); }
+  .body { gap: var(--arc-space-6); }
+  .statValue { font-size: var(--arc-text-xl); }
+  /* Narrow step buttons show their number; the caption names the current stage instead. */
+  .stepName { display: none; }
+  .captionStage { display: inline; }
+  .caption { font-size: var(--arc-text-xs); min-height: calc(var(--arc-text-xs) * var(--arc-leading-body) * 3); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .stage > *, .panel, .face, .outName, .outBar, .sheetRect, .evalTrack, .evalSpin, .evalTag, .play, .step, .trackFill { transition-duration: var(--arc-duration-instant); }
+  .tag { animation: none; }
+}

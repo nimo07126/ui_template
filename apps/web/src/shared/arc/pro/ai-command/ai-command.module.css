@@ -1,0 +1,111 @@
+/* AI command. A fixed-size palette: a 56px input bar, a results area of --aic-height and a 40px hint footer.
+   Geometry: icons sit 20px from the card edge and every label, answer line and footer text starts at 48px. */
+.root { container-type: inline-size; position: relative; display: flex; width: 100%; max-width: 680px; min-width: 0; flex-direction: column; overflow: hidden; border: 1px solid var(--arc-border); border-radius: var(--arc-radius-panel); background: var(--arc-surface); color: var(--arc-foreground); font-family: var(--arc-font-body); font-size: var(--arc-text-sm); letter-spacing: var(--arc-tracking-body); line-height: var(--arc-leading-body); -webkit-tap-highlight-color: transparent; }
+.elevated { box-shadow: var(--arc-shadow-floating); }
+.srOnly { position: absolute; width: 1px; height: 1px; overflow: hidden; clip-path: inset(50%); white-space: nowrap; }
+
+/* Crossfade slot shared by every label and icon swap. */
+.swap { position: relative; display: flex; min-width: 0; max-width: 100%; align-items: center; }
+.swapItem { display: block; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+
+/* Input bar */
+.bar { display: flex; height: 56px; flex: none; align-items: center; gap: 12px; padding: 0 12px 0 20px; border-bottom: 1px solid var(--arc-border-subtle); }
+.barIcon { display: grid; width: 16px; height: 16px; flex: none; place-items: center; color: var(--arc-text-muted); }
+.barIcon svg { display: block; }
+.input { min-width: 0; height: 100%; flex: 1; margin: 0; border: 0; padding: 0; background: transparent; color: var(--arc-foreground); caret-color: var(--arc-accent); font: inherit; font-size: var(--arc-text-base); letter-spacing: var(--arc-tracking-body); text-overflow: ellipsis; outline: none; }
+.input::placeholder { color: var(--arc-text-muted); opacity: 1; }
+
+/* Mode toggle: two equal halves, so the pill slides by exactly its own width. Radii nest inside the card corner (26 - 12). */
+.modes { position: relative; display: grid; height: 32px; flex: none; grid-template-columns: 1fr 1fr; padding: 2px; border-radius: 14px; background: var(--arc-surface-muted); }
+.modePill { position: absolute; top: 2px; bottom: 2px; left: 2px; width: calc(50% - 2px); border-radius: 12px; background: var(--arc-surface); box-shadow: 0 0 0 1px var(--arc-border-subtle), var(--arc-shadow-resting); transition: transform 200ms var(--arc-ease-standard); }
+.modes[data-mode="ask"] .modePill { transform: translateX(100%); }
+.modeButton { position: relative; z-index: 1; margin: 0; border: 0; padding: 0 12px; border-radius: 12px; background: transparent; color: var(--arc-text-muted); cursor: pointer; font: inherit; font-size: var(--arc-text-xs); white-space: nowrap; transition: color var(--arc-duration-fast) var(--arc-ease-standard); }
+.modeButton[aria-pressed="true"] { color: var(--arc-foreground); }
+@media (hover: hover) and (pointer: fine) { .modeButton[aria-pressed="false"]:hover { color: var(--arc-text-secondary); } }
+
+/* Results area: fixed height, so nothing outside it moves while typing or streaming. Views crossfade on top of each other. */
+.body { position: relative; height: var(--aic-height, 392px); flex: none; }
+.view { position: absolute; inset: 0; overflow-x: hidden; overflow-y: auto; overscroll-behavior: contain; padding: 8px; scrollbar-width: thin; scrollbar-color: var(--arc-border) transparent; }
+
+.list { position: relative; }
+.highlight { position: absolute; top: 0; right: 0; left: 0; height: 40px; border-radius: 12px; background: var(--arc-surface-muted); opacity: 0; pointer-events: none; transition: transform 130ms var(--arc-ease-standard), height 130ms var(--arc-ease-standard), opacity 120ms var(--arc-ease-standard), background-color 120ms var(--arc-ease-standard); }
+.list:has(.row:active) .highlight { background: color-mix(in oklab, var(--arc-surface-muted), var(--arc-foreground) 5%); }
+.group + .group { margin-top: 4px; }
+.groupHead { display: flex; height: 32px; align-items: flex-end; padding: 0 12px 6px; color: var(--arc-text-muted); font-size: var(--arc-text-xs); white-space: nowrap; }
+.empty { display: flex; height: 40px; align-items: center; padding: 0 12px 0 40px; overflow: hidden; color: var(--arc-text-muted); text-overflow: ellipsis; white-space: nowrap; }
+
+.row { position: relative; display: flex; height: 40px; align-items: center; padding: 0 12px; border-radius: 12px; color: var(--arc-foreground); cursor: pointer; user-select: none; }
+.icon { display: grid; width: 16px; height: 16px; flex: none; place-items: center; margin-right: 12px; color: var(--arc-text-secondary); transition: color 120ms var(--arc-ease-standard); }
+.icon svg { display: block; width: 16px; height: 16px; }
+.row[data-active] .icon { color: var(--arc-foreground); }
+.label { min-width: 0; flex: 0 1 auto; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.quoted { color: var(--arc-text-secondary); }
+.meta { min-width: 0; flex: 0 1000 auto; margin-left: 8px; overflow: hidden; color: var(--arc-text-muted); text-overflow: ellipsis; white-space: nowrap; }
+.end { display: flex; flex: none; align-items: center; gap: 4px; margin-left: auto; padding-left: 12px; color: var(--arc-text-muted); }
+.kbd { opacity: .9; }
+.statusSlot { position: relative; display: grid; width: 16px; height: 16px; place-items: center; }
+.statusIcon { display: grid; place-items: center; }
+.row[data-status="running"] .label { color: var(--arc-text-secondary); }
+.done { display: grid; place-items: center; color: var(--arc-success); }
+.failed { display: grid; place-items: center; color: var(--arc-danger); }
+.spinner { display: block; color: var(--arc-text-secondary); animation: aicSpin .8s linear infinite; }
+@keyframes aicSpin { to { transform: rotate(360deg); } }
+
+/* Answer: status line, source chips, streamed text, then suggested actions. */
+.answer { padding: 0 12px; }
+.status { display: flex; height: 40px; align-items: center; color: var(--arc-text-secondary); }
+.status .icon { color: inherit; }
+.status .failed { color: var(--arc-danger); }
+.statusLabel { flex: 1; }
+.statusEnd { display: flex; flex: none; align-items: center; gap: 8px; margin-left: 12px; }
+.elapsed { color: var(--arc-text-muted); font-size: var(--arc-text-xs); font-variant-numeric: tabular-nums; }
+.copyWrap { display: flex; margin-right: -6px; }
+
+.sources { display: flex; flex-wrap: wrap; gap: 8px; padding: 0 0 12px 28px; }
+.source { display: inline-flex; height: 28px; max-width: 200px; align-items: center; gap: 6px; margin: 0; padding: 0 10px 0 8px; border: 1px solid var(--arc-border-subtle); border-radius: 10px; background: var(--arc-surface); color: var(--arc-text-secondary); cursor: pointer; font: inherit; font-size: var(--arc-text-xs); transition: border-color 120ms var(--arc-ease-standard), background-color 120ms var(--arc-ease-standard), color 120ms var(--arc-ease-standard); }
+.source[data-focused] { border-color: color-mix(in oklab, var(--arc-accent) 45%, var(--arc-border)); background: color-mix(in oklab, var(--arc-accent) 6%, var(--arc-surface)); color: var(--arc-foreground); }
+.source:active { background: var(--arc-surface-muted); }
+.sourceNum { min-width: 8px; color: var(--arc-text-muted); font-variant-numeric: tabular-nums; text-align: center; }
+.sourceMark { display: grid; width: 14px; height: 14px; flex: none; place-items: center; color: var(--arc-foreground); }
+.sourceMark svg { display: block; width: 14px; height: 14px; }
+.sourceTitle { min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+
+.text, .errorText { margin: 0; padding: 0 8px 4px 28px; line-height: 1.6; text-wrap: pretty; }
+.errorText { color: var(--arc-text-secondary); }
+.chunk { animation: aicFade 140ms var(--arc-ease-standard) both; }
+@keyframes aicFade { from { opacity: 0; } }
+.cite { display: inline-flex; height: 16px; min-width: 16px; align-items: center; justify-content: center; margin: 0 1px 0 3px; border: 0; padding: 0 4px; border-radius: 5px; background: var(--arc-surface-muted); color: var(--arc-text-secondary); cursor: pointer; font: inherit; font-size: var(--arc-text-xs); font-variant-numeric: tabular-nums; line-height: 1; vertical-align: 1px; transition: background-color 120ms var(--arc-ease-standard), color 120ms var(--arc-ease-standard); }
+.cite[data-focused] { background: var(--arc-accent-subtle); color: var(--arc-accent); }
+.nowrap { white-space: nowrap; }
+.actions { margin-top: 12px; }
+
+/* Footer: model or the latest result on the left, keyboard hints on the right. */
+.footer { display: flex; height: 40px; flex: none; align-items: center; justify-content: space-between; gap: 16px; padding: 0 16px 0 20px; border-top: 1px solid var(--arc-border-subtle); color: var(--arc-text-muted); font-size: var(--arc-text-xs); }
+.footerStart { flex: 0 1 auto; }
+.footerItem { display: flex; min-width: 0; align-items: center; gap: 12px; }
+.footerIcon { display: grid; width: 16px; height: 16px; flex: none; place-items: center; }
+.footerIcon svg { display: block; width: 14px; height: 14px; }
+.footerText { min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.hints { flex: none; justify-content: flex-end; }
+.hintRow { display: flex; align-items: center; gap: 12px; }
+.hint { display: inline-flex; align-items: center; gap: 6px; white-space: nowrap; }
+.hintNav { gap: 2px; }
+.hintNav > :last-of-type { margin-right: 4px; }
+
+@container (max-width: 540px) { .hintNav { display: none; } }
+@container (max-width: 400px) {
+  .modeButton { padding: 0 10px; }
+  .footer { padding-right: 12px; }
+  .footerText { max-width: 132px; }
+}
+
+@media (hover: hover) and (pointer: fine) {
+  .source:hover { border-color: var(--arc-border); color: var(--arc-foreground); }
+  .cite:hover { color: var(--arc-foreground); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .chunk { animation: none; }
+  .highlight, .modePill { transition: none; }
+  .spinner { animation-duration: 1.6s; }
+}

@@ -1,0 +1,237 @@
+.root {
+  --ctd-accent: var(--arc-accent);
+  --ctd-paper: color-mix(in oklab, var(--arc-surface-muted) 38%, var(--arc-surface));
+  --ctd-glass: color-mix(in oklab, var(--arc-surface-raised) 80%, transparent);
+  container-type: inline-size;
+  display: grid;
+  gap: var(--arc-space-2);
+  width: 100%;
+  min-width: 0;
+  padding: var(--arc-space-2);
+  border: 1px solid var(--arc-border);
+  border-radius: var(--arc-radius-surface);
+  background: var(--arc-surface);
+  color: var(--arc-foreground);
+  font-family: var(--arc-font-body);
+  letter-spacing: var(--arc-tracking-body);
+  line-height: var(--arc-leading-body);
+  -webkit-tap-highlight-color: transparent;
+}
+
+.header {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: var(--arc-space-4);
+  padding: var(--arc-space-2) var(--arc-space-4) var(--arc-space-1);
+}
+.title { margin: 0; font-size: var(--arc-text-base); font-weight: 500; }
+.count {
+  margin: 0;
+  font-size: var(--arc-text-sm);
+  color: var(--arc-text-secondary);
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+}
+
+/* Paper: a quiet dot grid on a warm neutral sheet with a hairline edge. */
+.stage {
+  position: relative;
+  aspect-ratio: 16 / 10;
+  min-width: 0;
+  overflow: hidden;
+  border: 1px solid var(--arc-border-subtle);
+  border-radius: calc(var(--arc-radius-surface) - var(--arc-space-2));
+  background: var(--ctd-paper);
+  box-shadow: inset 0 1px 0 color-mix(in oklab, var(--arc-surface-raised) 70%, transparent);
+  isolation: isolate;
+}
+
+.canvas {
+  position: absolute;
+  inset: 0;
+  touch-action: none;
+  cursor: none;
+  user-select: none;
+  -webkit-user-select: none;
+}
+
+.svg { position: absolute; inset: 0; display: block; width: 100%; height: 100%; overflow: visible; }
+.gridDot { fill: var(--arc-border); }
+
+.ink {
+  color: var(--arc-foreground);
+  fill: currentColor;
+  stroke: none;
+  transition: opacity var(--arc-duration-fast) var(--arc-ease-exit);
+}
+.ink[data-mode="clean"] {
+  fill: none;
+  stroke: currentColor;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+.ink[data-leaving] { opacity: 0; }
+
+.laser { fill: var(--ctd-accent); opacity: .9; }
+
+/* The nib is the cursor: it shows the pen size and ink, or the laser dot. */
+.nib {
+  fill: currentColor;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity var(--arc-duration-fast) var(--arc-ease-standard);
+}
+.nib[data-show] { opacity: .92; }
+.nib[data-tool="pen"][data-show] { opacity: .55; }
+.nibRing {
+  fill: none;
+  stroke: currentColor;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity var(--arc-duration-fast) var(--arc-ease-standard);
+}
+.nibRing[data-show] { opacity: .32; }
+.nibRing[data-show][data-down] { opacity: .5; }
+
+.hint {
+  position: absolute;
+  inset: 0 var(--arc-space-6) 64px;
+  display: grid;
+  place-items: center;
+  margin: 0;
+  font-size: var(--arc-text-sm);
+  color: var(--arc-text-muted);
+  text-align: center;
+  text-wrap: balance;
+  pointer-events: none;
+  transition: opacity var(--arc-duration-standard) var(--arc-ease-standard);
+}
+.hint[data-hidden] { opacity: 0; transition-duration: var(--arc-duration-fast); }
+
+/* Snap confirmation floats above the paper. */
+.chip {
+  position: absolute;
+  top: var(--arc-space-3);
+  left: 50%;
+  z-index: 2;
+  display: flex;
+  align-items: center;
+  gap: var(--arc-space-2);
+  max-width: calc(100% - var(--arc-space-6));
+  padding: 4px 4px 4px var(--arc-space-3);
+  border-radius: var(--arc-radius-pill);
+  background: var(--ctd-glass);
+  box-shadow: 0 0 0 1px var(--arc-border), var(--arc-shadow-floating);
+  -webkit-backdrop-filter: blur(14px) saturate(1.4);
+  backdrop-filter: blur(14px) saturate(1.4);
+  translate: -50% 0;
+  font-size: var(--arc-text-sm);
+  white-space: nowrap;
+}
+.chipIcon { flex: none; color: var(--ctd-accent); }
+.chipText { overflow: hidden; text-overflow: ellipsis; }
+.chipButton {
+  flex: none;
+  min-height: 32px;
+  padding: 0 var(--arc-space-3);
+  border: 0;
+  border-radius: var(--arc-radius-pill);
+  background: var(--arc-surface-muted);
+  color: var(--arc-foreground);
+  font: inherit;
+  font-size: var(--arc-text-sm);
+  cursor: pointer;
+  transition: background-color var(--arc-duration-fast) var(--arc-ease-standard), transform var(--arc-duration-spring) var(--arc-ease-spring);
+}
+.chipButton:hover, .chipButton:focus-visible { background: color-mix(in oklab, var(--arc-foreground) 10%, var(--arc-surface-muted)); }
+.chipButton:active { transform: scale(.97); }
+
+/* Floating glass toolbar. */
+.toolbar {
+  position: absolute;
+  bottom: var(--arc-space-3);
+  left: 50%;
+  z-index: 2;
+  display: flex;
+  align-items: center;
+  gap: 2px;
+  padding: 4px;
+  border-radius: var(--arc-radius-pill);
+  background: var(--ctd-glass);
+  box-shadow: 0 0 0 1px var(--arc-border), var(--arc-shadow-floating);
+  -webkit-backdrop-filter: blur(14px) saturate(1.4);
+  backdrop-filter: blur(14px) saturate(1.4);
+  translate: -50% 0;
+}
+.group { display: flex; align-items: center; gap: 2px; transition: opacity var(--arc-duration-fast) var(--arc-ease-standard); }
+.group[data-dim] { opacity: .55; }
+.group[data-dim]:hover, .group[data-dim]:focus-within { opacity: 1; }
+.divider { width: 1px; height: 20px; margin: 0 4px; background: var(--arc-border); }
+
+.tool, .swatch {
+  position: relative;
+  display: inline-grid;
+  place-items: center;
+  width: 40px;
+  height: 40px;
+  padding: 0;
+  border: 0;
+  border-radius: var(--arc-radius-pill);
+  background: transparent;
+  color: var(--arc-text-secondary);
+  cursor: pointer;
+  transition: color var(--arc-duration-fast) var(--arc-ease-standard), background-color var(--arc-duration-fast) var(--arc-ease-standard), transform var(--arc-duration-spring) var(--arc-ease-spring);
+}
+.tool:hover, .tool:focus-visible, .swatch:hover, .swatch:focus-visible { background: color-mix(in oklab, var(--arc-foreground) 7%, transparent); color: var(--arc-foreground); }
+.tool:active:not(:disabled), .swatch:active { transform: scale(.94); }
+.tool:disabled { opacity: .4; cursor: default; }
+.tool[aria-pressed="true"] { color: var(--ctd-accent); }
+.tool[data-toggle][aria-pressed="true"] { background: color-mix(in oklab, var(--ctd-accent) 14%, transparent); }
+.toolHighlight {
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  background: color-mix(in oklab, var(--ctd-accent) 14%, transparent);
+}
+.icon { position: relative; }
+
+.swatchDot {
+  width: 16px;
+  height: 16px;
+  border-radius: 50%;
+  background: var(--swatch);
+  box-shadow: inset 0 0 0 1px color-mix(in oklab, var(--arc-foreground) 12%, transparent);
+  transition: transform var(--arc-duration-spring) var(--arc-ease-spring), box-shadow var(--arc-duration-fast) var(--arc-ease-standard);
+}
+.swatch[aria-pressed="true"] .swatchDot {
+  transform: scale(1.12);
+  box-shadow: 0 0 0 2px var(--arc-surface-raised), 0 0 0 3.5px var(--swatch);
+}
+
+.srOnly { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); clip-path: inset(50%); white-space: nowrap; }
+
+:global(:root[data-theme="night"]) .root {
+  --ctd-paper: color-mix(in oklab, var(--arc-surface-muted) 30%, var(--arc-background));
+  --ctd-glass: color-mix(in oklab, var(--arc-surface-raised) 72%, transparent);
+}
+:global(:root[data-theme="night"]) .stage { box-shadow: inset 0 1px 0 color-mix(in oklab, var(--arc-foreground) 4%, transparent); }
+
+@container (max-width: 560px) {
+  .stage { aspect-ratio: 4 / 5; }
+  .header { padding-inline: var(--arc-space-3); }
+  .tool, .swatch { width: 38px; height: 38px; }
+  .divider { margin: 0 2px; }
+}
+@container (max-width: 360px) {
+  /* Eight buttons have to fit a 256px stage at a 320px viewport. */
+  .toolbar { gap: 0; padding: 3px; }
+  .group { gap: 0; }
+  .divider { margin: 0 2px; }
+  .tool { width: 30px; height: 30px; }
+  .swatch { width: 28px; height: 30px; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .ink, .nib, .nibRing, .hint, .tool, .swatch, .swatchDot, .chipButton, .group { transition: none; }
+}

@@ -1,0 +1,101 @@
+/* Response feedback. A reply card (prompt bubble, author line, body, action row) and the feedback control that lives in the
+   row. Geometry: icon buttons are control-height-sm square with 16px icons, and the row pulls left by half the inset, so
+   the first icon lines up with the body text. Panels sit 8px under the row, pad 12px and nest at 18px inside the 26px card. */
+.card { --rf-mono: ui-monospace, "SFMono-Regular", Menlo, Consolas, "Liberation Mono", monospace; container-type: inline-size; display: grid; width: 100%; max-width: 600px; min-width: 0; gap: var(--arc-space-4, 16px); border: 1px solid var(--arc-border); border-radius: var(--arc-radius-panel); padding: 16px; background: var(--arc-surface); color: var(--arc-foreground); font-family: var(--arc-font-body); font-size: var(--arc-text-sm); letter-spacing: var(--arc-tracking-body); line-height: var(--arc-leading-body); }
+@container (min-width: 480px) { .card { padding: 24px; } }
+@supports not (container-type: inline-size) { .card { padding: 20px; } }
+
+.prompt { display: flex; justify-content: flex-end; }
+.bubble { max-width: min(85%, 440px); margin: 0; border-radius: var(--arc-radius-control); padding: 8px 12px; background: var(--arc-surface-muted); color: var(--arc-foreground); line-height: 20px; overflow-wrap: anywhere; }
+
+.reply { display: grid; min-width: 0; gap: 8px; }
+.author { display: flex; min-width: 0; align-items: center; gap: 8px; height: 20px; }
+.mark { display: grid; flex: none; width: 16px; height: 16px; place-items: center; }
+.mark svg { display: block; width: 16px; height: 16px; }
+.modelName { overflow: hidden; font-weight: 500; text-overflow: ellipsis; white-space: nowrap; }
+
+.body { display: grid; min-width: 0; gap: 8px; color: var(--arc-foreground); line-height: 22px; overflow-wrap: anywhere; }
+.body p, .body ul, .body ol { margin: 0; }
+.body ul, .body ol { display: grid; gap: 4px; padding-left: 20px; }
+.body ul { list-style: disc; }
+.body ol { list-style: decimal; }
+.body li::marker { color: var(--arc-text-muted); }
+.body code { border-radius: 6px; padding: 1px 5px; background: var(--arc-surface-muted); font-family: var(--rf-mono); font-size: .86em; }
+
+/* The control */
+.feedback { container-type: inline-size; min-width: 0; }
+.card .feedback { margin-top: 4px; }
+.row { display: flex; min-height: var(--arc-control-height-sm); align-items: center; justify-content: space-between; gap: 8px; }
+.actions { display: flex; align-items: center; gap: 2px; margin-left: calc((16px - var(--arc-control-height-sm)) / 2); }
+.trailing { min-width: 0; overflow: hidden; color: var(--arc-text-muted); font-size: var(--arc-text-xs); text-overflow: ellipsis; white-space: nowrap; }
+
+.iconButton, .close { position: relative; display: inline-grid; flex: none; width: var(--arc-control-height-sm); height: var(--arc-control-height-sm); place-items: center; border: 0; border-radius: var(--arc-radius-control); padding: 0; background: transparent; color: var(--arc-text-secondary); font: inherit; cursor: pointer; -webkit-tap-highlight-color: transparent; transition: background-color var(--arc-duration-fast) var(--arc-ease-standard), color var(--arc-duration-fast) var(--arc-ease-standard), transform var(--arc-duration-spring) var(--arc-ease-spring); }
+.iconButton:active:not(:disabled), .close:active { transform: scale(.94); transition-duration: var(--arc-duration-fast), var(--arc-duration-fast), var(--arc-duration-instant); transition-timing-function: var(--arc-ease-standard); }
+.iconButton:disabled { color: var(--arc-text-muted); cursor: default; opacity: .6; }
+.iconButton[data-active] { color: var(--arc-foreground); }
+.copy.copy { flex: none; }
+@media (hover: hover) and (pointer: fine) {
+  .iconButton:hover:not(:disabled), .close:hover { background: var(--arc-surface-muted); color: var(--arc-foreground); }
+}
+
+.thumb { display: grid; width: 16px; height: 16px; }
+.thumb > svg { display: block; grid-area: 1 / 1; }
+.thumbFill { opacity: 0; transition: opacity var(--arc-duration-fast) var(--arc-ease-standard); }
+.iconButton[data-active] .thumbFill { opacity: 1; }
+
+/* Panel: the clip animates height to and from zero; the pad carries the gap, so the gap folds with it. */
+.panelClip { overflow: hidden; }
+.panelPad { padding-top: 8px; }
+.panel { overflow: hidden; border: 1px solid var(--arc-border); border-radius: var(--arc-radius-control); background: var(--arc-surface); }
+.card .panel { background: color-mix(in oklab, var(--arc-surface-muted) 40%, var(--arc-surface)); }
+.panelInner { position: relative; padding: 12px; }
+.panelContent { min-width: 0; }
+
+.form { display: grid; gap: 12px; }
+.head { display: flex; align-items: center; justify-content: space-between; gap: 8px; height: 20px; }
+.heading { font-weight: 500; line-height: 20px; }
+.close { width: 28px; height: 28px; margin: -4px -6px -4px 0; border-radius: 10px; color: var(--arc-text-muted); }
+
+.chips { display: flex; flex-wrap: wrap; gap: 8px; }
+.chip { display: inline-flex; height: 28px; align-items: center; border: 1px solid var(--arc-border); border-radius: 999px; padding: 0 12px; background: var(--arc-surface); color: var(--arc-text-secondary); font: inherit; font-size: var(--arc-text-xs); line-height: 1; white-space: nowrap; cursor: pointer; -webkit-tap-highlight-color: transparent; transition: background-color var(--arc-duration-fast) var(--arc-ease-standard), border-color var(--arc-duration-fast) var(--arc-ease-standard), color var(--arc-duration-fast) var(--arc-ease-standard), transform var(--arc-duration-spring) var(--arc-ease-spring); }
+.chip:active:not(:disabled) { transform: scale(.96); transition-duration: var(--arc-duration-fast), var(--arc-duration-fast), var(--arc-duration-fast), var(--arc-duration-instant); }
+.chip[aria-pressed="true"] { border-color: var(--arc-foreground); background: var(--arc-foreground); color: var(--arc-background); }
+.chip:disabled { cursor: default; }
+@media (hover: hover) and (pointer: fine) {
+  .chip:hover:not(:disabled):not([aria-pressed="true"]) { border-color: var(--arc-border-strong, var(--arc-border)); background: var(--arc-surface-muted); color: var(--arc-foreground); }
+}
+@media (pointer: coarse) { .chip { height: 32px; } }
+
+.comment { display: block; width: 100%; height: 72px; min-height: 72px; box-sizing: border-box; resize: none; border: 1px solid var(--arc-border); border-radius: 12px; padding: 8px 12px; background: var(--arc-surface); color: var(--arc-foreground); font: inherit; font-size: var(--arc-text-sm); line-height: 20px; transition: border-color var(--arc-duration-fast) var(--arc-ease-standard); }
+.comment::placeholder { color: var(--arc-text-muted); }
+.comment:focus { border-color: var(--arc-border-strong, var(--arc-border)); }
+
+.footer { display: grid; grid-template-columns: minmax(0, 1fr) auto; align-items: center; gap: 8px; }
+.footActions { display: flex; align-items: center; gap: 8px; }
+.action.action { min-height: 32px; font-size: var(--arc-text-sm); }
+.submit.submit { border-color: var(--arc-accent); background: var(--arc-accent); color: var(--arc-accent-foreground); }
+.submit.submit:disabled { border-color: transparent; background: var(--arc-surface-muted); color: var(--arc-text-muted); opacity: 1; }
+
+.swap { position: relative; display: grid; min-width: 0; min-height: 20px; align-items: center; }
+.swapItem { display: flex; min-width: 0; align-items: center; overflow: hidden; }
+.note { overflow: hidden; color: var(--arc-text-muted); font-size: var(--arc-text-xs); text-overflow: ellipsis; white-space: nowrap; }
+.error { display: inline-flex; min-width: 0; max-width: 100%; align-items: center; gap: 6px; color: var(--arc-danger); font-size: var(--arc-text-xs); white-space: nowrap; }
+.error svg { flex: none; }
+.errorText { min-width: 0; overflow: hidden; text-overflow: ellipsis; }
+/* Narrow: the note gives way, and Cancel too (Close covers it), so an error and Try again always fit on one line. */
+@container (max-width: 400px) { .noteCell { visibility: hidden; } .cancel.cancel { display: none; } }
+
+.headAction.headAction { margin-block: -6px; }
+.muted { color: var(--arc-text-muted); font-size: var(--arc-text-xs); }
+
+.thanks { display: flex; flex-wrap: wrap; min-height: 32px; align-items: center; column-gap: 8px; row-gap: 2px; padding-left: 24px; position: relative; }
+.thanks:focus { outline: none; }
+.thanksIcon { position: absolute; top: 8px; left: 0; display: grid; width: 16px; height: 16px; place-items: center; color: var(--arc-success); }
+.thanksTitle { font-weight: 500; line-height: 20px; }
+
+.srOnly { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0, 0, 0, 0); white-space: nowrap; }
+
+@media (prefers-reduced-motion: reduce) {
+  .iconButton, .close, .chip { transition-property: background-color, border-color, color; }
+  .iconButton:active:not(:disabled), .close:active, .chip:active:not(:disabled) { transform: none; }
+}

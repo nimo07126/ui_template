@@ -1,0 +1,190 @@
+/* Speech player. An AI reply with an action row; Read aloud swaps the row for a compact player of the same 32px height,
+   so the card never changes size. Geometry: the dock bleeds 8px past the text on both sides, so ghost buttons line their
+   icons up with the text edge while their hover fills breathe; the play button sits flush with the text. */
+.root {
+  --sp-move: 150ms;
+  --sp-row: 32px;
+  --sp-button-radius: 10px;
+  position: relative;
+  container-type: inline-size;
+  width: 100%;
+  max-width: 640px;
+  min-width: 0;
+  color: var(--arc-foreground);
+  font-family: var(--arc-font-body);
+  font-size: var(--arc-text-sm);
+  letter-spacing: var(--arc-tracking-body);
+  line-height: var(--arc-leading-body);
+}
+.root:not(.plain) { border: 1px solid var(--arc-border); border-radius: var(--arc-radius-panel); padding: 16px 16px 12px; background: var(--arc-surface); }
+.srOnly { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0, 0, 0, 0); white-space: nowrap; }
+
+.author { display: flex; height: 20px; align-items: center; gap: 8px; margin-bottom: 8px; font-weight: 500; }
+.mark { display: grid; width: 16px; height: 16px; flex: none; place-items: center; }
+.mark svg { display: block; width: 16px; height: 16px; }
+.authorName { min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+
+/* The reply. Words are plain inline spans; the highlight is one rect behind them in an isolated stacking context. */
+.text { position: relative; isolation: isolate; font-size: var(--arc-text-base); line-height: 26px; text-wrap: pretty; overflow-wrap: break-word; }
+.paragraph { margin: 0; }
+.paragraph + .paragraph { margin-top: 12px; }
+.empty { color: var(--arc-text-muted); }
+.word { transition: color var(--arc-duration-fast) var(--arc-ease-standard); }
+.word[data-state="upcoming"] { color: var(--arc-text-secondary); }
+.root[data-seekable] .word { cursor: pointer; }
+@media (hover: hover) and (pointer: fine) {
+  .root[data-seekable] .word:hover { color: var(--arc-foreground); }
+}
+.highlight {
+  position: absolute;
+  top: 0;
+  left: 0;
+  z-index: -1;
+  width: 0;
+  height: 0;
+  border-radius: 7px;
+  background: color-mix(in oklab, var(--arc-accent) 18%, transparent);
+  opacity: 0;
+  pointer-events: none;
+  will-change: transform, width;
+  transition: transform var(--sp-move) var(--arc-ease-standard), width var(--sp-move) var(--arc-ease-standard), height var(--sp-move) var(--arc-ease-standard), opacity var(--arc-duration-instant) var(--arc-ease-standard);
+}
+.highlight[data-visible="true"] { opacity: 1; }
+.highlight[data-snap] { transition: opacity var(--arc-duration-instant) var(--arc-ease-standard); }
+
+/* The dock: action row and player share one grid cell and crossfade. */
+.dock { display: grid; margin: 12px -8px 0; }
+.actions, .player { grid-area: 1 / 1; min-width: 0; min-height: var(--sp-row); }
+.actions { display: flex; align-items: center; gap: 2px; }
+.player { display: grid; grid-template-columns: var(--sp-row) minmax(0, 1fr) auto auto var(--sp-row); align-items: center; gap: 2px; padding-left: 8px; }
+.actions[aria-hidden], .player[aria-hidden] { pointer-events: none; }
+
+/* Ghost controls: text-secondary at rest, a muted fill on hover. */
+.readAloud, .iconButton, .speed, .voice {
+  display: inline-flex;
+  height: var(--sp-row);
+  flex: none;
+  align-items: center;
+  justify-content: center;
+  margin: 0;
+  border: 0;
+  border-radius: var(--sp-button-radius);
+  background: transparent;
+  color: var(--arc-text-secondary);
+  cursor: pointer;
+  font: inherit;
+  font-weight: 500;
+  -webkit-tap-highlight-color: transparent;
+  transition: background-color var(--arc-duration-fast) var(--arc-ease-standard), color var(--arc-duration-fast) var(--arc-ease-standard);
+}
+.readAloud { gap: 6px; padding: 0 10px 0 8px; }
+.iconButton { width: var(--sp-row); padding: 0; }
+.iconButton[aria-pressed="true"] { color: var(--arc-foreground); }
+.iconButton[aria-pressed="true"] svg { fill: currentColor; fill-opacity: .14; }
+.copy.copy { width: var(--sp-row); height: var(--sp-row); min-height: var(--sp-row); border-radius: var(--sp-button-radius); color: var(--arc-text-secondary); }
+.readAloud:active, .iconButton:active, .speed:active, .voice:active, .voice[data-state="open"] { background: var(--arc-surface-muted); color: var(--arc-foreground); }
+@media (hover: hover) and (pointer: fine) {
+  .readAloud:hover, .iconButton:hover, .speed:hover, .voice:hover { background: var(--arc-surface-muted); color: var(--arc-foreground); }
+  .copy.copy:hover { color: var(--arc-foreground); }
+}
+.readAloud:disabled { color: var(--arc-text-muted); cursor: not-allowed; background: transparent; }
+
+/* Play: the one filled control. Icons swap inside a fixed circle. */
+.play {
+  position: relative;
+  display: grid;
+  width: var(--sp-row);
+  height: var(--sp-row);
+  margin: 0;
+  border: 0;
+  border-radius: 50%;
+  padding: 0;
+  background: var(--arc-accent);
+  color: var(--arc-accent-foreground);
+  cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
+  transition: background-color var(--arc-duration-fast) var(--arc-ease-standard), transform var(--arc-duration-instant) var(--arc-ease-standard);
+}
+.play:active:not([aria-disabled]) { transform: scale(.94); }
+.play[aria-disabled] { cursor: progress; }
+@media (hover: hover) and (pointer: fine) {
+  .play:hover:not([aria-disabled]) { background: color-mix(in oklab, var(--arc-accent) 88%, var(--arc-foreground)); }
+}
+.playIcon { position: absolute; inset: 0; display: grid; place-items: center; }
+.playIcon svg { display: block; }
+.spinner { animation: sp-spin .8s linear infinite; }
+@keyframes sp-spin { to { transform: rotate(360deg); } }
+
+/* Middle: the timeline, or a status line in the same place. */
+.middle { display: grid; min-width: 0; height: var(--sp-row); align-items: center; margin: 0 6px 0 10px; }
+.slot { display: flex; grid-area: 1 / 1; min-width: 0; align-items: center; gap: 8px; }
+.slot[aria-hidden] { pointer-events: none; }
+.time { flex: none; min-width: 2.4em; color: var(--arc-text-muted); font-size: var(--arc-text-xs); font-variant-numeric: tabular-nums; line-height: 16px; }
+.elapsed { text-align: right; }
+.message { gap: 6px; color: var(--arc-text-secondary); white-space: nowrap; }
+.messageText { min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.error > svg { flex: none; color: var(--arc-danger); }
+/* The shimmer draws its label as a clipped inline block, so the ellipsis has to live on that inner span. */
+.shimmer > span { display: block; max-width: 100%; }
+.shimmer > span > span { display: block; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+/* The headline keeps its width first; the detail takes what is left and is the first to go on narrow cards. */
+.error .messageText { flex: 0 1 auto; color: var(--arc-foreground); }
+.errorShort { display: none; }
+.errorDetail { flex: 1 1 0; min-width: 0; overflow: hidden; color: var(--arc-text-muted); font-size: var(--arc-text-xs); text-overflow: ellipsis; white-space: nowrap; }
+
+/* Scrub bar: a 4px track in a 24px hit area. The thumb shows on hover, focus and drag. */
+.scrub { position: relative; display: grid; height: 24px; flex: 1; min-width: 40px; align-items: center; border-radius: 6px; cursor: pointer; touch-action: none; -webkit-tap-highlight-color: transparent; }
+.track { display: block; height: 4px; overflow: hidden; border-radius: 2px; background: color-mix(in oklab, var(--arc-foreground) 12%, transparent); transition: transform var(--arc-duration-fast) var(--arc-ease-standard); }
+.fill { display: block; width: 100%; height: 100%; background: var(--arc-accent); transform: scaleX(0); transform-origin: left center; }
+.thumbRail { position: absolute; top: 50%; right: 0; left: 0; height: 0; pointer-events: none; }
+.thumb { position: absolute; top: -6px; left: -6px; width: 12px; height: 12px; border-radius: 50%; background: var(--arc-accent); box-shadow: 0 0 0 2px var(--arc-surface); transform: scale(0); transition: transform var(--arc-duration-fast) var(--arc-ease-standard); }
+.scrub:focus-visible .thumb, .scrub[data-dragging] .thumb { transform: scale(1); }
+.scrub[data-dragging] .track { transform: scaleY(1.5); }
+@media (hover: hover) and (pointer: fine) {
+  .scrub:hover .thumb { transform: scale(1); }
+  .scrub:hover .track { transform: scaleY(1.5); }
+}
+.plain .thumb { box-shadow: 0 0 0 2px var(--arc-background); }
+
+/* Speed and voice: labels swap in place over hidden copies of every option, so widths never change. */
+.speed { display: inline-grid; min-width: 40px; padding: 0 8px; font-variant-numeric: tabular-nums; }
+.measure, .swap { grid-area: 1 / 1; white-space: nowrap; }
+.measure { visibility: hidden; }
+.voice { gap: 4px; padding: 0 6px 0 8px; }
+/* The width follows the current name (set inline from the probe); overflow-x: clip keeps descenders and the 2px rise. */
+.voiceName { position: relative; display: inline-grid; max-width: 8rem; justify-items: start; overflow-x: clip; transition: width var(--arc-duration-fast) var(--arc-ease-standard); }
+.voiceName .swap { max-width: 8rem; overflow: hidden; text-overflow: ellipsis; }
+.voiceProbe { position: absolute; top: 0; left: 0; visibility: hidden; white-space: nowrap; pointer-events: none; }
+.chevron { flex: none; color: var(--arc-text-muted); transition: transform var(--arc-duration-standard) var(--arc-ease-standard); }
+.voice[data-state="open"] .chevron { transform: rotate(180deg); }
+
+/* Voice menu: 6px of panel padding around 12px items makes the 18px panel radius concentric. */
+.menu.menu { width: 15rem; min-width: 0; padding: 6px; border-radius: var(--arc-radius-control); }
+.menuItem { display: flex; width: 100%; align-items: center; justify-content: space-between; gap: 12px; margin: 0; border: 0; border-radius: 12px; padding: 7px 10px; background: transparent; color: var(--arc-foreground); cursor: pointer; font: inherit; text-align: left; transition: background-color var(--arc-duration-fast) var(--arc-ease-standard); }
+.menuItem:focus-visible, .menuItem:active { background: var(--arc-surface-muted); }
+@media (hover: hover) and (pointer: fine) { .menuItem:hover { background: var(--arc-surface-muted); } }
+.menuText { display: grid; min-width: 0; }
+.menuName { font-size: var(--arc-text-sm); font-weight: 500; line-height: 20px; }
+.menuDescription { color: var(--arc-text-muted); font-size: var(--arc-text-xs); line-height: 16px; }
+.menuCheck { flex: none; opacity: 0; transition: opacity var(--arc-duration-fast) var(--arc-ease-standard); }
+.menuItem[aria-checked="true"] .menuCheck { opacity: 1; }
+.menuNote { margin: 6px 0 0; border-top: 1px solid var(--arc-border-subtle); padding: 8px 10px 4px; color: var(--arc-text-muted); font-size: var(--arc-text-xs); line-height: 16px; text-wrap: pretty; }
+
+@media (pointer: coarse) { .root { --sp-row: 36px; } }
+@container (max-width: 440px) {
+  .total, .errorDetail { display: none; }
+}
+@container (max-width: 400px) {
+  .errorLong { display: none; }
+  .errorShort { display: inline; }
+}
+@container (max-width: 340px) {
+  .middle { margin: 0 2px 0 8px; }
+  .message { gap: 4px; }
+  .speed { min-width: 32px; padding: 0 4px; }
+  .voice { padding-left: 6px; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .highlight, .highlight[data-snap] { transition: opacity var(--arc-duration-instant) linear; }
+  .play, .track, .thumb, .voiceName { transition: none; }
+}

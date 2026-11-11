@@ -1,0 +1,92 @@
+/* Dictation button. A composer card: the field, then a 36px toolbar with the model label, the dictation pill and send.
+   Geometry: the card pads 10px and the field 8px, so text starts 18px in; the toolbar label sits on the same 18px line.
+   Every control is 36px (28px inside the pill, which pads 4px), so the pill's Insert lands exactly on the mic. */
+.root { container: dictation / inline-size; width: 100%; max-width: 640px; min-width: 0; color: var(--arc-foreground); font-family: var(--arc-font-body); font-size: var(--arc-text-sm); letter-spacing: var(--arc-tracking-body); line-height: var(--arc-leading-body); }
+.control { display: inline-flex; }
+.srOnly { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0, 0, 0, 0); white-space: nowrap; }
+
+.card { display: flex; flex-direction: column; gap: 4px; padding: 10px; border: 1px solid var(--arc-border); border-radius: var(--arc-radius-panel); background: var(--arc-surface); transition: border-color var(--arc-duration-fast) var(--arc-ease-standard); }
+.card:focus-within { border-color: color-mix(in oklab, var(--arc-foreground) 22%, var(--arc-border)); }
+.card[data-dictating] { border-color: color-mix(in oklab, var(--arc-accent) 28%, var(--arc-border)); }
+.card[data-disabled] { opacity: .6; }
+
+/* Field. The mirror sizes the box and shows live words while dictating; the textarea lies on top of it for editing. */
+.field { position: relative; }
+.scroll { max-height: calc(22px * 6 + 14px); overflow-y: auto; overscroll-behavior: contain; scrollbar-width: thin; }
+.stack { position: relative; }
+.mirror, .input { box-sizing: border-box; min-height: calc(22px * 2 + 14px); margin: 0; padding: 8px 8px 6px; font: inherit; font-size: 15px; letter-spacing: var(--arc-tracking-body); line-height: 22px; white-space: pre-wrap; overflow-wrap: anywhere; }
+.mirror { visibility: hidden; color: var(--arc-foreground); }
+.input { position: absolute; inset: 0; display: block; width: 100%; height: 100%; resize: none; overflow: hidden; border: 0; background: transparent; color: var(--arc-foreground); outline: none; }
+.input::placeholder { color: var(--arc-text-muted); opacity: 1; }
+.stack[data-dictating] .mirror { visibility: visible; }
+.stack[data-dictating] .input { visibility: hidden; }
+
+/* Live words only fade in. Interim guesses stay muted and settle to the text color when the recognizer commits them. */
+.word { animation: db-in 140ms var(--arc-ease-standard) both; transition: color var(--arc-duration-fast) var(--arc-ease-standard); }
+.word[data-interim] { color: color-mix(in oklab, var(--arc-text-muted) 55%, var(--arc-text-secondary)); }
+.hint { color: var(--arc-text-muted); animation: db-in 160ms var(--arc-ease-standard) both; }
+@keyframes db-in { from { opacity: 0; } }
+
+/* Toolbar */
+.bar { display: flex; align-items: center; gap: 8px; height: 36px; padding-left: 8px; }
+.slot { position: relative; flex: 1 1 auto; min-width: 0; height: 36px; }
+.slotItem { position: absolute; inset: 0; display: flex; min-width: 0; align-items: center; gap: 8px; color: var(--arc-text-secondary); font-size: var(--arc-text-sm); line-height: 20px; white-space: nowrap; }
+.slotText { min-width: 0; overflow: hidden; text-overflow: ellipsis; }
+.claude { display: block; flex: none; width: 16px; height: 16px; color: #d97757; }
+.warn { flex: none; color: var(--arc-warning); }
+.ok { flex: none; color: var(--arc-success); }
+.hints { display: inline-flex; align-items: center; gap: 6px; color: var(--arc-text-muted); font-size: var(--arc-text-xs); }
+.gap { margin-left: 6px; }
+.narrow { display: none; }
+@container dictation (max-width: 460px) { .hints { display: none; } }
+@container dictation (max-width: 400px) { .wide { display: none; } .narrow { display: inline; } }
+
+/* The pill. One element whose width springs between 36 (mic), 216 (recording) and 116 (try again), anchored right. */
+.pill { position: relative; flex: none; height: 36px; overflow: hidden; border-radius: 999px; background: transparent; transition: background-color var(--arc-duration-fast) var(--arc-ease-standard); }
+.pill[data-view="active"], .pill[data-view="retry"] { background: var(--arc-surface-muted); }
+.pill button { --focus-outline-offset: -2px; -webkit-tap-highlight-color: transparent; }
+.layer { position: absolute; top: 0; right: 0; display: flex; height: 100%; align-items: center; justify-content: flex-end; opacity: 0; visibility: hidden; transition: opacity 100ms var(--arc-ease-standard), visibility 0s linear 100ms; }
+.layer[data-on] { opacity: 1; visibility: visible; transition: opacity var(--arc-duration-fast) var(--arc-ease-standard) 40ms, visibility 0s; }
+
+.mic, .cancel, .confirm, .send { display: grid; flex: none; place-items: center; margin: 0; padding: 0; border: 0; border-radius: 999px; cursor: pointer; transition: background-color var(--arc-duration-instant) var(--arc-ease-standard), color var(--arc-duration-instant) var(--arc-ease-standard), transform var(--arc-duration-instant) var(--arc-ease-standard); }
+.mic { width: 36px; height: 36px; background: transparent; color: var(--arc-text-secondary); }
+.mic:active:not(:disabled) { transform: scale(.94); }
+.mic:disabled { color: var(--arc-text-muted); cursor: default; }
+
+.active { display: flex; box-sizing: border-box; width: 100%; align-items: center; gap: 8px; padding: 4px; }
+.cancel { width: 28px; height: 28px; background: transparent; color: var(--arc-text-secondary); }
+.cancel:active:not([aria-disabled]) { transform: scale(.92); }
+.cancel[aria-disabled] { color: var(--arc-text-muted); cursor: default; }
+.wave { display: flex; flex: 1 1 auto; min-width: 0; height: 20px; align-items: center; justify-content: center; gap: 2px; overflow: hidden; color: var(--arc-foreground); contain: layout paint; transition: color var(--arc-duration-fast) var(--arc-ease-standard); }
+.pill[data-status="starting"] .wave, .pill[data-status="processing"] .wave { color: var(--arc-text-muted); }
+/* 3px bars, fully rounded, 3px tall at rest so silence reads as a row of dots. Heights are eased per frame in JS. */
+.wave > span { display: block; flex: none; width: 3px; height: 3px; border-radius: 999px; background: currentColor; will-change: height; }
+.time { flex: none; width: 4.5ch; color: var(--arc-text-secondary); font-size: var(--arc-text-xs); font-variant-numeric: tabular-nums; line-height: 16px; text-align: center; }
+.confirm { position: relative; width: 28px; height: 28px; background: var(--arc-accent); color: var(--arc-accent-foreground); }
+.confirm:active:not([aria-disabled]) { transform: scale(.92); }
+.confirm[aria-disabled] { cursor: default; }
+.swap { position: absolute; inset: 0; display: grid; place-items: center; opacity: 0; transform: scale(.7); transition: opacity var(--arc-duration-instant) var(--arc-ease-standard), transform var(--arc-duration-fast) var(--arc-ease-standard); }
+.swap[data-on] { opacity: 1; transform: none; }
+.spin { animation: db-spin .8s linear infinite; }
+@keyframes db-spin { to { transform: rotate(360deg); } }
+
+.retry { display: inline-flex; box-sizing: border-box; flex: none; width: max-content; height: 36px; align-items: center; justify-content: center; gap: 6px; margin: 0; padding: 0 14px; border: 0; border-radius: 999px; background: transparent; color: var(--arc-foreground); font: inherit; font-size: var(--arc-text-sm); font-weight: 500; white-space: nowrap; cursor: pointer; transition: background-color var(--arc-duration-instant) var(--arc-ease-standard); }
+.retry:active:not(:disabled) { background: color-mix(in oklab, var(--arc-foreground) 9%, transparent); }
+.retry:disabled { color: var(--arc-text-muted); cursor: default; }
+
+.send { width: 36px; height: 36px; background: var(--arc-accent); color: var(--arc-accent-foreground); }
+.send:active:not(:disabled) { transform: scale(.94); }
+.send:disabled { background: var(--arc-surface-muted); color: var(--arc-text-muted); cursor: default; }
+
+@media (hover: hover) and (pointer: fine) {
+  .mic:hover:not(:disabled) { background: var(--arc-surface-muted); color: var(--arc-foreground); }
+  .cancel:hover:not([aria-disabled]) { background: color-mix(in oklab, var(--arc-foreground) 8%, transparent); color: var(--arc-foreground); }
+  .confirm:hover:not([aria-disabled]), .send:hover:not(:disabled) { background: color-mix(in oklab, var(--arc-accent) 88%, var(--arc-foreground)); }
+  .retry:hover:not(:disabled) { background: color-mix(in oklab, var(--arc-foreground) 6%, transparent); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .word, .hint { animation: none; }
+  .wave > span { transition: none; }
+  .spin { animation-duration: 1.6s; }
+}

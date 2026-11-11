@@ -1,0 +1,47 @@
+/* A combination is a row of caps; a single key is one cap. Everything sizes from --kbd-h so caps sit inline with text. */
+.kbd { --kbd-h: 22px; --kbd-pad: 6px; --kbd-radius: 6px; --kbd-gap: 3px; --kbd-ledge: 1px; display: inline-flex; align-items: center; gap: var(--kbd-gap); margin: 0; padding: 0 0 var(--kbd-ledge); font: inherit; font-family: var(--arc-font-body); font-size: var(--arc-text-xs); font-weight: 500; letter-spacing: 0; line-height: 1; vertical-align: middle; white-space: nowrap; }
+.sm { --kbd-h: 18px; --kbd-pad: 4px; --kbd-radius: 5px; --kbd-gap: 2px; font-size: 11px; }
+.md { --kbd-h: 22px; }
+.lg { --kbd-h: 28px; --kbd-pad: 8px; --kbd-radius: 8px; --kbd-gap: 4px; --kbd-ledge: 2px; font-size: 13px; }
+.slot { display: inline-flex; }
+
+/* The cap rests on a hairline ledge. Pressing drops it onto the ledge fast; letting go springs it back up. */
+.key {
+  --kbd-face: var(--arc-surface);
+  --kbd-edge: color-mix(in oklab, var(--arc-foreground) 13%, var(--arc-surface));
+  --kbd-under: color-mix(in oklab, var(--arc-foreground) 17%, var(--arc-surface));
+  display: inline-flex;
+  box-sizing: border-box;
+  min-width: var(--kbd-h);
+  height: var(--kbd-h);
+  align-items: center;
+  justify-content: center;
+  padding: 0 var(--kbd-pad);
+  border: 1px solid var(--kbd-edge);
+  border-radius: var(--kbd-radius);
+  background: var(--kbd-face);
+  box-shadow: 0 var(--kbd-ledge) 0 var(--kbd-under);
+  color: var(--arc-text-secondary);
+  font: inherit;
+  font-variant-numeric: tabular-nums;
+  transition: transform var(--arc-duration-spring) var(--arc-ease-spring), box-shadow var(--arc-duration-standard) var(--arc-ease-standard), background-color var(--arc-duration-fast) var(--arc-ease-standard), color var(--arc-duration-fast) var(--arc-ease-standard);
+}
+.key[data-pressed] {
+  transform: translateY(var(--kbd-ledge));
+  box-shadow: 0 0 0 var(--kbd-under);
+  background: color-mix(in oklab, var(--arc-foreground) 4%, var(--kbd-face));
+  color: var(--arc-foreground);
+  transition-duration: 50ms;
+  transition-timing-function: var(--arc-ease-standard);
+}
+:global(:root[data-theme="night"]) .key {
+  --kbd-face: var(--arc-surface-raised);
+  --kbd-edge: color-mix(in oklab, var(--arc-foreground) 14%, var(--arc-surface-raised));
+  --kbd-under: oklch(0% 0 0 / .5);
+}
+.glyph { display: inline-flex; align-items: center; }
+.hidden { position: absolute; width: 1px; height: 1px; overflow: hidden; clip-path: inset(50%); white-space: nowrap; }
+
+@media (prefers-reduced-motion: reduce) {
+  .key, .key[data-pressed] { transform: none; transition: background-color var(--arc-duration-instant) var(--arc-ease-standard), color var(--arc-duration-instant) var(--arc-ease-standard), box-shadow var(--arc-duration-instant) var(--arc-ease-standard); }
+}

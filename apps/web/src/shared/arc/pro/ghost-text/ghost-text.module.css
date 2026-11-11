@@ -1,0 +1,147 @@
+/* Ghost text. The textarea sits on a mirror with the same metrics: the mirror draws the typed text transparent, then the
+   ghost in muted ink, so the suggestion starts exactly at the caret and wraps the way the real text will. */
+.root {
+  --gt-line: 22px;
+  --gt-pad-x: 16px;
+  --gt-pad-top: 14px;
+  --gt-pad-bottom: 4px;
+  position: relative; display: flex; flex-direction: column; box-sizing: border-box; width: 100%; min-width: 0;
+  container-type: inline-size;
+  border: 1px solid var(--arc-border); border-radius: var(--arc-radius-control); background: var(--arc-surface); color: var(--arc-foreground);
+  font-family: var(--arc-font-body); font-size: var(--arc-text-sm); letter-spacing: var(--arc-tracking-body); text-align: start;
+  transition: border-color var(--arc-duration-fast) var(--arc-ease-standard), box-shadow var(--arc-duration-standard) var(--arc-ease-standard);
+}
+.root[data-labelled] { --gt-pad-top: 6px; }
+@media (hover: hover) and (pointer: fine) {
+  .root:not([data-disabled], [data-variant="plain"]):hover { border-color: color-mix(in oklab, var(--arc-foreground) 22%, var(--arc-border)); }
+}
+/* Same focus language as Arc's Input: the border firms up and a soft ring settles around the whole field. */
+.root:not([data-variant="plain"]):has(.input:focus-visible) { border-color: color-mix(in oklab, var(--arc-foreground) 50%, var(--arc-border)); box-shadow: 0 0 0 3px var(--arc-focus-ring); }
+.root[data-disabled] { background: var(--arc-surface-muted); opacity: .6; }
+/* Plain: flush inside a host card. No border, so the text's left edge lands exactly on the card's padding. */
+.root[data-variant="plain"] { border: 0; border-radius: 0; background: transparent; }
+.root[data-variant="plain"][data-disabled] { background: transparent; }
+
+.label { display: flex; align-items: center; gap: 8px; min-width: 0; padding: 12px var(--gt-pad-x) 0; font-size: var(--arc-text-xs); line-height: 20px; color: var(--arc-text-secondary); }
+
+/* Clip, not hidden, until the text passes maxRows: a clipped box cannot be scrolled to reveal the caret mid-tween. */
+.viewport {
+  position: relative; overflow: clip; scrollbar-width: none;
+  max-height: calc(var(--gt-max-rows) * var(--gt-line) + var(--gt-pad-top) + var(--gt-pad-bottom));
+}
+.viewport::-webkit-scrollbar { display: none; }
+.viewport[data-scroll="true"] { overflow: hidden auto; overscroll-behavior: contain; }
+.stack { position: relative; }
+
+.mirror, .input {
+  box-sizing: border-box; display: block; width: 100%; margin: 0; padding: var(--gt-pad-top) var(--gt-pad-x) var(--gt-pad-bottom);
+  font: inherit; letter-spacing: inherit; line-height: var(--gt-line); text-align: start; tab-size: 4;
+  white-space: pre-wrap; overflow-wrap: break-word; word-break: normal;
+  transition: opacity var(--arc-duration-fast) var(--arc-ease-standard);
+}
+.mirror { min-height: calc(var(--gt-rows) * var(--gt-line) + var(--gt-pad-top) + var(--gt-pad-bottom)); color: transparent; pointer-events: none; user-select: none; }
+.input {
+  position: absolute; inset: 0; height: 100%; border: 0; border-radius: 0; background: transparent; color: var(--arc-foreground);
+  caret-color: var(--arc-foreground); resize: none; overflow: hidden; outline: none; appearance: none; -webkit-appearance: none;
+}
+.input::placeholder { color: var(--arc-text-muted); opacity: 1; }
+.input:disabled { cursor: not-allowed; }
+.root[data-fading] :is(.mirror, .input) { opacity: 0; }
+
+/* Ghost chunks only fade in, so a streamed suggestion settles without any movement. Dismissal fades out faster than it came. */
+.ghost { color: var(--arc-text-muted); animation: ghostIn 140ms var(--arc-ease-standard) both; }
+.ghostOut { color: var(--arc-text-muted); animation: ghostOut 110ms var(--arc-ease-standard) both; }
+/* Accepting: for 200ms the mirror draws the text and the field's glyphs go transparent (the caret stays), so the accepted
+   range can settle from ghost ink to text ink in place. Same metrics on both layers, so nothing moves at the hand-off. */
+.root[data-merging] .mirror { color: var(--arc-foreground); }
+.root[data-merging] .input { color: transparent; }
+.merge { animation: merge 200ms var(--arc-ease-standard) both; }
+.marker { position: relative; }
+.marker[data-caret]::after {
+  content: ""; position: absolute; top: 2px; bottom: 2px; left: -1px; width: 1.5px; border-radius: 1px; background: var(--arc-foreground);
+  animation: blink 1.06s steps(1, end) infinite;
+}
+.marker[data-caret="typing"]::after { animation: none; }
+
+@keyframes ghostIn { from { opacity: 0; } to { opacity: 1; } }
+@keyframes ghostOut { from { opacity: 1; } to { opacity: 0; } }
+@keyframes merge { from { color: var(--arc-text-muted); } to { color: var(--arc-foreground); } }
+@keyframes blink { 50% { opacity: 0; } }
+
+/* Footer: start slot, key hints and the chip. The chip sits 6px inside the corner so its 12px radius nests in the field's. */
+.footer { display: flex; flex: none; align-items: center; justify-content: flex-end; gap: 10px; min-height: 30px; padding: 0 6px 6px var(--gt-pad-x); }
+.footerStart { display: flex; flex: 1 1 auto; align-items: center; gap: 8px; min-width: 0; font-size: var(--arc-text-xs); line-height: 20px; color: var(--arc-text-muted); }
+.keys { display: inline-flex; flex: none; align-items: center; gap: 10px; font-size: var(--arc-text-xs); line-height: 20px; color: var(--arc-text-muted); white-space: nowrap; }
+.keys > span { display: inline-flex; align-items: center; gap: 5px; }
+@container (max-width: 519px) { .keys { display: none; } }
+
+.chip {
+  position: relative; display: inline-flex; flex: none; align-items: center; justify-content: flex-end; box-sizing: border-box;
+  height: 24px; margin: 0; padding: 0; overflow: hidden; border: 0; border-radius: 12px;
+  background: color-mix(in oklab, var(--arc-surface-muted) 80%, var(--arc-surface)); color: var(--arc-text-secondary);
+  font: inherit; font-size: var(--arc-text-xs); line-height: 1; white-space: nowrap; cursor: default; -webkit-tap-highlight-color: transparent;
+  transition: background-color var(--arc-duration-fast) var(--arc-ease-standard), color var(--arc-duration-fast) var(--arc-ease-standard);
+}
+/* Calm at rest: the pill only fills in when there is something to do (accept or retry). */
+.chip:is([data-state="idle"], [data-state="loading"], [data-state="accepted"]) { background: transparent; }
+.chip:is([data-state="ready"], [data-state="error"]) { cursor: pointer; }
+@media (hover: hover) and (pointer: fine) {
+  .chip:is([data-state="ready"], [data-state="error"]):hover { background: var(--arc-surface-muted); color: var(--arc-foreground); }
+}
+.chip:is([data-state="ready"], [data-state="error"]):active { background: color-mix(in oklab, var(--arc-foreground) 10%, var(--arc-surface-muted)); }
+.chipStack { display: grid; align-items: center; justify-items: end; }
+.chipLayer { display: inline-flex; grid-area: 1 / 1; align-items: center; gap: 6px; box-sizing: border-box; height: 24px; padding: 0 9px 0 6px; }
+.chip[data-state="idle"] .chipLayer, .chip[data-state="loading"] .chipLayer { padding-right: 10px; }
+.mark { display: grid; flex: none; width: 12px; height: 12px; place-items: center; }
+.mark > svg { display: block; width: 12px; height: 12px; }
+.chipName { color: var(--arc-text-secondary); }
+.desk { display: inline-flex; align-items: center; gap: 5px; }
+.touch { display: none; }
+@media (hover: none) and (pointer: coarse) {
+  .desk { display: none; }
+  .touch { display: inline; }
+}
+.okIcon, .alertIcon { flex: none; width: 13px; height: 13px; stroke-width: 2; }
+.okIcon { color: var(--arc-success); }
+.alertIcon { color: var(--arc-warning); }
+.retry { color: var(--arc-accent); font-weight: 500; }
+
+.srOnly { position: absolute; width: 1px; height: 1px; overflow: hidden; clip-path: inset(50%); white-space: nowrap; }
+
+/* Single-line: the input scrolls sideways with the caret and the chip sits inline at the end. */
+.root[data-multiline="false"] { flex-direction: row; align-items: center; }
+.root[data-multiline="false"] .viewport { flex: 1 1 auto; min-width: 0; max-height: none; overflow: auto clip; }
+.root[data-multiline="false"] .stack { width: max-content; min-width: 100%; }
+.root[data-multiline="false"] :is(.mirror, .input) { padding: 8px 14px; white-space: pre; overflow-wrap: normal; }
+.root[data-multiline="false"] .mirror { min-height: 0; }
+.root[data-multiline="false"] .footer { min-height: 0; padding: 0 7px 0 0; }
+
+/* Demo dressing: a pull request card. The header's mark and the description share the 16px inset, so their left edges line up. */
+.host { width: 100%; max-width: 680px; margin-inline: auto; container-type: inline-size; }
+.card {
+  overflow: hidden; border: 1px solid var(--arc-border); border-radius: var(--arc-radius-panel); background: var(--arc-surface);
+  transition: border-color var(--arc-duration-fast) var(--arc-ease-standard), box-shadow var(--arc-duration-standard) var(--arc-ease-standard);
+}
+.card:has(textarea:focus-visible) { border-color: color-mix(in oklab, var(--arc-foreground) 50%, var(--arc-border)); box-shadow: 0 0 0 3px var(--arc-focus-ring); }
+.cardHead { display: flex; align-items: flex-start; gap: 12px; padding: 14px 16px 12px; border-bottom: 1px solid var(--arc-border-subtle); }
+.prMark { flex: none; width: 16px; height: 16px; margin-top: 2px; color: var(--arc-foreground); }
+.prText { display: flex; flex: 1 1 auto; flex-direction: column; gap: 2px; min-width: 0; }
+.prTitleRow { display: flex; align-items: baseline; gap: 8px; min-width: 0; font-size: var(--arc-text-sm); line-height: 20px; }
+.prTitle { min-width: 0; overflow: hidden; color: var(--arc-foreground); font-weight: 500; text-overflow: ellipsis; white-space: nowrap; }
+.prNumber { flex: none; color: var(--arc-text-muted); font-variant-numeric: tabular-nums; }
+.prMeta { display: flex; align-items: center; gap: 6px; min-width: 0; font-size: var(--arc-text-xs); line-height: 20px; color: var(--arc-text-muted); }
+.prAvatar { flex: none; width: 16px; height: 16px; border-radius: 50%; object-fit: cover; }
+.prMetaText { min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.prBranch { color: var(--arc-text-secondary); }
+.card .root { --gt-pad-top: 12px; --gt-pad-bottom: 10px; }
+.simNote { display: inline-flex; align-items: center; gap: 6px; min-width: 0; }
+.simText { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.replay { flex: none; margin-block: -6px; }
+.replay svg { width: 14px; height: 14px; }
+
+@media (prefers-reduced-motion: reduce) {
+  .root, .mirror, .input, .chip, .card { transition: none; }
+  .ghost, .ghostOut, .merge { animation: none; }
+  .ghostOut { opacity: 0; }
+  .marker[data-caret]::after { animation: none; }
+}

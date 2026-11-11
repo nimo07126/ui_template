@@ -1,0 +1,375 @@
+.root {
+  --cs-accent: var(--arc-accent);
+  --cs-on-accent: var(--arc-accent-foreground);
+  --cs-well: color-mix(in oklab, var(--arc-foreground) 5%, var(--arc-surface-muted));
+  --cs-shell: var(--arc-surface);
+  --cs-shell-edge: color-mix(in oklab, var(--arc-foreground) 22%, transparent);
+  --cs-sheen: transparent;
+  --cs-cable: color-mix(in oklab, var(--arc-foreground) 15%, var(--arc-surface));
+  --cs-cell: color-mix(in oklab, var(--arc-foreground) 7%, transparent);
+
+  /* Brushed metal charger post, mixed from the theme so it follows light and dark */
+  --cs-m1: color-mix(in oklab, var(--arc-foreground) 10%, var(--arc-surface));
+  --cs-m2: color-mix(in oklab, var(--arc-foreground) 3%, var(--arc-surface));
+  --cs-m3: color-mix(in oklab, var(--arc-foreground) 12%, var(--arc-surface));
+  --cs-m4: color-mix(in oklab, var(--arc-foreground) 5%, var(--arc-surface));
+  --cs-m5: color-mix(in oklab, var(--arc-foreground) 14%, var(--arc-surface));
+  --cs-post-edge: color-mix(in oklab, var(--arc-foreground) 16%, transparent);
+  --cs-screen: color-mix(in oklab, var(--arc-foreground) 88%, var(--arc-surface));
+
+  container-type: inline-size;
+  position: relative;
+  width: 100%;
+  min-width: 0;
+  color: var(--arc-foreground);
+  font-family: var(--arc-font-body);
+  letter-spacing: var(--arc-tracking-body);
+  line-height: var(--arc-leading-body);
+  -webkit-tap-highlight-color: transparent;
+}
+.card {
+  display: grid;
+  gap: var(--arc-space-4);
+  min-width: 0;
+  padding: var(--arc-space-6);
+  border: 1px solid var(--arc-border);
+  border-radius: var(--arc-radius-surface);
+  background: var(--arc-surface);
+}
+
+:global(:root[data-theme="night"]) .root {
+  --cs-well: color-mix(in oklab, var(--arc-foreground) 4%, var(--arc-surface-muted));
+  --cs-shell: var(--arc-surface-raised);
+  --cs-shell-edge: color-mix(in oklab, var(--arc-foreground) 20%, transparent);
+  --cs-sheen: color-mix(in oklab, var(--arc-foreground) 12%, transparent);
+  --cs-cable: color-mix(in oklab, var(--arc-foreground) 20%, var(--arc-surface));
+  --cs-cell: color-mix(in oklab, var(--arc-foreground) 6%, transparent);
+  --cs-m1: color-mix(in oklab, var(--arc-foreground) 14%, var(--arc-surface));
+  --cs-m2: color-mix(in oklab, var(--arc-foreground) 22%, var(--arc-surface));
+  --cs-m3: color-mix(in oklab, var(--arc-foreground) 12%, var(--arc-surface));
+  --cs-m4: color-mix(in oklab, var(--arc-foreground) 19%, var(--arc-surface));
+  --cs-m5: color-mix(in oklab, var(--arc-foreground) 13%, var(--arc-surface));
+  --cs-post-edge: color-mix(in oklab, var(--arc-foreground) 12%, transparent);
+  --cs-screen: var(--arc-background);
+}
+@media (prefers-color-scheme: dark) {
+  :global(:root[data-theme="night"]) .root {
+    --cs-well: color-mix(in oklab, var(--arc-foreground) 4%, var(--arc-surface-muted));
+    --cs-shell: var(--arc-surface-raised);
+    --cs-shell-edge: color-mix(in oklab, var(--arc-foreground) 20%, transparent);
+    --cs-sheen: color-mix(in oklab, var(--arc-foreground) 12%, transparent);
+    --cs-cable: color-mix(in oklab, var(--arc-foreground) 20%, var(--arc-surface));
+    --cs-cell: color-mix(in oklab, var(--arc-foreground) 6%, transparent);
+    --cs-m1: color-mix(in oklab, var(--arc-foreground) 14%, var(--arc-surface));
+    --cs-m2: color-mix(in oklab, var(--arc-foreground) 22%, var(--arc-surface));
+    --cs-m3: color-mix(in oklab, var(--arc-foreground) 12%, var(--arc-surface));
+    --cs-m4: color-mix(in oklab, var(--arc-foreground) 19%, var(--arc-surface));
+    --cs-m5: color-mix(in oklab, var(--arc-foreground) 13%, var(--arc-surface));
+    --cs-post-edge: color-mix(in oklab, var(--arc-foreground) 12%, transparent);
+    --cs-screen: var(--arc-background);
+  }
+}
+
+/* Header: charger and live state of charge */
+.header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: var(--arc-space-4);
+  min-width: 0;
+}
+.titles { display: grid; gap: 2px; min-width: 0; }
+.title {
+  margin: 0;
+  font-size: var(--arc-text-base);
+  font-weight: 500;
+  line-height: var(--arc-leading-body);
+  overflow-wrap: anywhere;
+}
+.location { margin: 0; font-size: var(--arc-text-sm); color: var(--arc-text-secondary); overflow-wrap: anywhere; }
+.charge { display: grid; justify-items: end; gap: 2px; flex: none; }
+.soc {
+  display: inline-block;
+  min-width: 3.2ch;
+  text-align: right;
+  font-family: var(--arc-font-display);
+  font-size: var(--arc-text-4xl);
+  font-weight: 400;
+  letter-spacing: var(--arc-tracking-display);
+  line-height: 1;
+  font-variant-numeric: tabular-nums;
+}
+.status {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-size: var(--arc-text-sm);
+  color: var(--arc-text-secondary);
+  white-space: nowrap;
+}
+.status svg { flex: none; color: var(--arc-text-muted); transition: color var(--arc-duration-fast) var(--arc-ease-standard); }
+.status[data-mode="charging"] svg { color: var(--cs-accent); }
+
+/* Hero: charger, cable and pack */
+.hero {
+  position: relative;
+  container-type: inline-size;
+  padding-top: 36px;
+  touch-action: pan-y;
+  user-select: none;
+  -webkit-user-select: none;
+  cursor: ew-resize;
+}
+.heroSvg { display: block; width: 100%; height: auto; aspect-ratio: 1000 / 240; overflow: visible; }
+
+.m1 { stop-color: var(--cs-m1); }
+.m2 { stop-color: var(--cs-m2); }
+.m3 { stop-color: var(--cs-m3); }
+.m4 { stop-color: var(--cs-m4); }
+.m5 { stop-color: var(--cs-m5); }
+.heroSvg :is(.post, .nub, .shell, .cell, .front, .sheen, .limitLine) { vector-effect: non-scaling-stroke; }
+.post { stroke: var(--cs-post-edge); stroke-width: 1; }
+.screen { fill: var(--cs-screen); }
+.led { fill: var(--cs-accent); }
+.holster { fill: var(--cs-screen); opacity: .85; }
+
+.cable { fill: none; stroke: var(--cs-cable); stroke-width: 14; stroke-linecap: round; }
+.core { fill: none; stroke: var(--cs-accent); stroke-width: 3; stroke-linecap: round; }
+.nub { fill: var(--cs-shell); stroke: var(--cs-shell-edge); stroke-width: 1.5; }
+
+.shell { fill: var(--cs-shell); stroke: var(--cs-shell-edge); stroke-width: 1.5; }
+.well { fill: var(--cs-well); }
+.fill { fill: var(--cs-accent); }
+.beyond { fill: var(--cs-cell); }
+.cell { stroke: var(--cs-cell); stroke-width: 1; }
+.front { stroke: var(--cs-on-accent); stroke-width: 2; }
+.sheen { fill: none; stroke: var(--cs-sheen); stroke-width: 1; stroke-linecap: round; }
+.limitLine {
+  stroke: var(--arc-foreground);
+  stroke-width: 1.5;
+  stroke-dasharray: 4 4;
+  stroke-opacity: .55;
+  transition: stroke-opacity var(--arc-duration-fast) var(--arc-ease-standard);
+}
+.root[data-dragging] .limitLine { stroke-opacity: .9; }
+
+.packets { pointer-events: none; }
+.packet { fill: var(--cs-accent); }
+.packet[data-in="in"] { fill: var(--cs-on-accent); }
+
+/* Limit marker: a real slider, positioned by the loop in container units */
+.handle {
+  position: absolute;
+  top: 0;
+  left: 0;
+  display: grid;
+  justify-items: center;
+  width: 64px;
+  height: 44px;
+  transform: translateX(calc(var(--x, 80) * 1cqw - 50%));
+  cursor: ew-resize;
+  touch-action: none;
+}
+/* Solid stem from the pill down to the top of the pack, where the dashed limit line takes over.
+   The pack top sits 20 viewBox units into the art, and one unit is 0.1cqw of the hero. */
+.handle::after {
+  content: "";
+  position: absolute;
+  top: 26px;
+  left: calc(50% - .75px);
+  width: 1.5px;
+  height: calc(var(--hero-pad, 36px) - 26px + 2cqw);
+  background: var(--arc-foreground);
+  opacity: .55;
+  pointer-events: none;
+  transition: opacity var(--arc-duration-fast) var(--arc-ease-standard);
+}
+.root[data-dragging] .handle::after { opacity: .9; }
+.pill {
+  display: inline-grid;
+  place-items: center;
+  min-width: 48px;
+  height: 26px;
+  padding: 0 var(--arc-space-2);
+  border: 1px solid var(--arc-border-strong);
+  border-radius: var(--arc-radius-pill);
+  background: var(--arc-surface-raised);
+  color: var(--arc-foreground);
+  font-size: var(--arc-text-xs);
+  font-weight: 500;
+  font-variant-numeric: tabular-nums;
+  /* Keeps the pill inside the hero when the limit sits near 100%, while the stem stays on the line. */
+  translate: clamp(calc(24px - var(--x, 80) * 1cqw), 0px, calc(100cqw - 24px - var(--x, 80) * 1cqw)) 0;
+  transition:
+    transform var(--arc-duration-spring) var(--arc-ease-spring),
+    background-color var(--arc-duration-fast) var(--arc-ease-standard),
+    color var(--arc-duration-fast) var(--arc-ease-standard),
+    border-color var(--arc-duration-fast) var(--arc-ease-standard);
+}
+@media (hover: hover) and (pointer: fine) {
+  .handle:hover .pill { background: var(--arc-surface-muted); border-color: var(--arc-foreground); }
+}
+.handle:focus-visible:not([data-pointer]) .pill { background: var(--arc-surface-muted); border-color: var(--arc-foreground); }
+.handle[data-pointer]:focus-visible { outline: none !important; }
+.root[data-dragging] .pill { transform: scale(1.08); background: var(--arc-foreground); border-color: var(--arc-foreground); color: var(--arc-background); }
+
+/* Lower: curve and stats */
+.lower { display: grid; gap: var(--arc-space-4); min-width: 0; }
+.curve { display: grid; gap: var(--arc-space-2); min-width: 0; }
+.curveHead { display: flex; align-items: baseline; justify-content: space-between; gap: var(--arc-space-3); }
+.curveTitle { font-size: var(--arc-text-sm); font-weight: 500; }
+.curveAt { font-size: var(--arc-text-sm); color: var(--arc-text-muted); font-variant-numeric: tabular-nums; white-space: nowrap; }
+
+.plot {
+  position: relative;
+  aspect-ratio: 2 / 1;
+  min-width: 0;
+  margin-bottom: 22px;
+  container-type: size;
+  touch-action: pan-y;
+  user-select: none;
+  -webkit-user-select: none;
+  cursor: ew-resize;
+}
+.plotSvg { position: absolute; inset: 0; display: block; width: 100%; height: 100%; overflow: visible; }
+.plotSvg :is(path, line) { vector-effect: non-scaling-stroke; }
+.grid { stroke: var(--arc-border-subtle); stroke-width: 1; }
+.axis { stroke: var(--arc-border); stroke-width: 1; }
+.areaTop { stop-color: var(--cs-accent); stop-opacity: .2; }
+.areaBottom { stop-color: var(--cs-accent); stop-opacity: .02; }
+.curveLine { fill: none; stroke: var(--arc-border-strong); stroke-width: 1.5; stroke-linejoin: round; }
+.curveDone { fill: none; stroke: var(--cs-accent); stroke-width: 2; stroke-linejoin: round; }
+.curveBeyond { fill: color-mix(in oklab, var(--arc-foreground) 3%, transparent); }
+.curveLimit { stroke: var(--arc-foreground); stroke-width: 1; stroke-dasharray: 4 4; stroke-opacity: .5; }
+
+.yLabel,
+.xLabel {
+  position: absolute;
+  font-size: var(--arc-text-xs);
+  color: var(--arc-text-muted);
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+  pointer-events: none;
+}
+.yLabel { left: 0; transform: translateY(calc(-100% - 4px)); }
+.xLabel { top: calc(96% + 6px); transform: translateX(-50%); }
+.xLabel[data-edge="start"] { left: 0; transform: none; }
+.xLabel[data-edge="end"] { right: 0; transform: none; }
+
+.dot {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 12px;
+  height: 12px;
+  border: 2px solid var(--arc-surface);
+  border-radius: var(--arc-radius-pill);
+  background: var(--cs-accent);
+  transform: translate(calc(var(--x, 0) * 1cqw - 50%), calc(var(--y, 0) * 1cqh - 50%));
+  pointer-events: none;
+}
+
+.stats {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  margin: 0;
+  border: 1px solid var(--arc-border);
+  border-radius: calc(var(--arc-radius-surface) - var(--arc-space-3));
+  overflow: hidden;
+}
+.stat {
+  display: grid;
+  gap: 2px;
+  align-content: center;
+  min-width: 0;
+  padding: var(--arc-space-3) var(--arc-space-4);
+}
+.stat:nth-child(odd) { border-right: 1px solid var(--arc-border-subtle); }
+.stat:nth-child(-n + 2) { border-bottom: 1px solid var(--arc-border-subtle); }
+.stat dt { font-size: var(--arc-text-xs); color: var(--arc-text-muted); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.stat dd {
+  margin: 0;
+  font-size: var(--arc-text-lg);
+  font-weight: 500;
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+}
+
+/* Footer */
+.footer {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--arc-space-3) var(--arc-space-4);
+  padding-top: var(--arc-space-4);
+  border-top: 1px solid var(--arc-border-subtle);
+}
+.hint { margin: 0; flex: 1 1 220px; font-size: var(--arc-text-sm); color: var(--arc-text-muted); }
+.action {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--arc-space-2);
+  height: var(--arc-control-height-md);
+  padding: 0 20px;
+  border: 1px solid transparent;
+  border-radius: var(--arc-radius-control);
+  background: var(--arc-foreground);
+  color: var(--arc-background);
+  font: inherit;
+  font-size: var(--arc-text-sm);
+  font-weight: 500;
+  cursor: pointer;
+  transition:
+    transform var(--arc-duration-spring) var(--arc-ease-spring),
+    background-color var(--arc-duration-fast) var(--arc-ease-standard),
+    color var(--arc-duration-fast) var(--arc-ease-standard),
+    border-color var(--arc-duration-fast) var(--arc-ease-standard);
+}
+.action[data-mode="charging"] { background: var(--arc-surface); color: var(--arc-foreground); border-color: var(--arc-border-strong); }
+@media (hover: hover) and (pointer: fine) {
+  .action[data-mode="charging"]:hover { background: var(--arc-surface-muted); }
+  .action:not([data-mode="charging"]):hover { background: color-mix(in oklab, var(--arc-foreground) 88%, var(--arc-background)); }
+}
+.action:active { transform: scale(.97); }
+.actionIcon { display: inline-grid; place-items: center; width: 16px; height: 16px; }
+.actionLabels { display: inline-grid; }
+.actionLabel { grid-area: 1 / 1; visibility: hidden; opacity: 0; transition: opacity var(--arc-duration-fast) var(--arc-ease-standard); white-space: nowrap; }
+.actionLabel[data-active] { visibility: visible; opacity: 1; }
+
+.sr {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  margin: -1px;
+  padding: 0;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+  white-space: nowrap;
+  border: 0;
+}
+
+/* Wide: curve beside the stats */
+@container (min-width: 640px) {
+  .card { padding: var(--arc-space-8); gap: var(--arc-space-6); }
+  .lower { grid-template-columns: minmax(0, 1.55fr) minmax(0, 1fr); gap: var(--arc-space-6); align-items: stretch; }
+  .plot { aspect-ratio: 5 / 2; }
+  .stats { grid-template-rows: 1fr 1fr; }
+  .stat { padding: var(--arc-space-4); }
+  .stat dd { font-size: var(--arc-text-xl); }
+  .soc { font-size: var(--arc-text-5xl); }
+}
+
+@container (max-width: 420px) {
+  .card { padding: var(--arc-space-4); }
+  .soc { font-size: var(--arc-text-3xl); }
+  .hero { padding-top: 32px; --hero-pad: 32px; }
+  .stat { padding: var(--arc-space-3); }
+  .stat dd { font-size: var(--arc-text-base); }
+  .action { width: 100%; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .pill, .action, .actionLabel, .status svg, .limitLine, .handle::after { transition: none; }
+}

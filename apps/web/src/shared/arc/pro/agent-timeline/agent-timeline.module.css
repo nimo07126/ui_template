@@ -1,0 +1,198 @@
+/* Agent timeline. Each row sets --c to its agent color; spans, connectors and the legend dot read it. The plot sets --now and
+   --axis (seconds) and every position on the time axis is a percentage of --axis, so bars, ticks, connectors and the playhead
+   share one grid without measuring. */
+.root {
+  --tint: 24%;
+  --shine: color-mix(in oklab, var(--arc-background) 62%, transparent);
+  position: relative;
+  container-type: inline-size;
+  width: 100%;
+  min-width: 0;
+  border: 1px solid var(--arc-border);
+  border-radius: var(--arc-radius-surface);
+  background: var(--arc-surface);
+  color: var(--arc-foreground);
+  font-size: var(--arc-text-sm);
+  line-height: var(--arc-leading-body);
+  letter-spacing: var(--arc-tracking-body);
+}
+:global(:root[data-theme="night"]) .root { --tint: 34%; --shine: color-mix(in oklab, var(--arc-foreground) 22%, transparent); }
+
+.inner {
+  --gutter: var(--arc-space-6);
+  --label-w: 176px;
+  --plot-min: 320px;
+  display: grid;
+  min-width: 0;
+  gap: var(--arc-space-4);
+  padding-block: var(--arc-space-5);
+}
+
+/* Header: title, then one status line that counts while the run plays and settles into the summary. */
+.header { display: grid; min-width: 0; gap: 2px; padding-inline: var(--gutter); }
+.title { margin: 0; color: var(--arc-foreground); font-size: var(--arc-text-base); font-weight: 500; line-height: var(--arc-leading-body); letter-spacing: var(--arc-tracking-body); }
+.status { display: grid; min-width: 0; color: var(--arc-text-secondary); }
+.layer { grid-area: 1 / 1; min-width: 0; margin: 0; opacity: 0; visibility: hidden; transition: opacity 100ms var(--arc-ease-standard), visibility 0s linear 100ms; }
+.layer[data-on] { opacity: 1; visibility: visible; transition: opacity var(--arc-duration-fast) var(--arc-ease-enter), visibility 0s; }
+.word { display: inline-grid; color: var(--arc-foreground); }
+.part { color: var(--arc-foreground); white-space: nowrap; }
+.unit { color: var(--arc-text-secondary); }
+.wordItem { grid-area: 1 / 1; opacity: 0; transition: opacity 100ms var(--arc-ease-standard); }
+.wordItem[data-on] { opacity: 1; transition: opacity var(--arc-duration-fast) var(--arc-ease-enter); }
+.count { display: inline-grid; justify-items: end; font-variant-numeric: tabular-nums; white-space: nowrap; }
+.count > * { grid-area: 1 / 1; }
+.countSizer { visibility: hidden; }
+.countValue { color: var(--arc-foreground); }
+.sep { color: var(--arc-text-muted); }
+.tabular { font-variant-numeric: tabular-nums; }
+.doneIcon { display: inline-block; width: 16px; height: 16px; margin-right: 6px; color: var(--arc-success); vertical-align: -3px; }
+
+/* Body: a sticky label column and the plot. Below the plot's minimum width the body scrolls inside its own frame. */
+.scroller { min-width: 0; overflow-x: auto; overflow-y: hidden; overscroll-behavior-x: contain; scrollbar-width: thin; scrollbar-color: var(--arc-border-strong) transparent; }
+.body { display: grid; min-width: 0; grid-template-columns: var(--label-w) minmax(calc(var(--plot-min) + 12px + var(--gutter)), 1fr); }
+.labels { position: sticky; left: 0; z-index: 6; min-width: 0; padding: var(--pad) var(--arc-space-3) var(--axis-h) var(--gutter); background: var(--arc-surface); transition: box-shadow var(--arc-duration-fast) var(--arc-ease-standard); }
+.scroller[data-scrolled] .labels { box-shadow: 1px 0 0 var(--arc-border); }
+.label { display: grid; height: var(--row); min-width: 0; grid-template-columns: 8px minmax(0, 1fr); grid-template-areas: "dot name" ". model"; align-content: center; align-items: center; column-gap: 10px; }
+.labelText { display: contents; }
+.dot { grid-area: dot; width: 8px; height: 8px; flex: none; border-radius: 50%; background: var(--c); }
+.name { grid-area: name; overflow: hidden; color: var(--arc-foreground); font-weight: 500; text-overflow: ellipsis; white-space: nowrap; }
+.model { grid-area: model; display: flex; min-width: 0; align-items: center; gap: 5px; color: var(--arc-text-muted); font-size: var(--arc-text-xs); }
+.modelName { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.mark { display: inline-grid; width: 12px; height: 12px; flex: none; color: var(--arc-text-secondary); }
+.mark > svg { width: 100%; height: 100%; }
+
+.track { min-width: 0; padding: 0 var(--gutter) 0 12px; }
+.plot { position: relative; height: calc(var(--rows-h) + var(--axis-h)); }
+.grid { position: absolute; inset: 0 0 var(--axis-h); pointer-events: none; }
+.gridline { position: absolute; top: 0; bottom: 0; width: 1px; margin-left: -.5px; background: var(--arc-border-subtle); }
+
+/* Spans grow from their start with the clock: width follows --now, so a bar's leading edge moves every frame without React. */
+.row { position: absolute; left: 0; right: 0; z-index: 2; height: var(--row); pointer-events: none; }
+.span {
+  --fill: color-mix(in oklab, var(--c) var(--tint), var(--arc-surface));
+  position: absolute;
+  top: calc((var(--row) - var(--bar)) / 2);
+  left: calc(var(--s) / var(--axis) * 100% + .75px);
+  display: grid;
+  width: max(0px, calc(clamp(0, var(--now) - var(--s), var(--d)) / var(--axis) * 100% - 1.5px));
+  height: var(--bar);
+  place-items: center;
+  overflow: hidden;
+  padding: 0;
+  border: 0;
+  border-radius: 5px;
+  background: var(--fill);
+  color: var(--arc-surface);
+  cursor: pointer;
+  pointer-events: auto;
+  -webkit-tap-highlight-color: transparent;
+  transition: opacity var(--arc-duration-fast) var(--arc-ease-standard), background-color var(--arc-duration-fast) var(--arc-ease-standard), box-shadow var(--arc-duration-fast) var(--arc-ease-standard), border-radius var(--arc-duration-fast) var(--arc-ease-standard);
+}
+.span[data-kind="tool"] { --fill: var(--c); }
+.span[data-kind="waiting"] {
+  background: repeating-linear-gradient(-45deg, color-mix(in oklab, var(--c) 30%, transparent) 0 1px, transparent 1px 5px), color-mix(in oklab, var(--c) 5%, var(--arc-surface));
+  box-shadow: inset 0 0 0 1px color-mix(in oklab, var(--c) 24%, transparent);
+}
+/* While a span grows its leading edge is square and solid, so the edge reads as the moving front; it rounds off when the span ends. */
+.span[data-state="active"] { border-start-end-radius: 1.5px; border-end-end-radius: 1.5px; box-shadow: inset -2px 0 0 var(--c); }
+.span[data-kind="tool"][data-state="active"] { box-shadow: inset -2px 0 0 color-mix(in oklab, var(--c) 70%, var(--arc-foreground)); }
+.span[data-kind="waiting"][data-state="active"] { box-shadow: inset 0 0 0 1px color-mix(in oklab, var(--c) 24%, transparent), inset -2px 0 0 var(--c); }
+/* A short shine runs along a span while it works, then stops when the span ends. */
+.span[data-state="active"]:not([data-kind="waiting"])::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(90deg, transparent, var(--shine), transparent) no-repeat;
+  background-size: 28px 100%;
+  animation: shine 1.5s var(--arc-ease-in-out) infinite;
+}
+.span[data-failed] { background: color-mix(in oklab, var(--arc-danger) 14%, var(--arc-surface)); box-shadow: inset 0 0 0 1px color-mix(in oklab, var(--arc-danger) 55%, transparent); color: var(--arc-danger); }
+.span[data-dim] { opacity: .28; }
+.spanIcon { width: 11px; height: 11px; animation: appear var(--arc-duration-fast) var(--arc-ease-enter); }
+@media (hover: hover) and (pointer: fine) {
+  .span:hover { --fill: color-mix(in oklab, var(--c) calc(var(--tint) + 10%), var(--arc-surface)); }
+  .span[data-kind="tool"]:hover { --fill: color-mix(in oklab, var(--c) 86%, var(--arc-foreground)); }
+}
+
+/* Connectors: an elbow box with two borders and one rounded corner. They draw in from the side the handoff leaves. */
+.links, .ports { position: absolute; inset: 0; pointer-events: none; }
+.links { z-index: 1; }
+.ports { z-index: 3; }
+.link { position: absolute; box-sizing: border-box; border: 0 solid var(--c); transition: opacity var(--arc-duration-fast) var(--arc-ease-standard); }
+.link[data-shape="out"][data-dir="down"] { border-bottom-width: 1.5px; border-left-width: 1.5px; border-bottom-left-radius: 7px; }
+.link[data-shape="out"][data-dir="up"] { border-top-width: 1.5px; border-left-width: 1.5px; border-top-left-radius: 7px; }
+.link[data-shape="in"][data-dir="up"] { border-right-width: 1.5px; border-bottom-width: 1.5px; border-bottom-right-radius: 7px; }
+.link[data-shape="in"][data-dir="down"] { border-top-width: 1.5px; border-right-width: 1.5px; border-top-right-radius: 7px; }
+.link[data-shape="line"] { border-left-width: 1.5px; }
+.link[data-draw][data-dir="down"] { animation: draw-down 360ms var(--arc-ease-standard) backwards; }
+.link[data-draw][data-dir="up"] { animation: draw-up 360ms var(--arc-ease-standard) backwards; }
+.port { position: absolute; width: 7px; height: 7px; margin: -3.5px 0 0 -3.5px; border-radius: 50%; background: var(--c); box-shadow: 0 0 0 1.5px var(--arc-surface); transition: opacity var(--arc-duration-fast) var(--arc-ease-standard); }
+.port[data-draw] { animation: port-in var(--arc-duration-fast) var(--arc-ease-enter) var(--delay) backwards; }
+.plot[data-path] .link:not([data-hot]), .plot[data-path] .port:not([data-hot]) { opacity: .16; }
+
+.playhead { position: absolute; z-index: 4; top: 0; left: calc(min(var(--now), var(--axis)) / var(--axis) * 100%); width: 1px; height: var(--rows-h); margin-left: -.5px; background: var(--arc-foreground); opacity: .5; pointer-events: none; transition: opacity var(--arc-duration-standard) var(--arc-ease-standard); }
+.playhead[data-settled] { opacity: 0; }
+
+/* The axis is the scrubber: drag along it, or use the arrow keys, Page keys, Home and End. */
+.axis { position: absolute; z-index: 5; top: var(--rows-h); right: 0; left: 0; height: var(--axis-h); border-top: 1px solid var(--arc-border); cursor: ew-resize; touch-action: none; user-select: none; }
+.axis[data-live] { cursor: default; }
+.tick { position: absolute; top: 9px; color: var(--arc-text-muted); font-size: var(--arc-text-xs); font-variant-numeric: tabular-nums; line-height: 1; white-space: nowrap; transform: translateX(-50%); pointer-events: none; }
+.knob { position: absolute; top: -1px; left: calc(min(var(--now), var(--axis)) / var(--axis) * 100%); width: 9px; height: 9px; margin: -4.5px 0 0 -4.5px; border-radius: 50%; background: var(--arc-foreground); box-shadow: 0 0 0 2px var(--arc-surface); pointer-events: none; transition: transform var(--arc-duration-fast) var(--arc-ease-standard); }
+.knob:focus-visible { transform: scale(1.3); }
+.knob[data-active] { transform: scale(1.3); }
+@media (hover: hover) and (pointer: fine) { .axis:not([data-live]):hover .knob { transform: scale(1.3); } }
+
+/* Footer: playback controls and the legend. */
+.footer { display: flex; min-width: 0; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: var(--arc-space-3) var(--arc-space-4); padding-inline: var(--gutter); }
+.controls { display: flex; align-items: center; gap: 6px; }
+.controls .iconButton { width: var(--arc-control-height-sm); padding: 0; }
+.controls .iconButton svg { width: 16px; height: 16px; }
+.glyph { display: grid; width: 16px; height: 16px; }
+.glyph > svg { grid-area: 1 / 1; transition: opacity 100ms var(--arc-ease-standard); }
+.glyphPlay { translate: .5px 0; transition-duration: var(--arc-duration-fast); }
+.glyphPause { opacity: 0; }
+.glyph[data-playing] .glyphPlay { opacity: 0; transition-duration: 100ms; }
+.glyph[data-playing] .glyphPause { opacity: 1; transition-duration: var(--arc-duration-fast); }
+.legend { display: flex; flex-wrap: wrap; align-items: center; gap: 4px 14px; margin: 0; padding: 0; color: var(--arc-text-secondary); font-size: var(--arc-text-xs); list-style: none; }
+.legend li { display: inline-flex; align-items: center; gap: 6px; white-space: nowrap; }
+.swatch { --c: var(--arc-text-secondary); width: 14px; height: 8px; border-radius: 3px; }
+.swatch[data-kind="thinking"] { background: color-mix(in oklab, var(--c) 28%, var(--arc-surface)); }
+.swatch[data-kind="tool"] { background: var(--c); }
+.swatch[data-kind="waiting"] { background: repeating-linear-gradient(-45deg, color-mix(in oklab, var(--c) 40%, transparent) 0 1px, transparent 1px 4px); box-shadow: inset 0 0 0 1px color-mix(in oklab, var(--c) 30%, transparent); }
+.legendIcon, .legendFailed { width: 13px; height: 13px; }
+.legendIcon { color: var(--arc-text-muted); }
+.legendFailed { color: var(--arc-danger); }
+
+/* Span card: one floating layer that glides between spans. */
+.cardLayer { position: absolute; z-index: 20; top: 0; left: 0; width: min(280px, calc(100% - 16px)); pointer-events: none; }
+.card { position: relative; box-sizing: content-box; overflow: hidden; border: 1px solid var(--arc-border); border-radius: var(--arc-radius-control); background: var(--arc-surface-raised); box-shadow: var(--arc-shadow-floating); }
+.cardBody { display: grid; gap: 3px; padding: 12px 14px; }
+.cardHead { display: flex; min-width: 0; align-items: center; gap: 6px; margin: 0; font-size: var(--arc-text-xs); }
+.cardAgent { flex: none; color: var(--arc-foreground); font-weight: 500; }
+.cardModel { overflow: hidden; color: var(--arc-text-muted); text-overflow: ellipsis; white-space: nowrap; }
+.cardLabel { margin: 0; color: var(--arc-foreground); }
+.cardMeta { display: flex; flex-wrap: wrap; align-items: center; gap: 2px 6px; margin: 2px 0 0; color: var(--arc-text-secondary); font-size: var(--arc-text-xs); }
+.cardTool { display: inline-flex; align-items: center; gap: 5px; }
+.cardFailed, .cardNote { display: flex; align-items: flex-start; gap: 6px; margin: 2px 0 0; color: var(--arc-text-secondary); font-size: var(--arc-text-xs); }
+.cardFailed { color: var(--arc-danger); }
+.cardFailed svg, .cardNote svg { width: 13px; height: 13px; flex: none; margin-top: 1.5px; }
+
+.srOnly { position: absolute; width: 1px; height: 1px; overflow: hidden; clip-path: inset(50%); white-space: nowrap; }
+
+@keyframes shine { from { background-position: -28px 0; } 70%, to { background-position: calc(100% + 28px) 0; } }
+@keyframes draw-down { from { clip-path: inset(0 0 100% 0); } to { clip-path: inset(0); } }
+@keyframes draw-up { from { clip-path: inset(100% 0 0 0); } to { clip-path: inset(0); } }
+@keyframes port-in { from { opacity: 0; transform: scale(.4); } to { opacity: 1; transform: scale(1); } }
+@keyframes appear { from { opacity: 0; } to { opacity: 1; } }
+
+@container (max-width: 520px) {
+  .inner { --gutter: var(--arc-space-4); --label-w: 132px; --plot-min: 300px; }
+  .label { grid-template-areas: "dot name"; }
+  .model { display: none; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .span[data-state="active"]::after { display: none; }
+  .link[data-draw], .port[data-draw], .spanIcon { animation: none; }
+  .layer, .wordItem, .glyph > svg, .span, .playhead, .knob, .link, .port { transition: none; }
+}

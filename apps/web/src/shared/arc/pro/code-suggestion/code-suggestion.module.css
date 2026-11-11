@@ -1,0 +1,132 @@
+/* Code suggestion. A card (26px radius, 6px inset) holding a header, an editor panel (20px, concentric) and a footer.
+   Code rows are 20px on a 12.5px mono face; the gutter is 58px (number 40 + sign 18) and pins left when lines scroll. */
+.root {
+  --cs-mono: ui-monospace, "SFMono-Regular", "SF Mono", Menlo, Consolas, "Liberation Mono", monospace;
+  --cs-inset: 6px;
+  --cs-gutter: 58px;
+  --cs-add: color-mix(in oklab, var(--arc-success) 10%, var(--arc-background));
+  --cs-add-strong: color-mix(in oklab, var(--arc-success) 16%, var(--arc-background));
+  --cs-del: color-mix(in oklab, var(--arc-danger) 9%, var(--arc-background));
+  --cs-del-strong: color-mix(in oklab, var(--arc-danger) 15%, var(--arc-background));
+  container-type: inline-size;
+  position: relative;
+  box-sizing: border-box;
+  width: 100%;
+  max-width: 720px;
+  min-width: 0;
+  border: 1px solid var(--arc-border);
+  border-radius: var(--arc-radius-panel);
+  padding: var(--cs-inset);
+  background: var(--arc-surface);
+  color: var(--arc-foreground);
+  font-family: var(--arc-font-body);
+  font-size: var(--arc-text-sm);
+  letter-spacing: var(--arc-tracking-body);
+  line-height: var(--arc-leading-body);
+}
+.srOnly { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0, 0, 0, 0); white-space: nowrap; }
+
+/* Header: the model mark sits on the instruction's line; the model name sits under it in the same column. */
+.header { display: grid; grid-template-columns: 16px minmax(0, 1fr); column-gap: 10px; padding: 10px 12px 12px; }
+.modelMark { display: grid; width: 16px; height: 20px; place-items: center; color: var(--arc-foreground); }
+.modelMark svg { display: block; width: 16px; height: 16px; }
+.instruction { overflow: hidden; margin: 0; font-weight: 500; line-height: 20px; text-overflow: ellipsis; white-space: nowrap; }
+.model { grid-column: 2; margin: 0; color: var(--arc-text-muted); font-size: var(--arc-text-xs); line-height: 18px; }
+
+/* Editor panel. */
+.editor { overflow: hidden; border: 1px solid var(--arc-border); border-radius: calc(var(--arc-radius-panel) - var(--cs-inset)); background: var(--arc-background); }
+.tabs { display: flex; height: 38px; align-items: center; justify-content: space-between; gap: 12px; padding: 0 12px; border-bottom: 1px solid var(--arc-border-subtle); }
+.tab { display: inline-flex; min-width: 0; align-items: center; gap: 8px; font-size: var(--arc-text-xs); line-height: 18px; }
+.fileMark { display: grid; flex: none; place-items: center; }
+.fileMark svg { display: block; width: 14px; height: 14px; border-radius: 2px; }
+.fileName { overflow: hidden; color: var(--arc-foreground); text-overflow: ellipsis; white-space: nowrap; }
+.filePath { overflow: hidden; color: var(--arc-text-muted); text-overflow: ellipsis; white-space: nowrap; }
+.stats { display: inline-flex; flex: none; gap: 8px; font-family: var(--cs-mono); font-size: var(--arc-text-xs); font-variant-numeric: tabular-nums; letter-spacing: 0; }
+.statAdd, .statDel { min-width: 3ch; text-align: right; }
+.statAdd, .statDel { transition: color var(--arc-duration-fast, .16s) var(--arc-ease-standard); }
+.statAdd { color: var(--arc-success); }
+.statDel { color: var(--arc-danger); }
+.statAdd[data-zero], .statDel[data-zero] { color: var(--arc-text-muted); }
+
+.code { overflow-x: auto; overscroll-behavior-x: contain; padding: 6px 0; scrollbar-width: thin; --focus-outline-offset: -2px; border-radius: 0 0 calc(var(--arc-radius-panel) - var(--cs-inset) - 1px) calc(var(--arc-radius-panel) - var(--cs-inset) - 1px); }
+.lines { width: max-content; min-width: 100%; font-family: var(--cs-mono); font-size: 12.5px; letter-spacing: 0; line-height: 20px; }
+
+.row { --row-bg: var(--arc-background); --sign-bg: var(--arc-background); display: flex; overflow: hidden; background: var(--row-bg); white-space: pre; transition: background-color var(--arc-duration-standard, .24s) var(--arc-ease-standard); }
+.row[data-kind="del"][data-decision="pending"] { --row-bg: var(--cs-del); --sign-bg: var(--cs-del-strong); }
+.row[data-kind="add"][data-decision="pending"] { --row-bg: var(--cs-add); --sign-bg: var(--cs-add-strong); }
+.gutter { position: sticky; left: 0; z-index: 1; display: grid; flex: none; width: var(--cs-gutter); height: 20px; grid-template-columns: 40px 18px; background: var(--sign-bg); transition: background-color var(--arc-duration-standard, .24s) var(--arc-ease-standard); }
+.num { padding-right: 10px; color: var(--arc-text-muted); font-variant-numeric: tabular-nums; text-align: right; opacity: .8; }
+.sign { color: var(--arc-text-muted); text-align: center; transition: opacity var(--arc-duration-fast, .16s) var(--arc-ease-standard); }
+.row[data-kind="add"] .sign { color: var(--arc-success); }
+.row[data-kind="del"] .sign { color: var(--arc-danger); }
+.row[data-decision="accepted"] .sign, .row[data-decision="rejected"] .sign { opacity: 0; }
+.text { display: block; flex: none; height: 20px; padding-right: 20px; color: var(--arc-foreground); }
+.row[data-kind="del"][data-decision="pending"] .text { color: var(--arc-text-secondary); }
+
+/* Syntax: categorical series mixed toward the text color so they stay calm on both themes. */
+.tKeyword { color: color-mix(in oklab, var(--arc-series-2) 78%, var(--arc-foreground)); }
+.tString { color: color-mix(in oklab, var(--arc-series-3) 70%, var(--arc-foreground)); }
+.tNumber { color: color-mix(in oklab, var(--arc-series-1) 70%, var(--arc-foreground)); }
+.tFunction { color: color-mix(in oklab, var(--arc-series-1) 82%, var(--arc-foreground)); }
+.tType { color: color-mix(in oklab, var(--arc-series-1) 45%, var(--arc-foreground)); }
+.tPunct { color: var(--arc-text-secondary); }
+.tComment { color: var(--arc-text-muted); }
+.row[data-kind="del"][data-decision="pending"] .text span { color: inherit; }
+
+/* Review bar under each pending change. It spans the visible width, not the scrolled width, so its buttons stay put. */
+.barRow { overflow: hidden; }
+.bar { position: sticky; left: 0; display: flex; box-sizing: border-box; width: var(--cs-viewport, 100%); height: 40px; align-items: center; justify-content: space-between; gap: 12px; padding: 0 8px 0 var(--cs-gutter); font-family: var(--arc-font-body); letter-spacing: var(--arc-tracking-body); white-space: nowrap; }
+.barSummary { min-width: 0; overflow: hidden; color: var(--arc-text-secondary); font-size: var(--arc-text-xs); line-height: 18px; text-overflow: ellipsis; }
+.barActions { display: inline-flex; flex: none; align-items: center; gap: 4px; }
+.hunkButton.hunkButton { min-height: 28px; height: 28px; padding-inline: 11px; border-radius: 10px; font-size: var(--arc-text-xs); }
+.reject.reject { color: var(--arc-text-secondary); }
+
+/* Accept takes the accent everywhere; the autoplay press borrows the active look for a beat. */
+.accept.accept { border-color: var(--arc-accent); background: var(--arc-accent); color: var(--arc-accent-foreground); }
+.accept.accept[data-pressing] { opacity: .84; }
+.reject.reject[data-pressing] { background: var(--arc-surface-muted); color: var(--arc-foreground); }
+
+/* Footer: status on the left, actions on the right. Icon, label and actions each crossfade inside a one cell grid
+   (old and new share the cell), so a swap never reflows the row. */
+.footer { display: grid; min-height: 48px; grid-template-columns: minmax(0, 1fr) auto; align-items: center; gap: 12px; padding: 6px 0 0 12px; }
+.status { display: flex; min-width: 0; align-items: center; gap: 8px; color: var(--arc-text-secondary); line-height: 20px; }
+.statusIcon, .statusLabel, .actionsSlot { display: grid; }
+.statusIcon > *, .statusLabel > *, .actionsSlot > * { grid-area: 1 / 1; }
+.statusIcon { flex: none; width: 16px; height: 16px; }
+.statusIcon > * { display: grid; place-items: center; }
+.statusLabel { flex: 1; min-width: 0; }
+.statusLabel > * { min-width: 0; }
+.statusIcon > [data-tone="busy"], .statusIcon > [data-tone="muted"] { color: var(--arc-text-muted); }
+.statusIcon > [data-tone="review"] { color: var(--arc-accent); }
+.statusIcon > [data-tone="done"] { color: var(--arc-success); }
+.statusIcon > [data-tone="error"] { color: var(--arc-danger); }
+.statusLabel > [data-tone="error"] { color: var(--arc-foreground); }
+.statusText { display: block; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.actionsSlot { min-height: 36px; align-items: center; justify-items: end; }
+.actions { display: inline-flex; align-items: center; gap: 6px; }
+.footButton.footButton { min-height: 36px; height: 36px; gap: 6px; padding-inline: 14px; border-radius: 14px; font-size: var(--arc-text-sm); }
+.shortcut { margin-left: 2px; font-size: var(--arc-text-xs); letter-spacing: 0; opacity: .7; }
+
+.spinner { animation: cs-spin .8s linear infinite; }
+@keyframes cs-spin { to { transform: rotate(360deg); } }
+
+@container (max-width: 520px) {
+  .filePath { display: none; }
+}
+@container (max-width: 440px) {
+  .root { --cs-gutter: 46px; }
+  .gutter { grid-template-columns: 30px 16px; }
+  .num { padding-right: 8px; }
+  .lines { font-size: 12px; }
+  .footer { grid-template-columns: minmax(0, 1fr); gap: 8px; padding-right: 0; }
+  .actionsSlot { justify-items: stretch; }
+  .actions { display: flex; }
+  .actions > * { flex: 1; }
+  .barSummary { display: none; }
+  .bar { justify-content: flex-end; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .spinner { animation-duration: 2.4s; }
+  .row, .gutter, .sign { transition: none; }
+}

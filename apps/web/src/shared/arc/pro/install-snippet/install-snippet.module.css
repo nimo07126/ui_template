@@ -1,0 +1,149 @@
+/* Install snippet. One card: header, framework tabs, three numbered steps with code blocks.
+   Type: 16px title, 14px step text and tabs, 13px mono for code, file names and meta.
+   Geometry: steps sit on a 24px number column with a 12px gap; code lines are 20px and every block reserves the height of
+   its longest snippet, so switching frameworks never moves anything. */
+.root {
+  --is-mono: ui-monospace, "SFMono-Regular", "SF Mono", Menlo, Consolas, "Liberation Mono", monospace;
+  --is-line: 20px;
+  --is-pad-y: 12px;
+  --is-pad: 20px;
+  --is-kw: color-mix(in oklab, var(--arc-series-2) 78%, var(--arc-foreground));
+  --is-str: color-mix(in oklab, var(--arc-series-4) 80%, var(--arc-foreground));
+  --is-fn: color-mix(in oklab, var(--arc-series-1) 82%, var(--arc-foreground));
+  --is-attr: color-mix(in oklab, var(--arc-series-3) 72%, var(--arc-foreground));
+  container-type: inline-size;
+  box-sizing: border-box;
+  width: 100%;
+  max-width: 640px;
+  min-width: 0;
+  border: 1px solid var(--arc-border);
+  border-radius: var(--arc-radius-panel);
+  background: var(--arc-surface);
+  color: var(--arc-foreground);
+  font-family: var(--arc-font-body);
+  font-size: var(--arc-text-sm);
+  letter-spacing: var(--arc-tracking-body);
+  line-height: var(--arc-leading-body);
+}
+.root *, .root *::before, .root *::after { box-sizing: border-box; }
+.srOnly { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0, 0, 0, 0); white-space: nowrap; }
+
+/* Header */
+.header { display: flex; align-items: flex-start; justify-content: space-between; gap: 16px; padding: var(--is-pad) var(--is-pad) 16px; }
+.headerText { min-width: 0; }
+.title { margin: 0; font-family: var(--arc-font-body); font-size: var(--arc-text-base); font-weight: 500; line-height: 24px; letter-spacing: var(--arc-tracking-body); }
+.subtitle { margin: 0; color: var(--arc-text-secondary); font-size: var(--arc-text-sm); line-height: 20px; }
+.version { flex: none; color: var(--arc-text-muted); font-family: var(--is-mono); font-size: 13px; line-height: 24px; letter-spacing: 0; }
+
+/* Framework tabs: a muted track with a raised highlight that slides between equal columns. */
+.tabsWrap { padding: 0 var(--is-pad); }
+.tabs { position: relative; display: grid; padding: 3px; border-radius: 14px; background: var(--arc-surface-muted); }
+.indicator { position: absolute; top: 3px; bottom: 3px; left: 0; border-radius: 11px; background: var(--arc-surface-raised); box-shadow: 0 0 0 1px var(--arc-border); pointer-events: none; }
+.tab {
+  position: relative; z-index: 1; display: inline-flex; min-width: 0; height: 34px; align-items: center; justify-content: center; gap: 8px;
+  margin: 0; border: 0; border-radius: 11px; padding: 0 8px; background: transparent; color: var(--arc-text-secondary);
+  font: inherit; font-size: var(--arc-text-sm); line-height: 20px; cursor: pointer; -webkit-tap-highlight-color: transparent;
+  transition: color var(--arc-duration-fast) var(--arc-ease-standard);
+}
+.tab svg { flex: none; }
+.tabLabel { min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.tab[data-selected] { color: var(--arc-foreground); }
+.tab:active:not([data-selected]) { color: var(--arc-foreground); }
+@media (hover: hover) and (pointer: fine) { .tab:hover { color: var(--arc-foreground); } }
+
+/* Steps */
+.steps { display: grid; gap: 20px; margin: 0; padding: var(--is-pad); list-style: none; }
+.step { position: relative; display: grid; grid-template-columns: 24px minmax(0, 1fr); column-gap: 12px; min-width: 0; }
+/* The connector runs from under one number to just above the next, with 6px of air at each end. */
+.step:not(:last-child)::before { content: ""; position: absolute; top: 28px; bottom: -14px; left: 11.5px; width: 1px; background: var(--arc-border); }
+.circle {
+  position: relative; display: grid; width: 24px; height: 24px; margin-top: -2px; place-items: center;
+  border: 1px solid var(--arc-border); border-radius: 50%; background: var(--arc-surface); color: var(--arc-text-secondary);
+  font-size: 13px; font-variant-numeric: tabular-nums; line-height: 1;
+  transition: color var(--arc-duration-standard) var(--arc-ease-standard), border-color var(--arc-duration-standard) var(--arc-ease-standard), background-color var(--arc-duration-standard) var(--arc-ease-standard);
+}
+.circle[data-done] { border-color: color-mix(in oklab, var(--arc-accent) 45%, var(--arc-border)); background: color-mix(in oklab, var(--arc-accent) 10%, var(--arc-surface)); color: var(--arc-accent); }
+.circleSwap { width: 100%; height: 100%; }
+.circleSwap > * { display: grid; place-items: center; }
+.circleSwap svg { display: block; }
+
+.stepMain { min-width: 0; }
+.stepHead { display: flex; min-height: 40px; align-items: center; justify-content: space-between; gap: 12px; }
+.stepText { display: grid; min-width: 0; align-self: flex-start; }
+.stepTitle { margin: 0; font-family: var(--arc-font-body); font-size: var(--arc-text-sm); font-weight: 500; line-height: 20px; letter-spacing: var(--arc-tracking-body); }
+.stepDesc { min-width: 0; color: var(--arc-text-secondary); font-size: var(--arc-text-sm); line-height: 20px; }
+.stepDescItem { min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.descError { display: inline-flex; align-items: center; gap: 6px; color: var(--arc-text-secondary); }
+.descError svg { flex: none; color: var(--arc-danger); }
+.generate { flex: none; }
+
+/* Swap: old and new share one grid cell while they crossfade. */
+.swap { display: grid; min-width: 0; }
+.swapItem { grid-area: 1 / 1; min-width: 0; }
+
+/* Code blocks */
+.code { margin-top: 12px; overflow: hidden; border: 1px solid var(--arc-border); border-radius: 14px; background: color-mix(in oklab, var(--arc-surface-muted) 55%, var(--arc-surface)); }
+.codeHead { display: flex; height: 40px; align-items: center; justify-content: space-between; gap: 8px; padding: 0 4px 0 14px; border-bottom: 1px solid var(--arc-border-subtle); }
+.codeHeadMain { display: flex; min-width: 0; flex: 1; align-items: center; }
+.headSwap { width: 100%; align-items: center; }
+.headSwap > * { display: flex; align-items: center; }
+.file { overflow: hidden; color: var(--arc-text-secondary); font-family: var(--is-mono); font-size: 13px; line-height: 20px; letter-spacing: 0; text-overflow: ellipsis; white-space: nowrap; }
+.copy { flex: none; }
+
+.codeBody { display: grid; min-width: 0; }
+.layers { min-width: 0; }
+.layer { min-width: 0; overflow-x: auto; overscroll-behavior-x: contain; scrollbar-width: thin; }
+.pre { margin: 0; padding: var(--is-pad-y) 14px; color: var(--arc-foreground); font-family: var(--is-mono); font-size: 13px; line-height: var(--is-line); letter-spacing: 0; tab-size: 2; white-space: pre; }
+.pre code { font: inherit; }
+.line { display: block; min-height: var(--is-line); }
+.ln { display: inline-block; width: 2ch; margin-right: 16px; color: var(--arc-text-muted); text-align: right; user-select: none; }
+
+/* Syntax colors: categorical series, softened toward the foreground so they read in light and dark. */
+.kw { color: var(--is-kw); }
+.str { color: var(--is-str); }
+.fn { color: var(--is-fn); }
+.tag { color: var(--is-kw); }
+.attr { color: var(--is-attr); }
+.num { color: var(--is-attr); }
+.cm { color: var(--arc-text-muted); }
+.punct { color: var(--arc-text-secondary); }
+
+/* Key slot: a tinted fill-in until there is a key. The tint spreads 2px with a box shadow so it never takes layout. */
+.keySlot {
+  --is-tint: color-mix(in oklab, var(--arc-accent) 13%, transparent);
+  position: relative; display: inline-block; height: var(--is-line); overflow: hidden; vertical-align: top;
+  border-radius: 3px; background: var(--is-tint); box-shadow: 0 0 0 2px var(--is-tint); color: var(--arc-accent);
+  transition: background-color 900ms var(--arc-ease-standard), box-shadow 900ms var(--arc-ease-standard), color var(--arc-duration-standard) var(--arc-ease-standard);
+}
+.keySlot[data-filled] { --is-tint: transparent; color: var(--is-str); }
+.keySlot[data-fresh] { --is-tint: color-mix(in oklab, var(--arc-accent) 16%, transparent); transition-duration: 160ms; }
+.keyText { position: absolute; top: 0; left: 0; white-space: pre; }
+
+/* Package manager tabs inside the install block header. */
+.pmTabs { position: relative; display: flex; gap: 2px; margin-left: -8px; }
+.pmIndicator { position: absolute; top: 0; bottom: 0; left: 0; border-radius: 8px; background: color-mix(in oklab, var(--arc-foreground) 7%, transparent); pointer-events: none; }
+.pmTab {
+  position: relative; z-index: 1; display: inline-flex; height: 28px; align-items: center; gap: 6px; margin: 0; border: 0; border-radius: 8px;
+  padding: 0 8px; background: transparent; color: var(--arc-text-muted); font: inherit; font-size: 13px; line-height: 20px; cursor: pointer;
+  -webkit-tap-highlight-color: transparent; transition: color var(--arc-duration-fast) var(--arc-ease-standard);
+}
+.pmTab svg { flex: none; }
+.pmTab[data-selected] { color: var(--arc-foreground); }
+.pmTab:active:not([data-selected]) { color: var(--arc-text-secondary); }
+@media (hover: hover) and (pointer: fine) { .pmTab:hover:not([data-selected]) { color: var(--arc-text-secondary); } }
+
+/* Narrow cards: tighter padding, package managers as marks only, framework tabs keep their names. */
+@container (max-width: 460px) {
+  .header, .tabsWrap, .steps { --is-pad: 16px; }
+  .step { grid-template-columns: 24px minmax(0, 1fr); column-gap: 10px; }
+  .pmLabel { display: none; }
+  .pmTab { padding: 0 9px; }
+  .tab { gap: 6px; padding: 0 6px; }
+  .pre { padding-inline: 12px; }
+  .codeHead { padding-left: 12px; }
+  .ln { margin-right: 12px; }
+}
+@container (max-width: 380px) {
+  .tab svg { display: none; }
+  .version { display: none; }
+}

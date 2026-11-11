@@ -1,0 +1,41 @@
+.figure { position: relative; display: grid; min-width: 0; gap: var(--arc-space-3); margin: 0; color: var(--arc-foreground); font-family: var(--arc-font-body); letter-spacing: var(--arc-tracking-body); }
+
+/* Series colors (--arc-series-1 to --arc-series-4) come from registry/foundation.css. */
+
+.head { display: flex; min-width: 0; align-items: flex-end; justify-content: space-between; gap: var(--arc-space-3); }
+.now { display: flex; min-width: 0; align-items: baseline; gap: 6px; margin: 0; }
+/* The current value rolls on a spring; tabular figures keep the unit still while digits change. */
+.value { font-family: var(--arc-font-display); font-size: var(--arc-text-4xl); font-weight: 400; letter-spacing: var(--arc-tracking-display); line-height: 1; font-variant-numeric: tabular-nums; }
+.unit { color: var(--arc-text-muted); font-size: var(--arc-text-base); }
+
+.status { display: inline-flex; min-height: 32px; flex: none; align-items: center; gap: 8px; padding: 0 12px 0 10px; border: 1px solid var(--arc-border); border-radius: var(--arc-radius-pill); background: var(--arc-surface); color: var(--arc-text-secondary); cursor: pointer; font: inherit; font-size: var(--arc-text-sm); font-variant-numeric: tabular-nums; -webkit-tap-highlight-color: transparent; transition: color var(--arc-duration-fast) var(--arc-ease-standard), background-color var(--arc-duration-fast) var(--arc-ease-standard), transform var(--arc-duration-instant) var(--arc-ease-standard); }
+.status:active { transform: scale(.97); }
+@media (hover: hover) and (pointer: fine) { .status:hover { color: var(--arc-foreground); background: var(--arc-surface-muted); } }
+/* Live is a filled dot; paused is two bars. Shape carries the state, not colour alone. */
+.statusDot { position: relative; width: 8px; height: 8px; border-radius: 50%; background: var(--arc-accent); transition: border-radius var(--arc-duration-standard) var(--arc-ease-standard), background-color var(--arc-duration-standard) var(--arc-ease-standard), scale var(--arc-duration-spring) var(--arc-ease-spring); }
+.status[data-held] .statusDot { border-radius: 1px; background: transparent; box-shadow: inset 3px 0 0 var(--arc-text-secondary), inset -3px 0 0 var(--arc-text-secondary); scale: .9; }
+.statusText { display: inline-flex; overflow: hidden; white-space: nowrap; }
+.statusLabel { flex: none; white-space: nowrap; }
+
+.plot { position: relative; min-width: 0; outline: none; touch-action: pan-y; user-select: none; -webkit-user-select: none; -webkit-tap-highlight-color: transparent; cursor: crosshair; }
+.canvas { position: absolute; inset: 0; width: 100%; }
+.probe { position: absolute; width: 0; height: 0; overflow: hidden; }
+.probe > :nth-child(1) { color: var(--arc-foreground); }
+/* The line and its dots wear the first series; anomalies wear the second, so they stand apart from the data in both themes. */
+.probe > :nth-child(2) { color: var(--arc-series-1); }
+.probe > :nth-child(3) { color: var(--arc-surface); }
+.probe > :nth-child(4) { color: var(--arc-border); }
+.probe > :nth-child(5) { color: var(--arc-text-muted); }
+.probe > :nth-child(6) { color: var(--arc-series-2); }
+
+.tooltip { position: absolute; top: 0; left: 0; z-index: 2; display: grid; gap: 1px; padding: 8px 12px; border: 1px solid var(--arc-border); border-radius: 12px; background: var(--arc-surface-raised); box-shadow: var(--arc-shadow-floating); opacity: 0; pointer-events: none; scale: .96; transition: opacity var(--arc-duration-fast) var(--arc-ease-standard), scale var(--arc-duration-fast) var(--arc-ease-standard); }
+.plot[data-active] .tooltip { opacity: 1; scale: 1; }
+.tipValue { margin: 0; font-size: var(--arc-text-sm); font-weight: 500; line-height: 1.3; font-variant-numeric: tabular-nums; white-space: nowrap; }
+.tipMeta { margin: 0; color: var(--arc-text-muted); font-size: var(--arc-text-xs); line-height: 1.3; font-variant-numeric: tabular-nums; white-space: nowrap; }
+
+.message { position: absolute; inset: 0; display: grid; place-items: center; margin: 0; color: var(--arc-text-muted); font-size: var(--arc-text-sm); }
+.srOnly { position: absolute; width: 1px; height: 1px; overflow: hidden; clip-path: inset(50%); white-space: nowrap; }
+
+@media (prefers-reduced-motion: reduce) {
+  .status, .statusDot, .tooltip { transition: none; }
+}

@@ -1,0 +1,14 @@
+/* The demo surface: a question, the source cards with their answer, and a quiet note that says nothing real happened. */
+.panel { box-sizing: border-box; width: 100%; max-width: 720px; border: 1px solid var(--arc-border); border-radius: var(--arc-radius-panel, 26px); padding: 24px 24px 16px; background: var(--arc-surface); color: var(--arc-foreground); font-family: var(--arc-font-body); letter-spacing: var(--arc-tracking-body); }
+.questionBox { margin-bottom: 12px; }
+.question { display: grid; }
+.questionText { grid-area: 1 / 1; margin: 0; color: var(--arc-foreground); font-size: var(--arc-text-base); font-weight: 500; line-height: 24px; text-wrap: pretty; }
+.body { min-width: 0; }
+.answer { margin: 0; color: var(--arc-foreground); font-size: var(--arc-text-sm); line-height: 23px; text-wrap: pretty; }
+.chunk { animation: sc-chunk 140ms var(--arc-ease-standard) both; }
+@keyframes sc-chunk { from { opacity: 0; } to { opacity: 1; } }
+.code { border-radius: 5px; padding: 1px 5px; background: var(--arc-surface-muted); color: var(--arc-foreground); font-family: ui-monospace, "SFMono-Regular", Menlo, Consolas, monospace; font-size: .86em; letter-spacing: 0; }
+.note { display: grid; min-height: 18px; margin: 12px 0 0; color: var(--arc-text-muted); font-size: var(--arc-text-xs); line-height: 18px; }
+.noteText { grid-area: 1 / 1; }
+@media (max-width: 420px) { .panel { padding: 16px 16px 12px; } }
+@media (prefers-reduced-motion: reduce) { .chunk { animation: none; } }

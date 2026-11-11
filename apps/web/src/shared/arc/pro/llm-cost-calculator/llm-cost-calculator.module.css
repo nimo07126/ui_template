@@ -1,0 +1,136 @@
+/* LLM cost calculator. One panel: header with the selected model's monthly total, workload controls, a ranked list, a breakdown.
+   Type: 13px meta, 14px body and names, 28px total. Rows are absolutely placed and translate by whole row heights, so a re-rank is
+   pure transform and nothing reflows. The list bleeds 8px each side so row highlights get padding while text stays on the panel edge. */
+.root {
+  --row: 44px;
+  --gutter: 8px;
+  container-type: inline-size;
+  box-sizing: border-box;
+  display: grid;
+  gap: var(--arc-space-6, 1.5rem);
+  width: 100%;
+  max-width: 720px;
+  min-width: 0;
+  padding: clamp(16px, 5vw, 24px);
+  border: 1px solid var(--arc-border);
+  border-radius: var(--arc-radius-panel);
+  background: var(--arc-surface);
+  color: var(--arc-foreground);
+  font-family: var(--arc-font-body);
+  font-size: var(--arc-text-sm);
+  letter-spacing: var(--arc-tracking-body);
+  line-height: var(--arc-leading-body);
+}
+.srOnly { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0, 0, 0, 0); white-space: nowrap; }
+.num { font-variant-numeric: tabular-nums; white-space: nowrap; }
+.meta { margin: 0; color: var(--arc-text-muted); font-size: .8125rem; }
+
+/* Header: title and source on the left, the total on the right; the two meta lines share a baseline. */
+.header { display: flex; align-items: last baseline; justify-content: space-between; gap: var(--arc-space-4); min-width: 0; }
+.heading { display: grid; gap: 2px; min-width: 0; }
+.title { margin: 0; font-size: var(--arc-text-sm); font-weight: 500; line-height: var(--arc-leading-body); }
+.hero { display: grid; flex: none; justify-items: end; gap: 2px; }
+.total { font-size: var(--arc-text-2xl); font-weight: 400; line-height: var(--arc-leading-display); letter-spacing: -.02em; }
+.totalIdle { color: var(--arc-text-muted); }
+.heroMeta { color: var(--arc-text-muted); font-size: .8125rem; white-space: nowrap; }
+
+/* A text swap: both lines share one grid cell, so the outgoing one fades over the incoming one without moving anything. */
+.swap { display: inline-grid; justify-items: inherit; }
+.swapItem { grid-area: 1 / 1; }
+.hero .swap { justify-items: end; }
+
+.presets { justify-self: start; }
+
+.controls { display: grid; gap: var(--arc-space-4); }
+.sliders { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: var(--arc-space-2) var(--arc-space-6, 1.5rem); }
+.cache { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: var(--arc-space-2) var(--arc-space-4); min-height: var(--arc-control-height-sm); }
+
+.ranking { display: grid; gap: var(--arc-space-2); padding-top: var(--arc-space-4); border-top: 1px solid var(--arc-border-subtle); }
+.listHead { display: flex; justify-content: space-between; color: var(--arc-text-muted); font-size: .8125rem; }
+
+.stage { position: relative; height: calc(var(--row) * var(--slots, 8)); margin: 0 calc(var(--gutter) * -1); }
+.list { position: absolute; inset: 0; }
+.row {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  box-sizing: border-box;
+  display: grid;
+  grid-template-columns: 16px 16px minmax(0, 10.5rem) minmax(0, 1fr) 5.5rem;
+  grid-template-areas: "rank mark name track cost";
+  align-items: center;
+  column-gap: var(--arc-space-3);
+  height: var(--row);
+  padding: 0 var(--gutter);
+  border: 0;
+  border-radius: calc(var(--arc-radius-control) - 6px);
+  background: transparent;
+  color: inherit;
+  font: inherit;
+  text-align: left;
+  cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
+  transition: background-color var(--arc-duration-fast) var(--arc-ease-standard);
+}
+.row[data-on] { background: color-mix(in oklab, var(--arc-accent) 7%, transparent); }
+@media (hover: hover) and (pointer: fine) {
+  .row:not(.ghost):not([data-on]):hover { background: color-mix(in oklab, var(--arc-foreground) 4%, transparent); }
+  .row:not(.ghost):hover .bar { background: color-mix(in oklab, var(--arc-foreground) 34%, transparent); }
+  .row[data-on]:hover .bar { background: var(--arc-accent); }
+}
+.row:active:not(.ghost) { background: color-mix(in oklab, var(--arc-foreground) 6%, transparent); }
+.row[data-on]:active { background: color-mix(in oklab, var(--arc-accent) 10%, transparent); }
+.ghost { cursor: default; }
+
+.rank { grid-area: rank; color: var(--arc-text-muted); font-size: .8125rem; font-variant-numeric: tabular-nums; text-align: center; }
+/* Rank numbers stay put while rows glide past them, so a slot always reads its own place. */
+.rankSlot { position: absolute; top: 0; left: var(--gutter); z-index: 1; display: flex; align-items: center; justify-content: center; width: 16px; height: var(--row); color: var(--arc-text-muted); font-size: .8125rem; font-variant-numeric: tabular-nums; pointer-events: none; }
+.mark { grid-area: mark; display: flex; width: 16px; height: 16px; }
+.mark svg { display: block; width: 16px; height: 16px; }
+.name { grid-area: name; overflow: hidden; font-weight: 500; text-overflow: ellipsis; white-space: nowrap; }
+.track { grid-area: track; position: relative; height: 6px; overflow: hidden; border-radius: 999px; background: color-mix(in oklab, var(--arc-foreground) 6%, transparent); }
+.bar { display: block; height: 100%; border-radius: inherit; background: color-mix(in oklab, var(--arc-foreground) 24%, transparent); transition: background-color var(--arc-duration-fast) var(--arc-ease-standard); }
+.row[data-on] .bar { background: var(--arc-accent); }
+.cost { grid-area: cost; justify-self: end; text-align: right; }
+.row:not([data-on]) .cost { color: var(--arc-text-secondary); }
+
+/* Loading rows keep the list's exact geometry, so prices arriving never move anything. */
+.skeleton { display: block; border-radius: 6px; background: color-mix(in oklab, var(--arc-foreground) 8%, transparent); animation: pulse 1.2s var(--arc-ease-standard) infinite alternate; }
+.skeletonMark { grid-area: mark; width: 16px; height: 16px; border-radius: 999px; }
+.skeletonName { grid-area: name; height: 10px; }
+.skeletonCost { grid-area: cost; justify-self: end; width: 3.5rem; height: 10px; }
+.skeletonTotal { display: inline-block; width: 7.5rem; height: 1.375rem; border-radius: 8px; vertical-align: middle; }
+@keyframes pulse { from { opacity: .5; } to { opacity: 1; } }
+
+.message { position: absolute; inset: 0; display: grid; align-content: center; justify-items: center; gap: var(--arc-space-1); padding: 0 var(--arc-space-4); text-align: center; }
+.messageTitle { display: inline-flex; align-items: center; gap: var(--arc-space-2); font-weight: 500; }
+.messageIcon { flex: none; color: var(--arc-danger); }
+.retry { margin-top: var(--arc-space-2); }
+
+.footer { display: grid; gap: var(--arc-space-3); padding-top: var(--arc-space-4); border-top: 1px solid var(--arc-border-subtle); }
+.breakdown { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: var(--arc-space-3) var(--arc-space-4); margin: 0; }
+.stat { display: grid; gap: 2px; min-width: 0; }
+.stat dd { margin: 0; }
+.statEnd { text-align: right; }
+.note { display: grid; gap: 2px; margin: 0; color: var(--arc-text-secondary); font-size: .8125rem; }
+.note .swap { justify-items: start; }
+.fine { color: var(--arc-text-muted); }
+
+@container (max-width: 600px) {
+  .sliders { grid-template-columns: minmax(0, 1fr); }
+}
+@container (max-width: 520px) {
+  .stage { --row: 58px; }
+  .header { flex-direction: column; align-items: flex-start; gap: var(--arc-space-3); }
+  .hero { justify-items: start; }
+  .hero .swap { justify-items: start; }
+  .row { grid-template-columns: 16px 16px minmax(0, 1fr) auto; grid-template-areas: "rank mark name cost" ". . track track"; row-gap: var(--arc-space-2); align-content: center; }
+  .rankSlot { height: 44px; }
+  .breakdown { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .statEnd { text-align: left; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .skeleton { animation: none; opacity: .75; }
+}

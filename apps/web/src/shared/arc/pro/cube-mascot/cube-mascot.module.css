@@ -1,0 +1,76 @@
+.root {
+  /* Restyle by setting these on the root (or with the color and faceColor props). */
+  --cube-body: var(--arc-accent);
+  --cube-ink: var(--arc-accent-foreground);
+  /* Three lighting anchors derived from the body: the lit top, the face side at rest, the side in shade.
+     Faces turning between them are mixed in oklab. */
+  --cube-top: color-mix(in oklab, var(--cube-body), #fff 26%);
+  --cube-front: var(--cube-body);
+  --cube-side: color-mix(in oklab, var(--cube-body), #000 30%);
+  --cube-line: var(--arc-text-muted);
+  --cube-shadow: color-mix(in oklab, var(--arc-foreground) 9%, transparent);
+  --cube-sparkle: var(--cube-body);
+  position: relative;
+  display: inline-block;
+  flex: none;
+  line-height: 0;
+  vertical-align: middle;
+}
+
+:global(:root[data-theme="night"]) .root {
+  /* A light body on a dark page: keep the top near the body and push the shade further. */
+  --cube-top: color-mix(in oklab, var(--cube-body), #fff 14%);
+  --cube-front: color-mix(in oklab, var(--cube-body), #000 10%);
+  --cube-side: color-mix(in oklab, var(--cube-body), #000 42%);
+  --cube-shadow: color-mix(in oklab, #000 40%, transparent);
+}
+
+.svg {
+  display: block;
+  overflow: visible;
+}
+
+.under {
+  fill: var(--cube-front);
+}
+
+.fill {
+  fill: var(--cube-front);
+  stroke: none;
+}
+
+.shadow {
+  fill: var(--cube-shadow);
+}
+
+.eye {
+  fill: var(--cube-ink);
+}
+
+.stroke {
+  fill: none;
+  stroke: var(--cube-ink);
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+.line {
+  fill: none;
+  stroke: var(--cube-line);
+  stroke-width: 2.4;
+  stroke-linecap: round;
+}
+
+.spark {
+  fill: var(--cube-sparkle);
+}
+
+.live {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  margin: -1px;
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
+}

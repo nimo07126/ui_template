@@ -1,0 +1,65 @@
+/* Chrome-less on purpose: the popover, sheet, or card around it supplies the surface, border, and shadow. */
+.picker { --emoji-cell: 37px; position: relative; display: flex; flex-direction: column; width: var(--emoji-picker-width, 352px); max-width: 100%; height: var(--emoji-picker-height, 408px); min-height: 0; color: var(--arc-foreground); font-size: var(--arc-text-sm); line-height: var(--arc-leading-body); letter-spacing: var(--arc-tracking-body); }
+.emojiGlyph { font-family: "Apple Color Emoji", "Segoe UI Emoji", "Noto Color Emoji", "Twemoji Mozilla", sans-serif; font-style: normal; font-weight: 400; letter-spacing: 0; line-height: 1; }
+
+.header { position: relative; display: flex; gap: var(--arc-space-2); padding: var(--arc-space-3) var(--arc-space-3) var(--arc-space-2); }
+.search { display: flex; flex: 1 1 auto; min-width: 0; height: var(--arc-control-height-sm); align-items: center; gap: var(--arc-space-2); padding: 0 var(--arc-space-2) 0 var(--arc-space-3); border: 1px solid transparent; border-radius: var(--arc-radius-control); background: var(--arc-surface-muted); cursor: text; transition: border-color var(--arc-duration-fast) var(--arc-ease-standard), background-color var(--arc-duration-fast) var(--arc-ease-standard); }
+.search:focus-within { border-color: var(--arc-border-strong); background: var(--arc-surface); }
+.searchIcon { flex: 0 0 auto; color: var(--arc-text-muted); }
+.search input { width: 100%; min-width: 0; padding: 0; border: 0; outline: 0; background: transparent; color: var(--arc-foreground); font: inherit; }
+.search input::placeholder { color: var(--arc-text-muted); }
+.search input:focus-visible { outline: none; }
+.clear { display: inline-grid; flex: 0 0 auto; width: 24px; height: 24px; place-items: center; padding: 0; border: 0; border-radius: var(--arc-radius-pill); background: transparent; color: var(--arc-text-muted); cursor: pointer; -webkit-tap-highlight-color: transparent; }
+@media (hover: hover) and (pointer: fine) { .clear:hover { background: var(--arc-surface-muted); color: var(--arc-foreground); } }
+
+.toneButton { display: inline-grid; flex: 0 0 auto; width: var(--arc-control-height-sm); height: var(--arc-control-height-sm); place-items: center; padding: 0; border: 0; border-radius: var(--arc-radius-control); background: transparent; font-size: 20px; cursor: pointer; -webkit-tap-highlight-color: transparent; transition: background-color var(--arc-duration-fast) var(--arc-ease-standard); }
+@media (hover: hover) and (pointer: fine) { .toneButton:hover { background: var(--arc-surface-muted); } }
+.toneButton:active { background: var(--arc-surface-muted); }
+/* Covers the header row, unrolling leftward out of the tone button; the inset interpolates, so a quick close reverses mid-way. */
+.tones { position: absolute; top: var(--arc-space-3); right: var(--arc-space-3); left: var(--arc-space-3); z-index: 2; display: flex; height: var(--arc-control-height-sm); align-items: center; justify-content: space-between; padding: 0 2px; border-radius: var(--arc-radius-control); background: var(--arc-surface-muted); clip-path: inset(0 0 0 calc(100% - var(--arc-control-height-sm)) round var(--arc-radius-control)); opacity: 0; visibility: hidden; transition: clip-path var(--arc-duration-considered) var(--arc-ease-standard), opacity var(--arc-duration-fast) var(--arc-ease-standard) var(--arc-duration-instant), visibility 0s linear var(--arc-duration-considered); }
+.tones[data-open] { clip-path: inset(0 0 0 0 round var(--arc-radius-control)); opacity: 1; visibility: visible; transition: clip-path var(--arc-duration-considered) var(--arc-ease-standard), opacity var(--arc-duration-instant) var(--arc-ease-standard), visibility 0s; }
+.tone { display: inline-grid; width: 32px; height: 32px; place-items: center; padding: 0; border: 0; border-radius: var(--arc-radius-pill); background: transparent; font-size: 19px; cursor: pointer; -webkit-tap-highlight-color: transparent; transition: background-color var(--arc-duration-fast) var(--arc-ease-standard), transform var(--arc-duration-fast) var(--arc-ease-standard); }
+.tone[aria-checked="true"] { background: var(--arc-surface); box-shadow: 0 0 0 1px var(--arc-border); }
+@media (hover: hover) and (pointer: fine) { .tone:hover { background: var(--arc-surface); } }
+.tone:focus-visible { background: var(--arc-surface); }
+.tone:active { transform: scale(.92); }
+
+.tabs { position: relative; display: grid; grid-template-columns: repeat(var(--emoji-tabs, 9), minmax(0, 1fr)); flex: 0 0 auto; margin: 0 var(--arc-space-2); border-bottom: 1px solid var(--arc-border-subtle); }
+.tab { display: grid; height: 36px; place-items: center; padding: 0; border: 0; border-radius: 10px 10px 0 0; background: transparent; color: var(--arc-text-muted); cursor: pointer; -webkit-tap-highlight-color: transparent; transition: color var(--arc-duration-fast) var(--arc-ease-standard); }
+@media (hover: hover) and (pointer: fine) { .tab:hover { color: var(--arc-text-secondary); } }
+.tab:focus-visible { color: var(--arc-foreground); }
+.tab[data-current] { color: var(--arc-foreground); }
+/* One cell wide, so an x of 100% moves exactly one tab; the visible bar is centered inside it. */
+.indicator { position: absolute; bottom: -1px; left: 0; width: calc(100% / var(--emoji-tabs, 9)); height: 2px; pointer-events: none; }
+.indicator::after { content: ""; position: absolute; inset: 0 calc(50% - 9px); border-radius: var(--arc-radius-pill); background: var(--arc-accent); }
+
+.scroller { position: relative; flex: 1 1 auto; min-height: 0; padding: 0 var(--arc-space-2); overflow-x: hidden; overflow-y: auto; overscroll-behavior: contain; scrollbar-width: thin; scrollbar-color: var(--arc-border-strong) transparent; outline: none; }
+.scroller:focus-visible { outline: none; }
+.canvas { position: relative; width: 100%; }
+.sectionRow, .row { position: absolute; top: 0; left: 0; width: 100%; }
+.sectionRow { display: flex; align-items: flex-end; padding: 0 6px 4px; }
+.sectionLabel { color: var(--arc-text-muted); font-size: var(--arc-text-xs); font-weight: 500; }
+.row { display: grid; }
+.cell { display: grid; width: 100%; height: 100%; place-items: center; padding: 0; border: 0; border-radius: 10px; background: transparent; font-size: calc(var(--emoji-cell) * .6); cursor: pointer; -webkit-tap-highlight-color: transparent; }
+.cell[data-active] { background: var(--arc-surface-muted); }
+.cell .emojiGlyph { transition: transform var(--arc-duration-spring) var(--arc-ease-spring); }
+.cell:active .emojiGlyph { transform: scale(.84); transition-duration: var(--arc-duration-instant); }
+.empty { display: grid; height: 100%; place-content: center; gap: var(--arc-space-1); padding: var(--arc-space-6); text-align: center; }
+.emptyTitle { margin: 0; overflow-wrap: anywhere; color: var(--arc-foreground); font-weight: 500; }
+.emptyHint { margin: 0; color: var(--arc-text-muted); font-size: var(--arc-text-xs); }
+
+.preview { display: flex; flex: 0 0 auto; height: 52px; align-items: center; gap: var(--arc-space-3); padding: 0 var(--arc-space-4); border-top: 1px solid var(--arc-border-subtle); }
+.previewGlyph { display: inline-grid; flex: 0 0 auto; width: 28px; place-items: center; font-size: 26px; animation: emoji-picker-preview var(--arc-duration-spring) var(--arc-ease-spring) both; }
+.previewIdle { opacity: .45; filter: grayscale(1); animation: none; }
+.previewText { display: grid; min-width: 0; }
+.previewName { overflow: hidden; color: var(--arc-foreground); font-weight: 500; text-overflow: ellipsis; white-space: nowrap; }
+.previewKeywords { overflow: hidden; color: var(--arc-text-muted); font-size: var(--arc-text-xs); text-overflow: ellipsis; white-space: nowrap; }
+.previewHint { color: var(--arc-text-muted); }
+.srOnly { position: absolute; width: 1px; height: 1px; overflow: hidden; clip-path: inset(50%); white-space: nowrap; }
+@keyframes emoji-picker-preview { from { transform: scale(.82); } }
+
+@media (prefers-reduced-motion: reduce) {
+  .search, .toneButton, .tone, .tab, .cell .emojiGlyph { transition: none; }
+  .tones, .tones[data-open] { transition: none; }
+  .previewGlyph { animation: none; }
+}

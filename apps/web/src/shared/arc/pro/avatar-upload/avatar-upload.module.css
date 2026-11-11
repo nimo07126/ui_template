@@ -1,0 +1,99 @@
+.root { position: relative; width: 100%; min-width: 0; container-type: inline-size; color: var(--arc-foreground); font-size: var(--arc-text-sm); line-height: var(--arc-leading-body); letter-spacing: var(--arc-tracking-body); }
+.file { display: none; }
+/* The clip reaches 12px past the block, so the progress ring and its release are never cut while the height animates. */
+.autoHeight { margin: -12px; overflow: hidden; }
+.autoHeight > div { padding: 12px; }
+
+.layout { display: grid; grid-template-columns: auto minmax(0, 1fr); align-items: center; gap: var(--arc-space-5); }
+.layout[data-mode="crop"] { grid-template-columns: 248px minmax(0, 1fr); gap: var(--arc-space-6); }
+@container (max-width: 480px) { .layout[data-mode="crop"] { grid-template-columns: minmax(0, 1fr); gap: var(--arc-space-4); } }
+
+.stage { position: relative; display: grid; place-items: center; min-width: 0; border-radius: var(--arc-radius-panel); }
+.layout[data-mode="crop"] .stage { height: 248px; overflow: hidden; cursor: grab; touch-action: none; user-select: none; }
+.layout[data-mode="crop"] .stage:active { cursor: grabbing; }
+.stageBackdrop { position: absolute; inset: 0; border-radius: inherit; background: var(--arc-surface-muted); pointer-events: none; }
+
+.circle { position: relative; flex: 0 0 auto; border-radius: 50%; }
+.clip { position: absolute; inset: 0; overflow: hidden; border-radius: 50%; background: var(--arc-surface-muted); }
+/* A hairline keeps light photos from melting into the page; while cropping it marks the mask edge against the dimmed overflow. */
+.clip::after { position: absolute; z-index: 2; inset: 0; border-radius: inherit; box-shadow: inset 0 0 0 1px oklch(0% 0 0 / .08); content: ""; pointer-events: none; }
+.layout[data-mode="crop"] .clip::after { box-shadow: inset 0 0 0 1.5px oklch(100% 0 0 / .7), 0 0 0 1px oklch(0% 0 0 / .08); }
+.clip::before { position: absolute; z-index: 1; inset: 0; background: oklch(0% 0 0 / .3); content: ""; opacity: 0; pointer-events: none; transition: opacity var(--arc-duration-standard) var(--arc-ease-standard); }
+.circle[data-busy] .clip::before { opacity: 1; }
+.ghost, .cropImage { position: absolute; top: 50%; left: 50%; max-width: none; pointer-events: none; user-select: none; -webkit-user-drag: none; }
+.ghost { transition: opacity var(--arc-duration-standard) var(--arc-ease-standard); }
+.photo { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; pointer-events: none; user-select: none; }
+.initials { position: absolute; inset: 0; display: grid; place-items: center; color: var(--arc-text-secondary); font-weight: 500; letter-spacing: 0; }
+
+.hit { position: absolute; z-index: 3; inset: 0; display: grid; place-items: center; padding: 0; border: 0; border-radius: 50%; background: transparent; color: oklch(100% 0 0); cursor: pointer; }
+.hit::before { position: absolute; inset: 0; border-radius: inherit; background: oklch(0% 0 0 / .38); content: ""; opacity: 0; transition: opacity var(--arc-duration-fast) var(--arc-ease-standard); }
+.hitIcon { position: relative; display: grid; opacity: 0; transform: scale(.85); transition: opacity var(--arc-duration-fast) var(--arc-ease-standard), transform var(--arc-duration-spring) var(--arc-ease-spring); }
+@media (hover: hover) and (pointer: fine) { .hit:hover:not(:disabled)::before, .hit:hover:not(:disabled) .hitIcon { opacity: 1; transform: none; } }
+.hit:focus-visible::before, .hit:focus-visible .hitIcon, .root[data-dragging] .hit::before, .root[data-dragging] .hitIcon { opacity: 1; transform: none; }
+.hit:disabled { cursor: not-allowed; }
+/* Dropping a file: a dashed ring in the accent marks the avatar as the target. */
+.circle::after { position: absolute; inset: -6px; border: 1.5px dashed var(--arc-accent); border-radius: 50%; content: ""; opacity: 0; pointer-events: none; transform: scale(.94); transition: opacity var(--arc-duration-fast) var(--arc-ease-standard), transform var(--arc-duration-spring) var(--arc-ease-spring); }
+.root[data-dragging] .circle::after { opacity: 1; transform: none; }
+
+.ring { position: absolute; z-index: 4; inset: -6px; width: calc(100% + 12px); height: calc(100% + 12px); overflow: visible; pointer-events: none; rotate: -90deg; }
+.ring circle { fill: none; stroke-width: 2; vector-effect: non-scaling-stroke; }
+.ringTrack { stroke: var(--arc-border); }
+.ringValue { stroke: var(--arc-accent); stroke-linecap: round; transition: stroke var(--arc-duration-fast) var(--arc-ease-standard); }
+.ring[data-state="waiting"] { animation: avatar-upload-spin 1s linear infinite; }
+.ring[data-state="failed"] .ringValue { stroke: var(--arc-danger); }
+.ring[data-state="settle"] .ringValue { stroke: var(--arc-accent); }
+
+.side { display: grid; align-content: center; min-width: 0; }
+.sideContent { display: grid; min-width: 0; }
+.title { margin: 0; color: var(--arc-foreground); font-size: var(--arc-text-sm); font-weight: 500; }
+.hint { margin: var(--arc-space-1) 0 0; color: var(--arc-text-muted); font-size: var(--arc-text-xs); }
+.message { display: grid; min-height: calc(var(--arc-text-xs) * 1.4); margin-top: var(--arc-space-1); font-size: var(--arc-text-xs); }
+.messageText { display: flex; grid-area: 1 / 1; align-items: flex-start; gap: var(--arc-space-1); min-width: 0; margin: 0; color: var(--arc-text-muted); }
+.messageText > svg { flex: 0 0 auto; margin-top: 2px; }
+.messageText > span { min-width: 0; overflow-wrap: anywhere; }
+.messageText[data-tone="error"] { color: var(--arc-danger); }
+.messageText[data-tone="success"] { color: var(--arc-success); }
+.number { font-variant-numeric: tabular-nums; }
+
+.actions { display: flex; flex-wrap: wrap; align-items: center; gap: var(--arc-space-2); margin-top: var(--arc-space-3); }
+.outline, .solid, .ghostButton { display: inline-flex; height: var(--arc-control-height-sm); align-items: center; justify-content: center; padding: 0 var(--arc-space-4); border: 1px solid transparent; border-radius: var(--arc-radius-control); font: inherit; font-size: var(--arc-text-sm); font-weight: 500; white-space: nowrap; cursor: pointer; transition: background-color var(--arc-duration-fast) var(--arc-ease-standard), border-color var(--arc-duration-fast) var(--arc-ease-standard), color var(--arc-duration-fast) var(--arc-ease-standard), transform var(--arc-duration-spring) var(--arc-ease-spring); }
+.outline { border-color: var(--arc-border-strong); background: var(--arc-surface); color: var(--arc-foreground); }
+.solid { background: var(--arc-accent); color: var(--arc-accent-foreground); }
+.ghostButton { padding: 0 var(--arc-space-3); background: transparent; color: var(--arc-text-secondary); }
+@media (hover: hover) and (pointer: fine) {
+  .outline:hover:not(:disabled) { background: var(--arc-surface-muted); }
+  .solid:hover:not(:disabled) { background: var(--arc-accent-strong); }
+  .ghostButton:hover:not(:disabled) { background: var(--arc-surface-muted); color: var(--arc-foreground); }
+}
+.outline:active:not(:disabled), .solid:active:not(:disabled), .ghostButton:active:not(:disabled) { transform: scale(.97); transition-duration: var(--arc-duration-fast), var(--arc-duration-fast), var(--arc-duration-fast), 100ms; }
+:is(.outline, .solid, .ghostButton):disabled { cursor: not-allowed; opacity: .5; }
+/* Both labels share one cell, so Upload photo and Replace photo swap without the button changing width. */
+.stack { display: grid; justify-items: center; }
+.stack > span { grid-area: 1 / 1; }
+.sizer { visibility: hidden; }
+
+.zoom { display: flex; max-width: 280px; align-items: center; gap: var(--arc-space-2); margin-top: var(--arc-space-4); }
+.zoomButton { display: grid; width: 30px; height: 30px; flex: 0 0 auto; place-items: center; padding: 0; border: 0; border-radius: 10px; background: transparent; color: var(--arc-text-secondary); cursor: pointer; transition: background-color var(--arc-duration-fast) var(--arc-ease-standard), color var(--arc-duration-fast) var(--arc-ease-standard); }
+@media (hover: hover) and (pointer: fine) { .zoomButton:hover:not(:disabled) { background: var(--arc-surface-muted); color: var(--arc-foreground); } }
+.zoomButton:disabled { cursor: default; opacity: .4; }
+.range { --fill: 0%; flex: 1; min-width: 0; height: 22px; margin: 0; background: transparent; appearance: none; -webkit-appearance: none; cursor: pointer; }
+.range::-webkit-slider-runnable-track { height: 4px; border-radius: 2px; background: linear-gradient(to right, var(--arc-control-fill) var(--fill), var(--arc-control-track) var(--fill)); }
+.range::-moz-range-track { height: 4px; border-radius: 2px; background: linear-gradient(to right, var(--arc-control-fill) var(--fill), var(--arc-control-track) var(--fill)); }
+.range::-webkit-slider-thumb { width: 18px; height: 18px; margin-top: -7px; border: 0; border-radius: 50%; background: var(--arc-control-thumb); box-shadow: var(--arc-control-thumb-shadow); appearance: none; -webkit-appearance: none; transition: scale var(--arc-duration-fast) var(--arc-ease-standard); }
+.range::-moz-range-thumb { width: 18px; height: 18px; border: 0; border-radius: 50%; background: var(--arc-control-thumb); box-shadow: var(--arc-control-thumb-shadow); }
+.range:active::-webkit-slider-thumb { scale: 1.12; }
+
+.srOnly { position: absolute; width: 1px; height: 1px; overflow: hidden; clip-path: inset(50%); white-space: nowrap; }
+@keyframes avatar-upload-spin { to { transform: rotate(360deg); } }
+@media (prefers-reduced-motion: reduce) {
+  .clip::before, .ghost, .hit::before, .hitIcon, .circle::after, .ringValue, .outline, .solid, .ghostButton, .zoomButton { transition: none; }
+  .ring[data-state="waiting"] { animation-duration: 3s; }
+  .outline:active:not(:disabled), .solid:active:not(:disabled), .ghostButton:active:not(:disabled) { transform: none; }
+  .range::-webkit-slider-thumb { transition: none; }
+}
+/* Narrow cards: tighter spacing keeps Replace photo and Remove on one row beside the avatar. */
+@container (max-width: 400px) {
+  .layout[data-mode="idle"] { gap: var(--arc-space-4); }
+  .outline, .solid { padding: 0 var(--arc-space-3); }
+  .ghostButton { padding: 0 var(--arc-space-2); }
+}
