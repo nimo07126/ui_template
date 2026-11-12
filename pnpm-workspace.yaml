@@ -3,8 +3,14 @@ packages:
   - 'packages/*'
 allowBuilds:
   unrs-resolver: false
-# Keep Next's ambient React types bound to the Web app in this mixed RN workspace.
+# Bind packages that reference React declarations to their consumer's React types.
 packageExtensions:
+  framer-motion:
+    peerDependencies:
+      '@types/react': '*'
+    peerDependenciesMeta:
+      '@types/react':
+        optional: true
   next:
     peerDependencies:
       '@types/react': '*'

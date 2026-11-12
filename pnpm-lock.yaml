@@ -4,7 +4,7 @@ settings:
   autoInstallPeers: true
   excludeLinksFromLockfile: false
 
-packageExtensionsChecksum: sha256-VVg1VasBC3HByyU75ae/Td85SZtGC4jiKZghoge+BNQ=
+packageExtensionsChecksum: sha256-qLcY0EJUm59HDieZ57nbkCmrHp7YjkUaqGqJ2n5iK54=
 
 pnpmfileChecksum: sha256-1/5NXsWaXfoNbl/ME3ISIA/FHp9O5phvZTotY2NCO8Y=
 
@@ -170,7 +170,7 @@ importers:
         version: 1.61.0(@types/react@19.3.0)(react@19.3.1)
       motion:
         specifier: ^14.6.0
-        version: 14.6.0(react-dom@19.3.1(react@19.3.1))(react@19.3.1)
+        version: 14.6.0(@types/react@19.3.0)(react-dom@19.3.1(react@19.3.1))(react@19.3.1)
       next:
         specifier: ^16.0.0
         version: 16.4.2(@babel/core@7.29.7(supports-color@8.1.1))(@types/node@24.19.2)(@types/react-dom@19.3.0(@types/react@19.3.0))(@types/react@19.3.0)(babel-plugin-react-compiler@1.0.0)(react-dom@19.3.1(react@19.3.1))(react@19.3.1)
@@ -3322,9 +3322,12 @@ packages:
   framer-motion@14.6.0:
     resolution: {integrity: sha512-MzBgZxGgoHPfSLEXmo4o5XlZvb+nVRFdHtGjVhm6LMIEJKTt/8hNO023euL5mYyzc8llV/hQTfjnN68tNRHalw==}
     peerDependencies:
+      '@types/react': '*'
       react: ^18.0.0 || ^19.0.0
       react-dom: ^18.0.0 || ^19.0.0
     peerDependenciesMeta:
+      '@types/react':
+        optional: true
       react:
         optional: true
       react-dom:
@@ -9924,12 +9927,13 @@ snapshots:
 
   forwarded@0.2.0: {}
 
-  framer-motion@14.6.0(react-dom@19.3.1(react@19.3.1))(react@19.3.1):
+  framer-motion@14.6.0(@types/react@19.3.0)(react-dom@19.3.1(react@19.3.1))(react@19.3.1):
     dependencies:
       motion-dom: 14.6.0
       motion-utils: 14.6.0
       tslib: 2.8.1
     optionalDependencies:
+      '@types/react': 19.3.0
       react: 19.3.1
       react-dom: 19.3.1(react@19.3.1)
 
@@ -11026,13 +11030,15 @@ snapshots:
 
   motion-utils@14.6.0: {}
 
-  motion@14.6.0(react-dom@19.3.1(react@19.3.1))(react@19.3.1):
+  motion@14.6.0(@types/react@19.3.0)(react-dom@19.3.1(react@19.3.1))(react@19.3.1):
     dependencies:
-      framer-motion: 14.6.0(react-dom@19.3.1(react@19.3.1))(react@19.3.1)
+      framer-motion: 14.6.0(@types/react@19.3.0)(react-dom@19.3.1(react@19.3.1))(react@19.3.1)
       tslib: 2.8.1
     optionalDependencies:
       react: 19.3.1
       react-dom: 19.3.1(react@19.3.1)
+    transitivePeerDependencies:
+      - '@types/react'
 
   ms@2.0.0: {}
 
